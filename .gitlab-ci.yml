@@ -1,0 +1,17 @@
+# File: .gitlab-ci.yml
+variables:
+  IAC_REPO: "git@gitlab.nexdev.net:iac/core-ci.git"
+  EAC_REPO: "git@gitlab.nexdev.net:iac/eac.git"
+
+stages:
+  - trigger
+  - monitor
+
+include:
+  - local: '/templates/trigger-iac.yml'
+  - local: '/templates/trigger-eac.yml'
+  - local: '/templates/cross-repo-vars.yml'
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"

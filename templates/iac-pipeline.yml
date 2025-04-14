@@ -1,0 +1,32 @@
+# File: templates/iac-pipeline.yml
+.terraform:init:
+  image: hashicorp/terraform:1.6.0
+  before_script:
+    - terraform init -backend-config="bucket=${TF_STATE_BUCKET}" -backend-config="key=${TF_KEY}"
+
+vault:deploy:
+  extends: .terraform:init
+  stage: deploy
+  script:
+    - terraform apply -auto-approve -target=module.vault
+    - vault policy write admin ./vault/policies/admin.hcl
+  artifacts:
+    reports:
+      terraform: tfplan.json
+
+rancher:rbac:
+  extends: .terraform:init
+  stage: deploy
+  script:
+    - terraform apply -auto-approve -target=module.rancher
+  needs: ["vault:deploy"]
+
+output:vars:
+  stage: output
+  image: jq:latest
+  script:
+    - terraform output -json > outputs.json
+    - jq 'to_entries | map({key: .key, value: .value.value}) | from_entries' outputs.json > vars.json
+  artifacts:
+    reports:
+      dotenv: vars.json
