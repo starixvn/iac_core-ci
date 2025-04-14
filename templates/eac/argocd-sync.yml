@@ -1,0 +1,6 @@
+# templates/eac/argocd-sync.yml
+sync:argocd:
+  image: argoproj/argocd-cli:latest
+  script:
+    - argocd app sync $APP_NAME --server $ARGOCD_SERVER --prune --timeout 300
+    - argocd app wait $APP_NAME --health

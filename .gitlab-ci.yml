@@ -1,17 +1,20 @@
 # File: .gitlab-ci.yml
 variables:
-  IAC_REPO: "git@gitlab.nexdev.net:iac/core-ci.git"
-  EAC_REPO: "git@gitlab.nexdev.net:iac/eac.git"
+  #IAC_REPO: "git@gitlab.nexdev.net:iac/core-ci.git"
+  #EAC_REPO: "git@gitlab.nexdev.net:iac/eac.git"
+  IAC_REPO_ID: "3061"  # GitLab Project ID của IaC repo
+  EAC_REPO_ID: "3062"  # GitLab Project ID của EaC repo
 
 stages:
-  - trigger
-  - monitor
+  - triggers
+  - audit
 
 include:
-  - local: '/templates/trigger-iac.yml'
-  - local: '/templates/trigger-eac.yml'
-  - local: '/templates/cross-repo-vars.yml'
+  - local: '/templates/triggers/iac-trigger.yml'
+  - local: '/templates/triggers/eac-trigger.yml'
+  - local: '/templates/audit/pipeline-audit.yml'
 
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_TAG
