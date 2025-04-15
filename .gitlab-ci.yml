@@ -90,7 +90,7 @@ security_scan:
   allow_failure: true
   artifacts:
     reports:
-      security: gl-security-report.json
+      sast: gl-security-report.json
 
 notify_success:
   extends: .notify
