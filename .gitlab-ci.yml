@@ -30,7 +30,9 @@ build_templates:
     - yamllint -d relaxed templates/*.yml
     - shellcheck scripts/**/*.sh
   only:
-    - changes:
+    refs:
+      - main
+    changes:
       - templates/*.yml
       - scripts/**/*.sh
 
