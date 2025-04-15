@@ -1,8 +1,6 @@
-# Template Infrastructure as Code
+# IaC Base Template
 .iac_template:
-  image: 
-    name: hashicorp/terraform:1.5.0
-    entrypoint: [""]
+  image: hashicorp/terraform:${TERRAFORM_VERSION}
   before_script:
     - export TF_WORKSPACE=${ENVIRONMENT:-dev}
     - cd applications/${APP_NAME}
@@ -12,16 +10,15 @@
       - .terraform
   artifacts:
     paths:
-      - tfplan
+      - tfplan.json
     expire_in: 1 week
 
 validate_terraform:
   extends: .iac_template
   stage: validate
   script:
-    - terraform init -backend=false
-    - terraform validate
-    - terraform fmt -check -diff -no-color
+    - chmod +x ${CI_PROJECT_DIR}/.gitlab-ci/scripts/tf-helpers/validate.sh
+    - ${CI_PROJECT_DIR}/.gitlab-ci/scripts/tf-helpers/validate.sh ${APP_NAME}
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
@@ -32,6 +29,3 @@ plan_terraform:
     - terraform init -backend-config="../../environments/${ENVIRONMENT}/backend.hcl"
     - terraform plan -out=tfplan -var-file="../../environments/${ENVIRONMENT}/${APP_NAME}.tfvars"
     - terraform show -json tfplan > tfplan.json
-  artifacts:
-    reports:
-      terraform: tfplan.json
