@@ -20,7 +20,7 @@ iac-trigger:
   stage: deploy
   trigger:
     include:
-      - local: '.gitlab-ci/templates/iac-base.yml'
+      - local: 'templates/iac-base.yml'
     strategy: depend
 
 # =================
@@ -30,7 +30,7 @@ eac-trigger:
   stage: deploy
   trigger:
     include:
-      - local: '.gitlab-ci/templates/eac-base.yml'
+      - local: 'templates/eac-base.yml'
     strategy: depend
 
 # ================
@@ -40,5 +40,5 @@ notify:
   stage: notify
   trigger:
     include:
-      - local: '.gitlab-ci/templates/notify.yml'
+      - local: 'templates/notify.yml'
     strategy: depend
