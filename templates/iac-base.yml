@@ -1,35 +1,57 @@
 # IaC Base Template
-.iac_template:
-  image: hashicorp/terraform:light
+.iac_init: &iac_init
+  image: hashicorp/terraform:${TF_VERSION}
   before_script:
-    - chmod +x templates/scripts/tf-helpers/*.sh
+    - terraform --version
+    - terraform init -backend=false
   variables:
     TF_IN_AUTOMATION: "true"
-  stages:
-    - validate
-    - plan
-    - apply
+    TF_INPUT: "false"
 
-validate:
+.iac_validate:
+  <<: *iac_init
   stage: validate
   script:
-    - templates/scripts/tf-helpers/validate.sh $TARGET_ENV
-  only:
-    - merge_requests
-    - branches
+    - /scripts/tf-helpers/validate.sh
 
-plan:
-  stage: plan
+.iac_deploy:
+  <<: *iac_init
+  stage: deploy
   script:
-    - terraform init
-    - terraform plan -var-file=environments/$TARGET_ENV/${APP}.tfvars
-  only:
-    - merge_requests
-    - branches
+    - /scripts/tf-helpers/deploy.sh
+  dependencies: []
 
-apply:
-  stage: apply
-  script:
-    - templates/scripts/tf-helpers/deploy.sh $TARGET_ENV
-  only:
-    - main
+# .iac_template:
+#   image: hashicorp/terraform:light
+#   before_script:
+#     - chmod +x templates/scripts/tf-helpers/*.sh
+#   variables:
+#     TF_IN_AUTOMATION: "true"
+#   stages:
+#     - validate
+#     - plan
+#     - apply
+
+# validate:
+#   stage: validate
+#   script:
+#     - templates/scripts/tf-helpers/validate.sh $TARGET_ENV
+#   only:
+#     - merge_requests
+#     - branches
+
+# plan:
+#   stage: plan
+#   script:
+#     - terraform init
+#     - terraform plan -var-file=environments/$TARGET_ENV/${APP}.tfvars
+#   only:
+#     - merge_requests
+#     - branches
+
+# apply:
+#   stage: apply
+#   script:
+#     - templates/scripts/tf-helpers/deploy.sh $TARGET_ENV
+#   only:
+#     - main

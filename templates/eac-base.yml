@@ -1,24 +1,42 @@
 # Template Environment as Code
-.eac_template:
-  image: alpine:latest
+.eac_init: &eac_init
+  image: python:3.9
   before_script:
-    - apk add --no-cache ansible curl git bash
-    - chmod +x templates/scripts/ansible-helpers/*.sh
-  stages:
-    - lint
-    - deploy
+    - pip install ansible==${ANSIBLE_VERSION}
+    - ansible --version
 
-lint:
-  stage: lint
+.eac_lint:
+  <<: *eac_init
+  stage: validate
   script:
-    - templates/scripts/ansible-helpers/lint.sh
-  only:
-    - merge_requests
-    - branches
+    - /scripts/ansible-helpers/lint.sh
 
-deploy:
+.eac_sync:
+  <<: *eac_init
   stage: deploy
   script:
-    - templates/scripts/ansible-helpers/argocd-sync.sh $TARGET_APP
-  only:
-    - main
+    - /scripts/ansible-helpers/argocd-sync.sh
+
+# .eac_template:
+#   image: alpine:latest
+#   before_script:
+#     - apk add --no-cache ansible curl git bash
+#     - chmod +x templates/scripts/ansible-helpers/*.sh
+#   stages:
+#     - lint
+#     - deploy
+
+# lint:
+#   stage: lint
+#   script:
+#     - templates/scripts/ansible-helpers/lint.sh
+#   only:
+#     - merge_requests
+#     - branches
+
+# deploy:
+#   stage: deploy
+#   script:
+#     - templates/scripts/ansible-helpers/argocd-sync.sh $TARGET_APP
+#   only:
+#     - main
