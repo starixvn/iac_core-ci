@@ -1,0 +1,9 @@
+.notify:
+  stage: notify
+  script:
+    - |
+      MESSAGE="Pipeline ${CI_PIPELINE_ID} - ${CI_JOB_STATUS}"
+      curl -X POST -H "Content-Type: application/json" \
+        -d "{\"text\":\"${MESSAGE}\"}" \
+        ${SLACK_WEBHOOK_URL}
+  when: always

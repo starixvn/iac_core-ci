@@ -1,5 +1,0 @@
-# templates/eac/kube-bench.yml
-audit:k8s:
-  image: aquasec/kube-bench:latest
-  script:
-    - kube-bench --json | jq '.' > kube-bench.json

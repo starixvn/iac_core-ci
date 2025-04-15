@@ -1,0 +1,4 @@
+variables:
+  TF_CLI_ARGS: "-no-color"
+  ANSIBLE_FORCE_COLOR: "1"
+  ARGOCD_OPTS: "--grpc-web --insecure"

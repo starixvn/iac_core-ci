@@ -1,43 +1,8 @@
-# File: templates/triggers/eac-trigger.yml
-variables:
-  EAC_TRIGGER_TOKEN: $EAC_PIPELINE_TRIGGER_TOKEN  # Defined in GitLab CI/CD Variables
-  EAC_PROJECT_ID: "3062"  # GitLab Project ID của EaC repo
-  EAC_DEFAULT_BRANCH: "main"
+stages:
+  - deploy
 
-.eac_trigger: &eac_trigger
-  stage: triggers
-  image: curlimages/curl:latest
-  interruptible: true
-  rules:
-    - if: $CI_COMMIT_BRANCH =~ /^eac-/  # Trigger khi branch bắt đầu bằng 'eac-'
-    - if: $CI_COMMIT_MESSAGE =~ /\[trigger eac\]/  # Hoặc commit message có tag
-    - if: $CI_PIPELINE_SOURCE == "schedule" && $SCHEDULE_JOB == "SYNC_EAC"  # Hoặc schedule
-
-trigger:eac:basic:
-  <<: *eac_trigger
+argocd-deploy:
+  image: alpine/k8s:1.20.4
   script:
-    - |
-      curl -X POST \
-        -H "PRIVATE-TOKEN: ${EAC_TRIGGER_TOKEN}" \
-        -F "ref=${EAC_DEFAULT_BRANCH}" \
-        -F "variables[TRIGGER_SOURCE]=${CI_PROJECT_NAME}" \
-        -F "variables[TF_OUTPUTS_REF]=${TF_OUTPUTS_REF}" \  # Tham chiếu artifacts từ IaC
-        "${CI_API_V4_URL}/projects/${EAC_PROJECT_ID}/trigger/pipeline"
-  tags:
-    - core-trigger
-
-trigger:eac:custom:
-  <<: *eac_trigger
-  variables:
-    EAC_CUSTOM_BRANCH: $CUSTOM_EAC_BRANCH  # Cho phép override branch
-  script:
-    - |
-      curl -X POST \
-        -H "PRIVATE-TOKEN: ${EAC_TRIGGER_TOKEN}" \
-        -F "ref=${EAC_CUSTOM_BRANCH:-$EAC_DEFAULT_BRANCH}" \
-        -F "variables[ENVIRONMENT_OVERRIDE]=${ENV}" \
-        "${CI_API_V4_URL}/projects/${EAC_PROJECT_ID}/trigger/pipeline"
-  rules:
-    - if: $CUSTOM_EAC_BRANCH  # Chỉ chạy khi có biến custom branch
-  tags:
-    - core-trigger
+    - chmod +x ./scripts/argocd-sync.sh
+    - ./scripts/argocd-sync.sh

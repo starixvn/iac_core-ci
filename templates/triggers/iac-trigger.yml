@@ -1,72 +1,23 @@
 # File: templates/triggers/iac-trigger.yml
-variables:
-  IAC_TRIGGER_TOKEN: $IAC_PIPELINE_TRIGGER_TOKEN  # Defined in GitLab CI/CD Variables
-  IAC_PROJECT_ID: "3061"                        # GitLab Project ID của IaC repo
-  IAC_DEFAULT_BRANCH: "main"
-  TF_STATE_PREFIX: "iac/${CI_ENVIRONMENT_NAME}"   # Dynamic state path
+stages:
+  - validate
+  - plan
+  - apply
 
-# Base template cho tất cả trigger jobs
-.iac_trigger_template: &iac_trigger_base
-  stage: triggers
-  image: registry.gitlab.com/gitlab-org/cli:latest  # Sử dụng GitLab CLI
-  interruptible: true
-  tags:
-    - core-trigger
-  rules:
-    - if: $CI_COMMIT_BRANCH =~ /^iac-/               # Pattern cho IaC branches
-    - if: $CI_COMMIT_MESSAGE =~ /\[trigger iac\]/    # Manual trigger qua commit message
-    - if: $CI_PIPELINE_SOURCE == "schedule" && $SCHEDULE_JOB == "SYNC_IAC"  # Scheduled trigger
+.terraform_common:
+  image: hashicorp/terraform:1.4.6
+  before_script:
+    - terraform init
 
-# Standard trigger
-trigger:iac:auto:
-  <<: *iac_trigger_base
+vault-plan:
+  extends: .terraform_common
   script:
-    - |
-      glab ci run \
-        --branch "${CI_COMMIT_REF_NAME:-$IAC_DEFAULT_BRANCH}" \
-        --project-id "$IAC_PROJECT_ID" \
-        --variables \
-          "TF_STATE_PREFIX=${TF_STATE_PREFIX}" \
-          "TRIGGER_SOURCE=${CI_PROJECT_NAME}" \
-          "CI_COMMIT_SHA=${CI_COMMIT_SHA}"
-  artifacts:
-    reports:
-      dotenv: trigger_report.env
+    - cd $CI_PROJECT_DIR/vault
+    - terraform plan
 
-# Manual trigger với custom parameters
-trigger:iac:manual:
-  <<: *iac_trigger_base
-  variables:
-    IAC_CUSTOM_BRANCH: ""  # Có thể override qua variables
-    EXTRA_TF_VARS: ""      # Biến Terraform bổ sung
+vault-apply:
+  stage: apply
+  extends: .terraform_common
   script:
-    - |
-      glab ci run \
-        --branch "${IAC_CUSTOM_BRANCH:-$IAC_DEFAULT_BRANCH}" \
-        --project-id "$IAC_PROJECT_ID" \
-        --variables \
-          "TF_STATE_PREFIX=${TF_STATE_PREFIX}" \
-          "TF_VAR_environment=${ENVIRONMENT_OVERRIDE:-$CI_ENVIRONMENT_NAME}" \
-          "EXTRA_TF_VARS=${EXTRA_TF_VARS}" \
-          "DRY_RUN=${DRY_RUN:-false}"
-  rules:
-    - if: $CI_JOB_NAME == "trigger:iac:manual"  # Chỉ chạy khi gọi thủ công
-    - when: manual                              # Yêu cầu manual trigger từ UI
-
-# Emergency rollback trigger
-trigger:iac:rollback:
-  <<: *iac_trigger_base
-  variables:
-    TF_ROLLBACK_VERSION: ""  # Phiên bản Terraform state cần rollback
-  script:
-    - |
-      glab ci run \
-        --branch "$IAC_DEFAULT_BRANCH" \
-        --project-id "$IAC_PROJECT_ID" \
-        --variables \
-          "TF_STATE_PREFIX=${TF_STATE_PREFIX}" \
-          "TERRAFORM_ROLLBACK=true" \
-          "TF_ROLLBACK_VERSION=${TF_ROLLBACK_VERSION}"
-  rules:
-    - if: $TF_ROLLBACK_VERSION
-    - when: manual
+    - cd $CI_PROJECT_DIR/vault
+    - terraform apply -auto-approve

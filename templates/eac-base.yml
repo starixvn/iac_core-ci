@@ -1,0 +1,16 @@
+# Template Environment as Code
+.eac_template:
+  image: alpine/k8s:1.26.0
+  before_script:
+    - apk add --no-cache ansible argocd kubectl yq
+    - cd ${APP_DIR:-.}
+  variables:
+    KUBECONFIG: "/tmp/kubeconfig"
+
+validate_manifests:
+  extends: .eac_template
+  stage: validate
+  script:
+    - ansible-lint --exclude=roles/ ansible/
+    - kubeval --strict argocd/apps/*/manifest.yaml
+    - yq e 'true' argocd/apps/*/values.yaml
