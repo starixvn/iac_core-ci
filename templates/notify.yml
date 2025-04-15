@@ -7,7 +7,7 @@
 #         -d "{\"text\":\"${MESSAGE}\"}" \
 #         ${SLACK_WEBHOOK_URL}
 #   when: always
-.notify:
+.notify_slack:
   stage: notify
   script:
     - echo "Notifying team..."
