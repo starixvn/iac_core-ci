@@ -5,6 +5,7 @@
 stages:
   - validate
   - build
+  - plan
   - deploy
   - notify
 
