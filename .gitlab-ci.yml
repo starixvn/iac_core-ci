@@ -1,52 +1,44 @@
 # Core CI Pipeline Template Repository
 stages:
   - validate
-  - test
-  - sync
-
-variables:
-  TERRAFORM_VERSION: "1.5.7"
-  ARGOCD_VERSION: "2.8.4"
-  ANSIBLE_VERSION: "8.3.0"
+  - deploy
+  - notify
 
 include:
-  - local: 'templates/iac-base.yml'
-  - local: 'templates/eac-base.yml'
   - local: 'includes/common-vars.yml'
+  - local: 'includes/secrets.yml'
 
-validate_templates:
-  stage: validate
-  image: yamllint/yamllint
-  script:
-    - yamllint -d relaxed templates/*.yml
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-
-test_scripts:
-  stage: test
+.default:
   image: alpine:latest
-  script:
-    - apk add shellcheck
-    - shellcheck scripts/**/*.sh
-    - find scripts -type f -name "*.sh" -exec bash -n {} \;
+  before_script:
+    - apk add --no-cache bash curl git openssh
 
-sync_templates:
-  stage: sync
-  image: alpine/git
-  variables:
-    IAC_REPO: "git@gitlab.nexdev.net:iac/iac.git"
-    EAC_REPO: "git@gitlab.nexdev.net:iac/eac.git"
-  script:
-    - |
-      echo "Syncing to IaC repo..."
-      git clone $IAC_REPO /tmp/iac
-      cp -r templates/iac/* /tmp/iac/templates/
-      cp -r scripts/tf-helpers/* /tmp/iac/scripts/
-      cd /tmp/iac && git add . && git commit -m "Update CI templates [skip ci]" && git push
-    - |
-      echo "Syncing to EaC repo..."
-      git clone $EAC_REPO /tmp/eac
-      cp -r templates/eac/* /tmp/eac/templates/
-      cp -r scripts/ansible-helpers/* /tmp/eac/scripts/
-      cd /tmp/eac && git add . && git commit -m "Update CI templates [skip ci]" && git push
-  when: manual
+# =================
+# IaC Trigger Job
+# =================
+iac-trigger:
+  stage: deploy
+  trigger:
+    include:
+      - local: '.gitlab-ci/templates/iac-base.yml'
+    strategy: depend
+
+# =================
+# EaC Trigger Job
+# =================
+eac-trigger:
+  stage: deploy
+  trigger:
+    include:
+      - local: '.gitlab-ci/templates/eac-base.yml'
+    strategy: depend
+
+# ================
+# Notify Job
+# ================
+notify:
+  stage: notify
+  trigger:
+    include:
+      - local: '.gitlab-ci/templates/notify.yml'
+    strategy: depend

@@ -1,16 +1,24 @@
 # Template Environment as Code
 .eac_template:
-  image: alpine/k8s:1.26.0
+  image: alpine:latest
   before_script:
-    - apk add --no-cache ansible argocd kubectl yq
-    - cd ${APP_DIR:-.}
-  variables:
-    KUBECONFIG: "/tmp/kubeconfig"
+    - apk add --no-cache ansible curl git bash
+    - chmod +x .gitlab-ci/scripts/ansible-helpers/*.sh
+  stages:
+    - lint
+    - deploy
 
-validate_manifests:
-  extends: .eac_template
-  stage: validate
+lint:
+  stage: lint
   script:
-    - ansible-lint --exclude=roles/ ansible/
-    - kubeval --strict argocd/apps/*/manifest.yaml
-    - yq e 'true' argocd/apps/*/values.yaml
+    - .gitlab-ci/scripts/ansible-helpers/lint.sh
+  only:
+    - merge_requests
+    - branches
+
+deploy:
+  stage: deploy
+  script:
+    - .gitlab-ci/scripts/ansible-helpers/argocd-sync.sh $TARGET_APP
+  only:
+    - main

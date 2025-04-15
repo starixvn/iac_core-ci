@@ -1,31 +1,35 @@
 # IaC Base Template
 .iac_template:
-  image: hashicorp/terraform:${TERRAFORM_VERSION}
+  image: hashicorp/terraform:light
   before_script:
-    - export TF_WORKSPACE=${ENVIRONMENT:-dev}
-    - cd applications/${APP_NAME}
-  cache:
-    key: ${CI_JOB_NAME}-${APP_NAME}
-    paths:
-      - .terraform
-  artifacts:
-    paths:
-      - tfplan.json
-    expire_in: 1 week
+    - chmod +x .gitlab-ci/scripts/tf-helpers/*.sh
+  variables:
+    TF_IN_AUTOMATION: "true"
+  stages:
+    - validate
+    - plan
+    - apply
 
-validate_terraform:
-  extends: .iac_template
+validate:
   stage: validate
   script:
-    - chmod +x ${CI_PROJECT_DIR}/.gitlab-ci/scripts/tf-helpers/validate.sh
-    - ${CI_PROJECT_DIR}/.gitlab-ci/scripts/tf-helpers/validate.sh ${APP_NAME}
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - .gitlab-ci/scripts/tf-helpers/validate.sh $TARGET_ENV
+  only:
+    - merge_requests
+    - branches
 
-plan_terraform:
-  extends: .iac_template
+plan:
   stage: plan
   script:
-    - terraform init -backend-config="../../environments/${ENVIRONMENT}/backend.hcl"
-    - terraform plan -out=tfplan -var-file="../../environments/${ENVIRONMENT}/${APP_NAME}.tfvars"
-    - terraform show -json tfplan > tfplan.json
+    - terraform init
+    - terraform plan -var-file=environments/$TARGET_ENV/${APP}.tfvars
+  only:
+    - merge_requests
+    - branches
+
+apply:
+  stage: apply
+  script:
+    - .gitlab-ci/scripts/tf-helpers/deploy.sh $TARGET_ENV
+  only:
+    - main
