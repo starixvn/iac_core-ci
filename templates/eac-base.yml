@@ -1,4 +1,49 @@
 # Template Environment as Code
+---
+.eac_init: &eac_init
+  image:
+    name: $DOCKER_REG_LOCAL_URL/base/python:3.10-alpine
+    entrypoint: [""]
+  before_script:
+    - apk add --no-cache git openssh-client curl bash
+    - pip install ansible==${ANSIBLE_VERSION} ansible-lint openshift
+    - ansible --version
+
+.eac_lint:
+  <<: *eac_init
+  stage: validate
+  script:
+    - ansible-lint --exclude=galaxy-roles/ ansible/
+
+.eac_kubespray_deploy:
+  <<: *eac_init
+  stage: deploy
+  script:
+    - cd ansible/kubespray
+    - ansible-playbook -i ${CLUSTER}/inventory.ini cluster.yml --become --become-user=root
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+
+.eac_argocd_sync:
+  <<: *eac_init
+  image:
+    name: argoproj/argocd:${ARGOCD_VERSION}
+    entrypoint: [""]
+  stage: deploy
+  script:
+    - argocd login ${ARGOCD_SERVER} --grpc-web --insecure --username admin --password ${ARGOCD_TOKEN}
+    - |
+      for app in $(ls argocd/apps); do
+        argocd app sync $app --grpc-web --insecure
+        argocd app wait $app --grpc-web --insecure --health
+      done
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+
+
+
 .eac_init: &eac_init
   image: $DOCKER_REG_LOCAL_URL/base/python:3.10-alpine
   #python:3.9
