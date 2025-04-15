@@ -1,8 +1,9 @@
 # Template Environment as Code
 .eac_init: &eac_init
-  image: python:3.9
+  image: $DOCKER_REG_LOCAL_URL/base/python/3.10-alpine #python:3.9
   before_script:
-    - pip install ansible==${ANSIBLE_VERSION}
+    - pip install ansible==2.15.3
+    #${ANSIBLE_VERSION}
     - ansible --version
 
 .eac_lint:
