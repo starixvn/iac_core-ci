@@ -2,7 +2,7 @@
 .iac_template:
   image: hashicorp/terraform:light
   before_script:
-    - chmod +x .gitlab-ci/scripts/tf-helpers/*.sh
+    - chmod +x templates/scripts/tf-helpers/*.sh
   variables:
     TF_IN_AUTOMATION: "true"
   stages:
@@ -13,7 +13,7 @@
 validate:
   stage: validate
   script:
-    - .gitlab-ci/scripts/tf-helpers/validate.sh $TARGET_ENV
+    - templates/scripts/tf-helpers/validate.sh $TARGET_ENV
   only:
     - merge_requests
     - branches
@@ -30,6 +30,6 @@ plan:
 apply:
   stage: apply
   script:
-    - .gitlab-ci/scripts/tf-helpers/deploy.sh $TARGET_ENV
+    - templates/scripts/tf-helpers/deploy.sh $TARGET_ENV
   only:
     - main
