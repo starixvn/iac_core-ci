@@ -4,6 +4,9 @@ variables:
   TF_CLI_ARGS: "-no-color"
   TF_CLI_ARGS_plan: "-lock-timeout=300s"
   TF_CLI_ARGS_apply: "-lock-timeout=300s"
+
+  GIT_CLEAN_TAG_IMAGE: "alpine/git:v2.36.3"
+  GITLAB_API_URL: "https://gitlab.nexdev.net/api/v4"
   
   # Ansible
   ANSIBLE_FORCE_COLOR: "1"
