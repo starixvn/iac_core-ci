@@ -30,7 +30,7 @@
 .iac_security:
   <<: *iac_init
   stage: security
-  image: aquasec/tfsec:latest
+  #image: aquasec/tfsec:latest
   script:
     #- tfsec .
     - echo "iac_security scanning"
