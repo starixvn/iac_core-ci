@@ -1,0 +1,31 @@
+variables:
+  # Regex pattern to extract app and env from tag
+  DEPLOY_TAG_PATTERN: '/^deploy-(?<app>[a-z-]+)-(?<env>dev|staging|production)$/'
+
+  # Script to detect changed applications
+  DETECT_CHANGES_SCRIPT: |
+    function detect_changed_app() {
+      if [[ "$CI_COMMIT_TAG" =~ $DEPLOY_TAG_PATTERN ]]; then
+        # Extract from tag for deploy jobs
+        echo "${BASH_REMATCH[1]}"
+      else
+        # Detect changed apps from file changes
+        if [[ -d "applications" ]]; then
+          # IaC repo pattern
+          changed=$(git diff --name-only HEAD~1 | grep -oE 'applications/([^/]+)/' | cut -d'/' -f2 | sort | uniq)
+        elif [[ -d "argocd/apps" ]]; then
+          # EaC repo pattern
+          changed=$(git diff --name-only HEAD~1 | grep -oE 'argocd/apps/([^/]+)/' | cut -d'/' -f3 | sort | uniq)
+        fi
+        
+        if [ -z "$changed" ]; then
+          echo "No application changes detected"
+          exit 0
+        elif [ $(echo "$changed" | wc -l) -gt 1 ]; then
+          echo "Multiple applications changed: $changed"
+          exit 1
+        else
+          echo "$changed"
+        fi
+      fi
+    }
