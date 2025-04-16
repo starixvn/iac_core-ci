@@ -1,9 +1,9 @@
 #!/bin/bash
-set -e
+set -eo pipefail
 
-WORKDIR=$1
-
-cd "$WORKDIR"
+cd applications/${APP}
 echo "🔍 Validating Terraform code in $WORKDIR..."
-terraform init -backend=false
+terraform init -backend-config="environments/${ENV}/backend.hcl"
 terraform validate
+terraform fmt -check -recursive
+terraform plan -var-file="environments/${ENV}/${APP}.tfvars"

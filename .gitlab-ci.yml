@@ -2,18 +2,19 @@
 include:
   - local: '/templates/iac-base.yml'
   - local: '/templates/eac-base.yml'
+  - local: '/templates/notify.yml'
   - local: '/includes/common-vars.yml'
   - local: '/includes/secrets.yml'
+  - local: '/includes/tag-trigger.yml'
 
-variables:
-  GIT_STRATEGY: clone
-  TF_VERSION: "1.5.7"
-  ANSIBLE_VERSION: "2.15.3"
+# variables:
+#   GIT_STRATEGY: clone
+#   TF_VERSION: "1.5.7"
+#   ANSIBLE_VERSION: "2.15.3"
 stages:
-  - init
   - validate
   - test
-  - build
+  - security
   - deploy
   - notify
 
@@ -21,5 +22,4 @@ workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_TAG
-    - if: $CI_JOB_NAME == "trigger-child-pipeline"
+    - if: $CI_COMMIT_TAG =~ /^deploy-.+/

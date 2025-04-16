@@ -15,56 +15,36 @@
     TF_INPUT: "false"
     TF_DATA_DIR: "${CI_PROJECT_DIR}/.terraform"
 
-.iac_fmt:
+.iac_validate:
   <<: *iac_init
   stage: validate
   script:
-    - terraform fmt -check -recursive
-    - terraform validate
-
-.iac_plan:
-  <<: *iac_init
-  stage: test
-  script:
-    - terraform plan -var-file=environments/${ENVIRONMENT}/${APP}.tfvars -out=tfplan
+    - scripts/tf-helpers/validate.sh
   artifacts:
     paths:
-      - tfplan
+      - .terraform/
     expire_in: 1 week
 
-.iac_apply:
+.iac_security:
   <<: *iac_init
-  stage: deploy
+  stage: security
+  image: aquasec/tfsec:latest
   script:
-    - terraform apply -auto-approve tfplan
-  #dependencies:
-  #  - iac_plan
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      when: manual
-      allow_failure: false
-    - if: $CI_COMMIT_TAG
-      when: manual
-      allow_failure: false
+    - tfsec .
 
-.iac_tag_deploy:
+.iac_deploy:
   <<: *iac_init
   stage: deploy
   script:
-    - |
-      read -r APP ENV VERSION <<< $(eval "$TAG_REGEX_MATCHER")
-      echo "Deploying ${APP} v${VERSION} to ${ENV}"
-      cd applications/${APP}
-      terraform init -backend-config="environments/${ENV}/backend.hcl"
-      terraform apply -auto-approve -var-file="environments/${ENV}/${APP}.tfvars"
+    - /scripts/tf-helpers/deploy.sh
   rules:
-    - if: $CI_COMMIT_TAG =~ $TAG_REGEX
+    - if: $CI_COMMIT_TAG =~ /^deploy-.+-.+/
       when: manual
 
-.iac_destroy:
-  <<: *iac_init
-  stage: deploy
-  script:
-    - terraform destroy -auto-approve -var-file=environments/${ENVIRONMENT}/${APP}.tfvars
-  when: manual
-  allow_failure: false
+# .iac_destroy:
+#   <<: *iac_init
+#   stage: deploy
+#   script:
+#     - terraform destroy -auto-approve -var-file=environments/${ENVIRONMENT}/${APP}.tfvars
+#   when: manual
+#   allow_failure: false
