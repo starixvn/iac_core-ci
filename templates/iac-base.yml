@@ -43,11 +43,11 @@
     - chmod +x scripts/*/*.sh
     #- sh scripts/tf-helpers/deploy.sh
     - echo "🚀 Deploying Terraform configuration for ${APP} in ${ENVIRONMENT}"
-    - echo "PRIVATE-TOKEN:$CI_JOB_TOKEN $GITLAB_API_URL/projects/$CI_PROJECT_ID/repository/tags/$CI_COMMIT_TAG" ;
-    - curl --request DELETE --header "PRIVATE-TOKEN:$CI_JOB_TOKEN" $GITLAB_API_URL/projects/$CI_PROJECT_ID/repository/tags/$CI_COMMIT_TAG ;
+    #- echo "PRIVATE-TOKEN:$CI_JOB_TOKEN $GITLAB_API_URL/projects/$CI_PROJECT_ID/repository/tags/$CI_COMMIT_TAG" ;
+    #- curl --request DELETE --header "PRIVATE-TOKEN:$CI_JOB_TOKEN" $GITLAB_API_URL/projects/$CI_PROJECT_ID/repository/tags/$CI_COMMIT_TAG ;
   rules:
     - if: $CI_COMMIT_TAG =~ /^deploy-.+-.+/
-      when: manual
+      #when: manual
 
 # .iac_destroy:
 #   <<: *iac_init
