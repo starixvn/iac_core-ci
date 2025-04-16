@@ -13,7 +13,9 @@ variables:
       # Detect changed apps from file changes
       if [ -d "applications" ]; then
         # IaC repo pattern
-        changed=$(git diff --name-only HEAD~1 | grep -E 'applications/vault/([^/]+)/' | cut -d'/' -f2 | sort | uniq)
+        ch1=$(git diff --name-only HEAD~1 | grep -E 'applications/([^/]+)/')
+        echo "$ch1"
+        changed=$(git diff --name-only HEAD~1 | grep -E 'applications/([^/]+)/' | cut -d'/' -f2 | sort | uniq)
       elif [ -d "argocd/apps" ]; then
         # EaC repo pattern
         changed=$(git diff --name-only HEAD~1 | grep -E 'argocd/apps/([^/]+)/' | cut -d'/' -f3 | sort | uniq)
