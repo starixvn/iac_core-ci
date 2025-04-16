@@ -1,6 +1,6 @@
 variables:
   # Regex pattern to extract app and env from tag
-  DEPLOY_TAG_PATTERN: '/^deploy-(?<app>[a-z-]+)-(?<env>dev|staging|production)$/'
+  DEPLOY_TAG_PATTERN: '/^deploy-(?<app>[a-z-]+)-(?<env>test|dev|local|uat|sit|prod|dr)$/'
 
   # Script to detect changed applications
   DETECT_CHANGES_SCRIPT: |
