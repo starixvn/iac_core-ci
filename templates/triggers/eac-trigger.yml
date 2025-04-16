@@ -1,8 +1,0 @@
-stages:
-  - deploy
-
-argocd-deploy:
-  image: alpine/k8s:1.20.4
-  script:
-    - chmod +x ./scripts/argocd-sync.sh
-    - ./scripts/argocd-sync.sh
