@@ -2,33 +2,29 @@ variables:
   DEPLOY_TAG_PATTERN: '^deploy-[a-z-]+-(dev|staging|production)$'
   
   DETECT_APP_SCRIPT: |
+    # Check if this is a deploy tag
     if echo "$CI_COMMIT_TAG" | grep -Eq "$DEPLOY_TAG_PATTERN"; then
-      # Extract from tag for deploy jobs
       APP=$(echo "$CI_COMMIT_TAG" | cut -d'-' -f2)
       ENV=$(echo "$CI_COMMIT_TAG" | cut -d'-' -f3)
       echo "Detected APP from tag: $APP"
       echo "APP=$APP" >> app.env
       echo "ENV=$ENV" >> app.env
     else
-      # Detect changed apps from file changes
+      # For merge requests or branch pushes
       if [ -d "applications" ]; then
-        # IaC repo pattern
-        ch1=$(git diff --name-only HEAD~1 | grep -E 'applications/([^/]+)/')
-        echo "$ch1"
-        changed=$(git diff --name-only HEAD~1 | grep -E 'applications/([^/]+)/' | cut -d'/' -f2 | sort | uniq)
+        # IaC repo - look for changes in applications directory
+        changed=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | grep -E '^applications/([^/]+)/' | cut -d'/' -f2 | sort | uniq)
       elif [ -d "argocd/apps" ]; then
-        # EaC repo pattern
-        changed=$(git diff --name-only HEAD~1 | grep -E 'argocd/apps/([^/]+)/' | cut -d'/' -f3 | sort | uniq)
+        # EaC repo - look for changes in argocd/apps directory
+        changed=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | grep -E '^argocd/apps/([^/]+)/' | cut -d'/' -f3 | sort | uniq)
       fi
       
       if [ -z "$changed" ]; then
-        echo "No application changes detected"
-        exit 0
-      elif [ $(echo "$changed" | wc -l) -gt 1 ]; then
-        echo "Multiple applications changed: $changed"
-        exit 1
+        echo "No application changes detected in paths: applications/ or argocd/apps/"
       else
-        echo "Detected changed APP: $changed"
-        echo "APP=$changed" >> app.env
+        echo "Detected changed APP(s): $changed"
+        # Take first app if multiple changed (or modify as needed)
+        APP=$(echo "$changed" | head -n1)
+        echo "APP=$APP" >> app.env
       fi
     fi
