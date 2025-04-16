@@ -13,7 +13,9 @@ variables:
       # For merge requests or branch pushes
       if [ -d "applications" ]; then
         # IaC repo - look for changes in applications directory
-        changed=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | grep -E '^applications/([^/]+)/' | cut -d'/' -f2 | sort | uniq)
+        # More precise detection for IaC
+        changed_apps=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA -- 'applications/*/' 'applications/*/*.tf')
+        changed=$(echo "$changed" | grep -oE 'applications/([^/]+)' | cut -d'/' -f2 | sort | uniq)
       elif [ -d "argocd/apps" ]; then
         # EaC repo - look for changes in argocd/apps directory
         changed=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | grep -E '^argocd/apps/([^/]+)/' | cut -d'/' -f3 | sort | uniq)
