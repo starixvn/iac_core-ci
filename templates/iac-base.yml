@@ -57,7 +57,8 @@
     - cd applications/${APP}
     - ls
     - ls ../
-    - terraform init -backend-config="../environments/${ENV:-local}/${APP}.hcl"
+    - ls .../
+    - terraform init -backend-config=".../environments/${ENV:-local}/${APP}.hcl"
     #- cd
   variables:
     TF_IN_AUTOMATION: "true"
