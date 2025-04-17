@@ -3,14 +3,7 @@ include:
   - local: '/templates/iac-base.yml'
   - local: '/templates/eac-base.yml'
   - local: '/templates/notify.yml'
-  #- local: '/includes/tag-vars.yml'
-  #- local: '/includes/secrets.yml'
-  #- local: '/includes/tag-trigger.yml'
 
-# variables:
-#   GIT_STRATEGY: clone
-#   TF_VERSION: "1.5.7"
-#   ANSIBLE_VERSION: "2.15.3"
 stages:
   - validate
   - test
@@ -18,11 +11,6 @@ stages:
   - plan
   - deploy
   - notify
-
-# variables:
-#   TF_VERSION: "1.5.7"
-#   ANSIBLE_VERSION: "2.15.3"
-#   ARGOCD_VERSION: "2.7.4"
 
 # workflow:
 #   rules:

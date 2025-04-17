@@ -9,9 +9,13 @@
       if [[ -n "$CI_COMMIT_TAG" ]]; then
         APP=$(echo "$CI_COMMIT_TAG" | cut -d'-' -f2)
         ENV=$(echo "$CI_COMMIT_TAG" | cut -d'-' -f3)
-        echo "APP=$APP" >> tag_vars.env
-        echo "ENV=$ENV" >> tag_vars.env
-        echo "Extracted APP=$APP, ENV=$ENV"
+        if echo $ENV | grep -q "dev"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault-dev.nexdev.net";
+          echo "APP=$APP" >> tag_vars.env
+          echo "ENV=$ENV" >> tag_vars.env
+          echo "VAULT_ENV=$VAULT_ENV" >> tag_vars.env
+          echo "VAULT_ADDR=$VAULT_ADDR" >> tag_vars.env
+          echo "Extracted APP=$APP, ENV=$ENV | $VAULT_ENV , $VAULT_ADDR"
+        fi;
       else
         echo "FAIL"
       fi
