@@ -43,8 +43,7 @@
     name: $DOCKER_REG_LOCAL_URL/base/hashicorp/terraform:1.4.5-vault
     entrypoint: ["/usr/bin/env"]
   before_script:
-    - terraform --version
-    - echo "${APP} | $TF_CLI_CONFIG_FILE"
+    - echo "${APP} | ${ENV} - $ENV | $TF_CLI_CONFIG_FILE"
     - echo -e "credentials \"$CI_SERVER_HOST\" {\n  token = \"$CI_JOB_TOKEN\"\n}" > $TF_CLI_CONFIG_FILE
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
@@ -54,7 +53,8 @@
     - git config --global url."https://ansible:$CI_JOB_TOKEN@$CI_SERVER_HOST".insteadOf "https://$CI_SERVER_HOST"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
     - cd applications/${APP}
-    - terraform init -backend-config="../environments/${ENV}/${APP}.hcl"
+    - terraform --version
+    - terraform init -backend-config="../environments/$ENV/${APP}.hcl"
     #- cd
   variables:
     TF_IN_AUTOMATION: "true"
