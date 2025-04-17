@@ -59,7 +59,6 @@
   variables:
     TF_IN_AUTOMATION: "true"
     TF_INPUT: "false"
-    TF_CLI_CONFIG_FILE: $CI_PROJECT_DIR/.terraformrc
   allow_failure: true
 
 .iac_validate:
