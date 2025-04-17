@@ -48,7 +48,7 @@
   image:
     name: $DOCKER_REG_LOCAL_URL/base/hashicorp/terraform:1.4.5-vault
     entrypoint: ["/usr/bin/env"]
-  before_script:
+  script:
     - echo ${APP}
     - echo "Scanning Security... ${APP}"
     - ls 
