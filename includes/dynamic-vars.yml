@@ -11,7 +11,7 @@ variables:
       echo "ENV=$ENV" >> app.env
     else
       # For merge requests or branch pushes
-      if [ -d "applications" ]; then
+      if [ projectid -d "applications" ]; then
         # IaC repo - look for changes in applications directory
         changed=$(git diff --name-only HEAD~1 | grep -E 'applications/([^/]+)/' | cut -d'/' -f2 | sort | uniq)
       elif [ -d "argocd/apps" ]; then

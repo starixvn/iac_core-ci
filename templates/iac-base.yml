@@ -15,48 +15,95 @@
   <<: *iac_init
   stage: validate
   script:
-    - |
-      cd applications/${APP}
-      terraform init -backend-config="environments/${ENV}/backend.hcl"
-      terraform validate
-      terraform fmt -check -recursive
-      terraform plan -var-file="environments/${ENV}/${APP}.tfvars"
-  artifacts:
-    paths:
-      - applications/${APP}/.terraform/
-    expire_in: 1 week
+    - cd applications/${APP}
+    - terraform validate
+    - terraform fmt -check -recursive
 
 .iac_security:
   <<: *iac_init
   stage: security
   image: aquasec/tfsec:latest
   script:
-    - |
-      echo "cd applications/${APP} & tfsec ."
+    - cd applications/${APP}
+    - tfsec .
+
+.iac_plan:
+  <<: *iac_init
+  stage: plan
+  script:
+    - cd applications/${APP}
+    - terraform plan -var-file="environments/${ENV}/${APP}.tfvars" -out=tfplan
+  artifacts:
+    paths:
+      - applications/${APP}/tfplan
+    expire_in: 1 week
 
 .iac_deploy:
   <<: *iac_init
   stage: deploy
   script:
-    - |
-      echo "🚀 Deploying Terraform configuration for ${APP} in ${ENVIRONMENT}"
-      cd applications/${APP}
-      terraform apply -auto-approve -var-file="environments/${ENV}/${APP}.tfvars"
-      if [ $? -eq 0 ]; then
-        echo "Deployment successful"
-        # Tag cleanup would go here if using API
-        curl --header "PRIVATE-TOKEN: ${GITLAB_DEPLOY_TOKEN}" \
-          --request DELETE \
-          "${GITLAB_API_URL}/projects/${CI_PROJECT_ID}/repository/tags/${CI_COMMIT_TAG}"
-      else
-        echo "Deployment failed"
-        # Tag cleanup would go here if using API
-        curl --header "PRIVATE-TOKEN: ${GITLAB_DEPLOY_TOKEN}" \
-          --request DELETE \
-          "${GITLAB_API_URL}/projects/${CI_PROJECT_ID}/repository/tags/${CI_COMMIT_TAG}"
-        exit 1
-      fi
-  rules:
-    - if: $CI_COMMIT_TAG =~ /^deploy-.+-.+/
-      when: manual
+    - echo "🚀 Deploying Terraform configuration for ${APP} in ${ENVIRONMENT}"
+    - cd applications/${APP}
+    - terraform apply -auto-approve tfplan
+
+# .iac_init: &iac_init
+#   image:
+#     name: $DOCKER_REG_LOCAL_URL/base/hashicorp/terraform:1.4.5-vault
+#     entrypoint: ["/usr/bin/env"]
+#   before_script:
+#     - terraform --version
+#     - | 
+#       cd applications/${APP}
+#       terraform init -backend-config="environments/${ENV}/backend.hcl"
+#   variables:
+#     TF_IN_AUTOMATION: "true"
+#     TF_INPUT: "false"
+
+# .iac_validate:
+#   <<: *iac_init
+#   stage: validate
+#   script:
+#     - |
+#       cd applications/${APP}
+#       terraform validate
+#       terraform fmt -check -recursive
+# #terraform plan -var-file="environments/${ENV}/${APP}.tfvars"
+#   # artifacts:
+#   #   paths:
+#   #     - applications/${APP}/.terraform/
+#   #   expire_in: 1 week
+
+# .iac_security:
+#   <<: *iac_init
+#   stage: security
+#   image: aquasec/tfsec:latest
+#   script:
+#     - |
+#       echo "cd applications/${APP} & tfsec ."
+
+# .iac_deploy:
+#   <<: *iac_init
+#   stage: deploy
+#   script:
+#     - |
+#       echo "🚀 Deploying Terraform configuration for ${APP} in ${ENVIRONMENT}"
+#       cd applications/${APP}
+#       terraform apply -auto-approve -var-file="environments/${ENV}/${APP}.tfvars"
+#       if [ $? -eq 0 ]; then
+#         echo "Deployment successful"
+#         # Tag cleanup would go here if using API
+#         curl --header "PRIVATE-TOKEN: ${GITLAB_DEPLOY_TOKEN}" \
+#           --request DELETE \
+#           "${GITLAB_API_URL}/projects/${CI_PROJECT_ID}/repository/tags/${CI_COMMIT_TAG}"
+#       else
+#         echo "Deployment failed"
+#         # Tag cleanup would go here if using API
+#         curl --header "PRIVATE-TOKEN: ${GITLAB_DEPLOY_TOKEN}" \
+#           --request DELETE \
+#           "${GITLAB_API_URL}/projects/${CI_PROJECT_ID}/repository/tags/${CI_COMMIT_TAG}"
+#         exit 1
+#       fi
+#   rules:
+#     - if: $CI_COMMIT_TAG =~ /^deploy-.+-.+/
+#       when: manual
  
