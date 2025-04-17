@@ -28,10 +28,6 @@ graph TD
     D --> E[Manual Approval]
     E --> F[Apply Changes]
 
-graph LR
-    A[Developer] -->|Read| B[Dev Environment]
-    C[SRE] -->|Write| D[Prod Environment]
-
 
 ### Key Features:
 1. **Visual Workflows**: Mermaid diagrams for pipeline visualization
