@@ -7,10 +7,10 @@
   before_script:
     - terraform --version
     - echo ${APP}
-    - ls
-    - cd applications/${APP}
-    - terraform init -backend=false
-    - cd
+    - ls applications/${APP}
+    #- cd applications/${APP}
+    #- terraform init -backend=false
+    #- cd
   variables:
     TF_IN_AUTOMATION: "true"
     TF_INPUT: "false"
@@ -19,10 +19,10 @@
 .iac_validate:
   <<: *iac_init
   stage: validate
-  # variables:
-  #   APP: "$APP"
+  variables:
+    APP: ${APP}
   script:
-    - echo "app ${APP}"
+    - echo "app $APP - ${APP}"
     - ls
     - terraform validate
     - terraform fmt -check -recursive
