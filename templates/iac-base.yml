@@ -48,8 +48,10 @@
   image:
     name: $DOCKER_REG_LOCAL_URL/base/hashicorp/terraform:1.4.5-vault
     entrypoint: ["/usr/bin/env"]
+  variables:
+    APP: ${APP}
   script:
-    - echo ${APP}
+    - echo "app $APP - ${APP}"
     - echo "Scanning Security... ${APP}"
     - ls 
     - ls applications/${APP}
