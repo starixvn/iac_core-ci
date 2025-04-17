@@ -19,7 +19,11 @@
       fi
       
       if [ -z "$changed" ]; then
-        echo "No application changes detected in paths: applications/ or argocd/apps/"
+        echo "No application changes detected"
+        exit 0
+      elif [ $(echo "$changed" | wc -l) -gt 1 ]; then
+        echo "Multiple applications changed: $changed"
+        exit 1
       else
         echo "Detected changed APP(s): $changed"
         # Take first app if multiple changed (or modify as needed)
