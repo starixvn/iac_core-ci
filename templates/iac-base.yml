@@ -43,7 +43,6 @@
     #- terraform fmt -check -recursive
 
 .iac_security:
-  <<: *iac_init
   stage: security
   #image: aquasec/tfsec:latest
   variables:
