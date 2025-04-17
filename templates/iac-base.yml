@@ -126,7 +126,8 @@
       - applications/${APP}/tfplan
     expire_in: 1 week
   rules:
-    - if: '$CI_COMMIT_TAG =~ $TAG_REGEX'
+    #- if: '$CI_COMMIT_TAG =~ $TAG_REGEX'
+    - if: $CI_COMMIT_TAG =~ /^deploy-.+-.+/
 
 .iac_deploy:
   #<<: *iac_init
@@ -136,5 +137,6 @@
     - cd applications/${APP}
     - terraform apply -auto-approve tfplan
   rules:
-    - if: '$CI_COMMIT_TAG =~ $TAG_REGEX'
+    #- if: '$CI_COMMIT_TAG =~ $TAG_REGEX'
+    - if: $CI_COMMIT_TAG =~ /^deploy-.+-.+/
       when: manual
