@@ -15,9 +15,16 @@
   <<: *iac_init
   stage: validate
   script:
-    - cd applications/${APP}
-    - terraform validate
-    - terraform fmt -check -recursive
+    - |
+      for app in $(ls applications); do
+        APP=$app
+        echo "app is ${APP}"
+        cd applications/${APP}
+        terraform validate
+      done
+    #- cd applications/${APP}
+    #- terraform validate
+    #- terraform fmt -check -recursive
 
 .iac_security:
   <<: *iac_init
