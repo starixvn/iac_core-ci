@@ -41,9 +41,8 @@
   before_script:
     - terraform --version
     - echo ${APP}
-    - ls applications/${APP}
-    #- cd applications/${APP}
-    #- terraform init -backend=false
+    - cd applications/${APP}
+    - terraform init -backend-config="../environments/${ENV}/${APP}.hcl"
     #- cd
   variables:
     TF_IN_AUTOMATION: "true"
@@ -54,7 +53,7 @@
   <<: *iac_init
   stage: validate
   script:
-    - echo "app $APP - ${APP}"
+    - echo "app $APP"
     - ls
     - terraform validate
     #- terraform fmt -check -recursive
@@ -68,10 +67,8 @@
   #image: aquasec/tfsec:latest
   image: hub.nexdev.net/base/alpine:git-3.21
   script:
-    - echo "app $APP - ${APP}"
+    - echo "app $APP"
     - echo "Scanning Security... ${APP}"
-    - ls 
-    - ls applications/${APP}
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -85,7 +82,8 @@
     ENV: "${CI_COMMIT_TAG##*-}"
   script:
     - cd applications/${APP}
-    - terraform plan -var-file="../environments/${ENV:-dev}/${APP}.tfvars" -out=tfplan
+    - terraform init -backend-config="../environments/${ENV}/${APP}.hcl"
+    - terraform plan -var-file="../environments/${ENV}/${APP}.tfvars" -out=tfplan
   artifacts:
     paths:
       - applications/${APP}/tfplan
