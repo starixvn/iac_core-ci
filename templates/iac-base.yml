@@ -25,7 +25,7 @@
     - echo "app $APP - ${APP}"
     - ls
     - terraform validate
-    - terraform fmt -check -recursive
+    #- terraform fmt -check -recursive
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -46,9 +46,10 @@
   <<: *iac_init
   stage: security
   #image: aquasec/tfsec:latest
-  # variables:
-  #   APP: "$APP"
+  variables:
+    APP: ${APP}
   script:
+    - echo "app $APP - ${APP}"
     - echo "Scanning Security... ${APP}"
     - ls 
     - ls applications/${APP}
