@@ -55,7 +55,6 @@
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - git config --global user.email "ansible@nexdev.net"
     - git config --global user.name "ansible"
-    - git config --global url."https://ansible:$CI_JOB_TOKEN@$CI_SERVER_HOST".insteadOf "https://$CI_SERVER_HOST"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
     - terraform --version
     - ls $CI_PROJECT_DIR
@@ -104,12 +103,13 @@
     #- tfsec .
 
 .iac_plan:
-  <<: *iac_init
+  #<<: *iac_init
   stage: plan
   variables:
     APP: "${CI_COMMIT_TAG#deploy-}"
     ENV: "${CI_COMMIT_TAG##*-}"
   script:
+    - echo "${APP} | ${ENV:-local} - $ENV | $TF_CLI_CONFIG_FILE"
     - cd applications/${APP}
     - terraform init -backend-config="$CI_PROJECT_DIR/environments/${ENV}/${APP}.hcl"
     - terraform plan -var-file="$CI_PROJECT_DIR/environments/${ENV}/${APP}.tfvars" -out=tfplan
