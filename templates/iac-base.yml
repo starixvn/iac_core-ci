@@ -19,11 +19,11 @@
 .iac_validate:
   <<: *iac_init
   stage: validate
-  variables:
-    APP: "$APP"
+  # variables:
+  #   APP: "$APP"
   script:
+    - echo "app ${APP}"
     - ls
-    - cd ../applications/${APP}
     - terraform validate
     - terraform fmt -check -recursive
   rules:
@@ -46,10 +46,10 @@
   <<: *iac_init
   stage: security
   #image: aquasec/tfsec:latest
-  variables:
-    APP: "$APP"
+  # variables:
+  #   APP: "$APP"
   script:
-    - echo "Scanning Security..."
+    - echo "Scanning Security... ${APP}"
     - ls 
     - ls applications/${APP}
   rules:
