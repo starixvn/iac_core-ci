@@ -19,8 +19,8 @@
 .iac_validate:
   <<: *iac_init
   stage: validate
-  variables:
-    APP: ${APP}
+  #variables:
+  #  APP: ${APP}
   script:
     - echo "app $APP - ${APP}"
     - ls
