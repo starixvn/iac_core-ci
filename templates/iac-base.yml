@@ -11,6 +11,8 @@
         APP=$(echo "$CI_COMMIT_TAG" | cut -d'-' -f2)
         ENV=$(echo "$CI_COMMIT_TAG" | cut -d'-' -f3)
         echo "Extracted APP=${BASH_REMATCH[1]}, ENV=${BASH_REMATCH[2]} from tag"
+      else
+        echo "FAIL"
       fi
     - echo  "$APP $ENV | ${APP} ${ENV}"
   artifacts:
