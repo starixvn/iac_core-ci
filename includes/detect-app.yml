@@ -1,0 +1,34 @@
+variables:
+  DETECT_APP_SCRIPT: |
+    function detect_app() {
+      if [[ "$CI_COMMIT_TAG" =~ ^deploy-(.+)-(.+)$ ]]; then
+        # For deploy tags, extract app from tag name
+        echo "${BASH_REMATCH[1]}"
+      else
+        # For code changes, detect modified applications
+        if [[ -d "applications" ]]; then
+          # IaC repo detection
+          changed_apps=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | 
+                        grep -oE 'applications/([^/]+)/' | 
+                        cut -d'/' -f2 | 
+                        sort | uniq)
+        elif [[ -d "argocd/apps" ]]; then
+          # EaC repo detection
+          changed_apps=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | 
+                        grep -oE 'argocd/apps/([^/]+)/' | 
+                        cut -d'/' -f3 | 
+                        sort | uniq)
+        fi
+
+        if [[ -z "$changed_apps" ]]; then
+          echo "No application changes detected"
+          exit 0
+        elif [[ $(echo "$changed_apps" | wc -l) -gt 1 ]]; then
+          echo "Multiple applications changed: $changed_apps"
+          exit 1
+        else
+          echo "$changed_apps"
+        fi
+      fi
+    }
+    detect_app
