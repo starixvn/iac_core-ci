@@ -3,8 +3,8 @@ include:
   - local: '/templates/iac-base.yml'
   - local: '/templates/eac-base.yml'
   - local: '/templates/notify.yml'
-  - local: '/includes/common-vars.yml'
-  - local: '/includes/secrets.yml'
+  #- local: '/includes/common-vars.yml'
+  #- local: '/includes/secrets.yml'
   - local: '/includes/tag-trigger.yml'
 
 # variables:
