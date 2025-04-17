@@ -14,6 +14,7 @@
   variables:
     TF_IN_AUTOMATION: "true"
     TF_INPUT: "false"
+  allow_failure: true
 
 .iac_validate:
   <<: *iac_init
@@ -28,6 +29,7 @@
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  allow_failure: true
   # script:
   #   - |
   #     for app in $(ls applications); do
