@@ -6,6 +6,7 @@
     entrypoint: ["/usr/bin/env"]
   before_script:
     - terraform --version
+    - cd applications/${APP}
     - terraform init -backend=false
   variables:
     TF_IN_AUTOMATION: "true"
