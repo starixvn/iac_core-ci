@@ -19,8 +19,6 @@
 .iac_validate:
   <<: *iac_init
   stage: validate
-  #variables:
-  #  APP: ${APP}
   script:
     - echo "app $APP - ${APP}"
     - ls
@@ -30,26 +28,11 @@
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   allow_failure: true
-  # script:
-  #   - |
-  #     for app in $(ls applications); do
-  #       APP=$app
-  #       echo "app is ${APP}"
-  #       cd applications/${APP}
-  #       terraform validate
-  #     done
-    #- cd applications/${APP}
-    #- terraform validate
-    #- terraform fmt -check -recursive
-
+ 
 .iac_security:
   stage: security
   #image: aquasec/tfsec:latest
-  image:
-    name: $DOCKER_REG_LOCAL_URL/base/hashicorp/terraform:1.4.5-vault
-    entrypoint: ["/usr/bin/env"]
-  variables:
-    APP: ${APP}
+  image: hub.nexdev.net/base/alpine:git-3.21
   script:
     - echo "app $APP - ${APP}"
     - echo "Scanning Security... ${APP}"
