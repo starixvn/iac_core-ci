@@ -53,12 +53,11 @@
     - git config --global url."https://ansible:$CI_JOB_TOKEN@$CI_SERVER_HOST".insteadOf "https://$CI_SERVER_HOST"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
     - terraform --version
-    - ls
+    - ls $CI_PROJECT_DIR
     - cd applications/${APP}
     - ls
     - ls ../
-    - ls .../
-    - terraform init -backend-config=".../environments/${ENV:-local}/${APP}.hcl"
+    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${ENV:-local}/${APP}.hcl"
     #- cd
   variables:
     TF_IN_AUTOMATION: "true"
@@ -101,8 +100,8 @@
     ENV: "${CI_COMMIT_TAG##*-}"
   script:
     - cd applications/${APP}
-    - terraform init -backend-config="../environments/${ENV}/${APP}.hcl"
-    - terraform plan -var-file="../environments/${ENV}/${APP}.tfvars" -out=tfplan
+    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${ENV}/${APP}.hcl"
+    - terraform plan -var-file="$CI_PROJECT_DIR/environments/${ENV}/${APP}.tfvars" -out=tfplan
   artifacts:
     paths:
       - applications/${APP}/tfplan
