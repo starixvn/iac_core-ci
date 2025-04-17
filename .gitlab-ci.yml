@@ -5,7 +5,7 @@ include:
   - local: '/templates/notify.yml'
   #- local: '/includes/common-vars.yml'
   #- local: '/includes/secrets.yml'
-  - local: '/includes/tag-trigger.yml'
+  #- local: '/includes/tag-trigger.yml'
 
 # variables:
 #   GIT_STRATEGY: clone
