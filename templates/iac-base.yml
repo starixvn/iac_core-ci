@@ -52,8 +52,11 @@
     - git config --global user.name "ansible"
     - git config --global url."https://ansible:$CI_JOB_TOKEN@$CI_SERVER_HOST".insteadOf "https://$CI_SERVER_HOST"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
-    - cd applications/${APP}
     - terraform --version
+    - ls
+    - cd applications/${APP}
+    - ls
+    - ls ../
     - terraform init -backend-config="../environments/${ENV:-local}/${APP}.hcl"
     #- cd
   variables:
