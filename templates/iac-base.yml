@@ -43,7 +43,7 @@
     name: $DOCKER_REG_LOCAL_URL/base/hashicorp/terraform:1.4.5-vault
     entrypoint: ["/usr/bin/env"]
   before_script:
-    - echo "${APP} | ${ENV} - $ENV | $TF_CLI_CONFIG_FILE"
+    - echo "${APP} | ${ENV:-local} - $ENV | $TF_CLI_CONFIG_FILE"
     - echo -e "credentials \"$CI_SERVER_HOST\" {\n  token = \"$CI_JOB_TOKEN\"\n}" > $TF_CLI_CONFIG_FILE
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
@@ -54,12 +54,12 @@
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
     - cd applications/${APP}
     - terraform --version
-    - terraform init -backend-config="../environments/$ENV/${APP}.hcl"
+    - terraform init -backend-config="../environments/${ENV:-local}/${APP}.hcl"
     #- cd
   variables:
     TF_IN_AUTOMATION: "true"
     TF_INPUT: "false"
-    ENV: ${ENV:-local}
+    #ENV: ${ENV:-local}
   allow_failure: true
 
 .iac_validate:
