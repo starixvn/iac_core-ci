@@ -109,7 +109,7 @@
     APP: "${CI_COMMIT_TAG#deploy-}"
     ENV: "${CI_COMMIT_TAG##*-}"
   script:
-    - echo "${APP} | ${ENV:-local} - $ENV | $TF_CLI_CONFIG_FILE"
+    - echo "${APP} $APP | ${ENV:-local} - $ENV | $TF_CLI_CONFIG_FILE"
     - cd applications/${APP}
     - terraform init -backend-config="$CI_PROJECT_DIR/environments/${ENV}/${APP}.hcl"
     - terraform plan -var-file="$CI_PROJECT_DIR/environments/${ENV}/${APP}.tfvars" -out=tfplan
