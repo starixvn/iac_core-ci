@@ -59,11 +59,14 @@
   variables:
     TF_IN_AUTOMATION: "true"
     TF_INPUT: "false"
+    ENV: ${ENV:-local}
   allow_failure: true
 
 .iac_validate:
   <<: *iac_init
   stage: validate
+  variables:
+    ENV: ${ENV:-local}
   script:
     - echo "app $APP"
     - ls
