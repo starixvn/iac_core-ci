@@ -1,5 +1,5 @@
-# IaC Base Template
 ---
+# IaC Base Template
 .iac_init: &iac_init
   image:
     name: $DOCKER_REG_LOCAL_URL/base/hashicorp/terraform:1.4.5-vault
@@ -22,7 +22,7 @@
 .iac_security:
   <<: *iac_init
   stage: security
-  image: $DOCKER_REG_LOCAL_URL/base/hashicorp/terraform:1.4.5-vault #aquasec/tfsec:latest
+  #image: aquasec/tfsec:latest
   script:
     - echo "Scanning Security..."
     - ls applications
