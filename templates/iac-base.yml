@@ -6,9 +6,10 @@
     entrypoint: ["/usr/bin/env"]
   before_script:
     - terraform --version
+    - echo ${APP}
     - cd applications/${APP}
     - terraform init -backend=false
-    - cd ../
+    - cd
   variables:
     TF_IN_AUTOMATION: "true"
     TF_INPUT: "false"
@@ -18,10 +19,10 @@
   stage: validate
   script:
     - |
-      for app in $(ls); do
+      for app in $(ls applications); do
         APP=$app
         echo "app is ${APP}"
-        cd ${APP}
+        cd applications/${APP}
         terraform validate
       done
     #- cd applications/${APP}
@@ -35,7 +36,7 @@
   script:
     - echo "Scanning Security..."
     - ls 
-    - ls ${APP}
+    - ls applications/${APP}
     #- tfsec .
 
 .iac_plan:
