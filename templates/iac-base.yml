@@ -6,8 +6,10 @@
   script:
     - echo "checking deploy tag $CI_COMMIT_TAG ..."
     - |
-      if echo "$CI_COMMIT_TAG" | grep -Eq "deploy-[a-z-]+-(local|dev|uat|prod)$"; then
-        echo "Extracted from tag"
+      if echo "$CI_COMMIT_TAG" | grep -Eq "deploy-[a-z-]+-(local|dev|staging|production)$"; then
+        APP=${BASH_REMATCH[1]}
+        ENV=${BASH_REMATCH[2]}
+        echo "Extracted APP=${BASH_REMATCH[1]}, ENV=${BASH_REMATCH[2]} from tag"
       else
         echo "FAIL"
       fi
