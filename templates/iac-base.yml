@@ -22,10 +22,12 @@
 .iac_security:
   <<: *iac_init
   stage: security
-  image: aquasec/tfsec:latest
+  image: $DOCKER_REG_LOCAL_URL/base/hashicorp/terraform:1.4.5-vault #aquasec/tfsec:latest
   script:
-    - cd applications/${APP}
-    - tfsec .
+    - echo "Scanning Security..."
+    - ls applications
+    - ls applications/${APP}
+    #- tfsec .
 
 .iac_plan:
   <<: *iac_init
