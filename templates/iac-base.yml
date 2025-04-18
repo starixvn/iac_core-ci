@@ -76,19 +76,14 @@
     - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
     #- terraform plan -var-file=env/$CI_COMMIT_REF_NAME.tfvars -out=${PLAN} # -lock=false
     - terraform plan -var-file="$CI_PROJECT_DIR/environments/${ENV}/${APP}.tfvars" -out=${PLAN}
-    - "terraform show -json $PLAN | convert_report > $JSON_PLAN_FILE"
+    - "terraform show -json $PLAN | convert_report > ${JSON_PLAN_FILE}"
   artifacts:
     name: $APP-$ENV
     reports:
       terraform: ${CI_PROJECT_DIR}/${APP}/${JSON_PLAN_FILE}
     paths:
-      - $CI_PROJECT_DIR/applications/${ENV}/${APP}
-      #- ${CI_PROJECT_DIR}/$DIR_PATH/$PLAN
-      - ${CI_PROJECT_DIR}/$DIR_PATH/${JSON_PLAN_FILE}
-    expire_in: 7 days
-  artifacts:
-    paths:
-      - $CI_PROJECT_DIR/environments/${ENV}
+      - $CI_PROJECT_DIR/applications/${APP}/${JSON_PLAN_FILE}
+      - $CI_PROJECT_DIR/applications/${APP}/${PLAN}
     expire_in: 1 week
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy-.+-.+$/'
