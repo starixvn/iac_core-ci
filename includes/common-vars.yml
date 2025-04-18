@@ -26,5 +26,6 @@ variables:
   ARGOCD_OPTS: "--grpc-web --insecure"
   
   # Defaults
+  ENV: ${ENV:-local}
   #ENVIRONMENT: "dev"
   #CLUSTER: "cluster1"
