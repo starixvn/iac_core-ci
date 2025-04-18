@@ -16,7 +16,6 @@
             echo "VAULT_ENV=$VAULT_ENV" >> tag_vars.env
             echo "VAULT_ADDR=$VAULT_ADDR" >> tag_vars.env
             echo "Extracted APP=$APP, ENV=$ENV | $VAULT_ENV , $VAULT_ADDR"
-        fi;
       else
         echo "FAIL"
       fi
