@@ -82,7 +82,7 @@
   stage: deploy
   script:
     - echo "🚀 Deploying Terraform configuration for ${APP} in ${ENVIRONMENT}"
-    - cd applications/${APP}
+    #- cd applications/${APP}
     #- terraform apply -auto-approve tfplan
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy-.+-.+$/'
