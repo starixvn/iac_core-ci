@@ -73,8 +73,9 @@
         vault token lookup
     - mkdir -p ~/.aws
     - echo "$AWS_SHARED_CREDENTIALS_FILE" > ~/.aws/credentials
+    - cat ~/.aws/credentials
     - export AWS_PROFILE=$VAULT_ENV
-    #- aws configure list
+    - aws configure list
     - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
     - terraform plan -var-file="$CI_PROJECT_DIR/environments/${ENV}/${APP}.tfvars" -out=tfplan
   artifacts:
