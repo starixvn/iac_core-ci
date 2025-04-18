@@ -21,7 +21,6 @@
     - git config --global url."https://ansible:$CI_JOB_TOKEN@$CI_SERVER_HOST".insteadOf "https://$CI_SERVER_HOST"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
     - terraform --version
-#    - terraform init -backend=false -input=false
 
 .iac_validate:
   <<: *iac_init
@@ -42,11 +41,10 @@
       terraform workspace new ${VAULT_ENV})
     - terraform validate
     - terraform fmt 
-    #-check -recursive
+
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
- # allow_failure: true
  
 .iac_security:
   stage: security
@@ -58,7 +56,6 @@
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    #- tfsec .
 
 .iac_plan:
   <<: *iac_init
@@ -89,7 +86,6 @@
     expire_in: 1 week
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy-.+-.+$/'
-  #allow_failure: true
 
 .iac_deploy:
   <<: *iac_init
