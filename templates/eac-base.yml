@@ -18,7 +18,6 @@
       echo "yamllint ansible/"
 
 .eac_security:
-  <<: *eac_init
   stage: security
   #image: aquasec/trivy:latest
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
