@@ -80,7 +80,7 @@
   artifacts:
     name: $APP-$ENV
     reports:
-      terraform: ${CI_PROJECT_DIR}/${APP}/${JSON_PLAN_FILE}
+      terraform: ${CI_PROJECT_DIR}/applications/${APP}/${JSON_PLAN_FILE}
     paths:
       - $CI_PROJECT_DIR/applications/${APP}/${JSON_PLAN_FILE}
       - $CI_PROJECT_DIR/applications/${APP}/${PLAN}
