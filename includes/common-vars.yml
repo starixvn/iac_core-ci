@@ -7,7 +7,7 @@ variables:
   TF_IN_AUTOMATION: "true"
   TF_INPUT: "false"
   TF_VAR_vault_role: vault_jwt_auth_backend-pipeline
-  TF_DATA_DIR: "${CI_PROJECT_DIR}/.terraform"
+  TF_DATA_DIR: "${CI_PROJECT_DIR}/applications/${APP}/.terraform"
 
   GIT_CLEAN_TAG_IMAGE: "alpine/git:v2.36.3"
   GITLAB_API_URL: "https://gitlab.nexdev.net/api/v4"
