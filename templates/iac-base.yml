@@ -29,7 +29,7 @@
     - echo "app $APP"
     - ls $CI_PROJECT_DIR
     - cd applications/$APP
-    - terraform -backend=false -input=false
+    - terraform init -backend=false -input=false
     - terraform validate
     #- terraform fmt -check -recursive
   rules:
