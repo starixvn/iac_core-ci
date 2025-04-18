@@ -71,20 +71,20 @@
         vault token lookup
     - export AWS_PROFILE=$VAULT_ENV
     - aws configure list
-    - terraform init -backend-config="$TF_ROOT/environments/${VAULT_ENV}/${APP}.hcl"
+    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
     - echo "Preparing Terraform configuration for ${APP} in ${ENVIRONMENT}"
     - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
     #- terraform plan -var-file=env/$CI_COMMIT_REF_NAME.tfvars -out=${PLAN} # -lock=false
-    - terraform plan -var-file="$TF_ROOT/environments/${ENV}/${APP}.tfvars" -out=tfplan
+    - terraform plan -var-file="$CI_PROJECT_DIR/environments/${ENV}/${APP}.tfvars" -out=tfplan
     - "terraform show -json $PLAN | convert_report > $JSON_PLAN_FILE"
   artifacts:
     name: $APP-$ENV
     reports:
-      terraform: ${TF_ROOT}/${APP}/${JSON_PLAN_FILE}
+      terraform: ${CI_PROJECT_DIR}/${APP}/${JSON_PLAN_FILE}
     paths:
-      - $TF_ROOT/applications/${APP}/tfplan
-      #- ${TF_ROOT}/$DIR_PATH/$PLAN
-      - ${TF_ROOT}/$DIR_PATH/${JSON_PLAN_FILE}
+      - $CI_PROJECT_DIR/applications/${APP}/tfplan
+      #- ${CI_PROJECT_DIR}/$DIR_PATH/$PLAN
+      - ${CI_PROJECT_DIR}/$DIR_PATH/${JSON_PLAN_FILE}
     expire_in: 7 days
   artifacts:
     paths:
