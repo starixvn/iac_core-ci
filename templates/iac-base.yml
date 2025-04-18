@@ -11,7 +11,8 @@
     entrypoint: ["/usr/bin/env"]
   before_script:
     - echo "${APP} | ${ENV:-local} - $ENV | $TF_DATA_DIR"
-    - mkdir -p ${TF_DATA_DIR}
+    #- mkdir -p ${TF_DATA_DIR}
+    - cd $CI_PROJECT_DIR/applications/${APP}
     - echo -e "credentials \"$CI_SERVER_HOST\" {\n  token = \"$CI_JOB_TOKEN\"\n}" > $TF_DATA_DIR
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
@@ -20,7 +21,6 @@
     - git config --global user.name "ansible"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
     - terraform --version
-    - cd $CI_PROJECT_DIR/applications/${APP}
     - terraform init -backend=false -input=false
 
 .iac_validate:
