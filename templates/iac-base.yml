@@ -10,7 +10,7 @@
     name: $DOCKER_REG_LOCAL_URL/base/hashicorp/terraform:1.4.5-vault
     entrypoint: ["/usr/bin/env"]
   before_script:
-    - echo "${APP} | ${ENV:-local} - $ENV | $CI_SERVER_HOST | $CI_JOB_TOKEN | $TF_CLI_CONFIG_FILE"
+    - echo "${APP} | $VAULT_ENV | $CI_SERVER_HOST | $CI_JOB_TOKEN | $TF_CLI_CONFIG_FILE"
     #- mkdir -p ${TF_DATA_DIR}
     - echo -e "credentials \"$CI_SERVER_HOST\" {\n  token = \"$CI_JOB_TOKEN\"\n}" > $TF_CLI_CONFIG_FILE
     - eval $(ssh-agent -s)
@@ -37,7 +37,7 @@
         vault --version
         export VAULT_TOKEN="$(vault write -field=token auth/jwt/login role="$TF_VAR_vault_role" jwt=$VAULT_ID_TOKEN)"
         vault token lookup
-    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${ENV}/${APP}.hcl"
+    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
     - terraform validate
     - terraform fmt 
     #-check -recursive
