@@ -36,7 +36,6 @@
         vault --version
         export VAULT_TOKEN="$(vault write -field=token auth/jwt/login role="$TF_VAR_vault_role" jwt=$VAULT_ID_TOKEN)"
         vault token lookup
-    - mkdir -p ~/.aws
     - export AWS_PROFILE=$VAULT_ENV
     - aws configure list
     - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
@@ -73,6 +72,7 @@
     - export AWS_PROFILE=$VAULT_ENV
     - aws configure list
     - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
+    - echo "Preparing Terraform configuration for ${APP} in ${ENVIRONMENT}"
     - terraform plan -var-file="$CI_PROJECT_DIR/environments/${ENV}/${APP}.tfvars" -out=tfplan
   artifacts:
     paths:
