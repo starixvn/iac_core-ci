@@ -5,8 +5,9 @@
     name: $DOCKER_REG_LOCAL_URL/base/python:3.10-alpine
     entrypoint: [""]
   before_script:
-    - apk add --no-cache git openssh-client curl bash
-    - pip install ansible==${ANSIBLE_VERSION} ansible-lint
+    - echo "Preparing init ${APP}"
+    #- apk add --no-cache git openssh-client curl bash
+    #- pip install ansible==${ANSIBLE_VERSION} ansible-lint
 
 .eac_validate:
   <<: *eac_init
