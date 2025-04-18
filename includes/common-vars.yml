@@ -8,6 +8,9 @@ variables:
   TF_INPUT: "false"
   TF_VAR_vault_role: vault_jwt_auth_backend-pipeline
   TF_DATA_DIR: "${CI_PROJECT_DIR}/.terraform"
+  TF_ROOT: ${CI_PROJECT_DIR}
+  PLAN: plan.tfplan
+  JSON_PLAN_FILE: tfplan.json
 
   GIT_CLEAN_TAG_IMAGE: "alpine/git:v2.36.3"
   GITLAB_API_URL: "https://gitlab.nexdev.net/api/v4"
