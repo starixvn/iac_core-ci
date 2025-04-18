@@ -10,7 +10,7 @@
     name: $DOCKER_REG_LOCAL_URL/base/hashicorp/terraform:1.4.5-vault
     entrypoint: ["/usr/bin/env"]
   before_script:
-    - echo "${APP} | ${ENV:-local} - $ENV | $TF_DATA_DIR - $TF_CLI_CONFIG_FILE"
+    - echo "${APP} | ${ENV:-local} - $ENV | $CI_SERVER_HOST | $CI_JOB_TOKEN | $TF_CLI_CONFIG_FILE"
     #- mkdir -p ${TF_DATA_DIR}
     - echo -e "credentials \"$CI_SERVER_HOST\" {\n  token = \"$CI_JOB_TOKEN\"\n}" > $TF_CLI_CONFIG_FILE
     - eval $(ssh-agent -s)
@@ -19,6 +19,7 @@
     - cd $CI_PROJECT_DIR/applications/${APP}
     - git config --global user.email "ansible@nexdev.net"
     - git config --global user.name "ansible"
+    - git config --global url."https://ansible:$CI_JOB_TOKEN@$CI_SERVER_HOST".insteadOf "https://$CI_SERVER_HOST"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
     - terraform --version
     - terraform init -backend=false -input=false
