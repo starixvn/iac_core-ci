@@ -19,8 +19,8 @@
     - git config --global user.name "ansible"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
     - terraform --version
-    - cd applications/$APP
-    - terraform init
+    - mkdir -p ${TF_DATA_DIR}
+    - terraform init -backend=false -input=false
 
 .iac_validate:
   <<: *iac_init
