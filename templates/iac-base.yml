@@ -11,7 +11,6 @@
     entrypoint: ["/usr/bin/env"]
   before_script:
     - echo "${APP} | $VAULT_ENV | $CI_SERVER_HOST | $CI_JOB_TOKEN | $TF_CLI_CONFIG_FILE"
-    #- mkdir -p ${TF_DATA_DIR}
     - echo -e "credentials \"$CI_SERVER_HOST\" {\n  token = \"$CI_JOB_TOKEN\"\n}" > $TF_CLI_CONFIG_FILE
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
@@ -74,7 +73,6 @@
     - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
     - echo "Preparing Terraform configuration for ${APP} in ${ENVIRONMENT}"
     - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
-    #- terraform plan -var-file=env/$CI_COMMIT_REF_NAME.tfvars -out=${PLAN} # -lock=false
     - terraform plan -var-file="$CI_PROJECT_DIR/environments/${ENV}/${APP}.tfvars" -out=${PLAN}
     - "terraform show -json $PLAN | convert_report > ${JSON_PLAN_FILE}"
   artifacts:
