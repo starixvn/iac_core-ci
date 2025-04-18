@@ -10,9 +10,9 @@
     name: $DOCKER_REG_LOCAL_URL/base/hashicorp/terraform:1.4.5-vault
     entrypoint: ["/usr/bin/env"]
   before_script:
-    - echo "${APP} | ${ENV:-local} - $ENV | $TF_DATA_DIR"
+    - echo "${APP} | ${ENV:-local} - $ENV | $TF_DATA_DIR - $TF_CLI_CONFIG_FILE"
     #- mkdir -p ${TF_DATA_DIR}
-    - echo -e "credentials \"$CI_SERVER_HOST\" {\n  token = \"$CI_JOB_TOKEN\"\n}" > $TF_DATA_DIR
+    - echo -e "credentials \"$CI_SERVER_HOST\" {\n  token = \"$CI_JOB_TOKEN\"\n}" > $TF_CLI_CONFIG_FILE
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
