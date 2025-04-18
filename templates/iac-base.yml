@@ -37,6 +37,8 @@
         vault token lookup
     - export AWS_PROFILE=$VAULT_ENV
     - aws configure list
+    - (terraform workspace select ${VAULT_ENV} ||
+      terraform workspace new ${VAULT_ENV})
     - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
     - terraform validate
     - terraform fmt 
@@ -70,6 +72,8 @@
         vault token lookup
     - export AWS_PROFILE=$VAULT_ENV
     - aws configure list
+    - (terraform workspace select ${VAULT_ENV} ||
+      terraform workspace new ${VAULT_ENV})
     - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
     - echo "Preparing Terraform configuration for ${APP} in ${ENVIRONMENT}"
     - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
@@ -91,6 +95,16 @@
   <<: *iac_init
   stage: deploy
   script:
+    - |
+        echo "** Getting credentials - Project_ID $CI_PROJECT_ID"
+        vault --version
+        export VAULT_TOKEN="$(vault write -field=token auth/jwt/login role="$TF_VAR_vault_role" jwt=$VAULT_ID_TOKEN)"
+        vault token lookup
+    - export AWS_PROFILE=$VAULT_ENV
+    - aws configure list
+    - (terraform workspace select ${VAULT_ENV} ||
+      terraform workspace new ${VAULT_ENV})
+    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
     - echo "🚀 Deploying Terraform configuration for ${APP} in ${ENVIRONMENT}"
     #- cd applications/${APP}
     #- terraform apply -auto-approve tfplan
