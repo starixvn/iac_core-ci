@@ -22,7 +22,7 @@
   image: aquasec/trivy:latest
   script:
     - |
-      echo "trivy config --security-checks config ansible/
+      echo "trivy config --security-checks config ansible/"
 
 .eac_deploy:
   <<: *eac_init
