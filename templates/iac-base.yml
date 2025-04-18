@@ -55,7 +55,7 @@
 .iac_security:
   stage: security
   #image: aquasec/tfsec:latest
-  image: hub.nexdev.net/base/alpine:git-3.21
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - echo "app $APP"
     - echo "Scanning Security... ${APP}"

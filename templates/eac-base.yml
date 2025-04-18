@@ -5,7 +5,7 @@
     name: $DOCKER_REG_LOCAL_URL/base/python:3.10-alpine
     entrypoint: [""]
   before_script:
-    - echo "Preparing init ${APP}"
+    - echo "Preparing init ${APP} ..."
     #- apk add --no-cache git openssh-client curl bash
     #- pip install ansible==${ANSIBLE_VERSION} ansible-lint
 
@@ -20,16 +20,19 @@
 .eac_security:
   <<: *eac_init
   stage: security
-  image: aquasec/trivy:latest
+  #image: aquasec/trivy:latest
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - |
-      echo "trivy config --security-checks config ansible/"
+      echo "Scanning security ..."
 
 .eac_deploy:
   <<: *eac_init
   stage: deploy
-  image: argoproj/argocd:${ARGOCD_VERSION}
+  #image: argoproj/argocd:${ARGOCD_VERSION}
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
+    - echo "Deploying ${APP} to ${ENV} ..."
     - |
       argocd login ${ARGOCD_SERVER} --grpc-web --insecure --username admin --password ${ARGOCD_TOKEN}
       if [[ -n "$APP" ]]; then
