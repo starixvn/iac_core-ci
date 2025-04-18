@@ -58,7 +58,7 @@
   stage: plan
   script:
     - echo "App $APP | Env $ENV | $TF_CLI_CONFIG_FILE"
-    - cd applications/${APP}
+    #- cd applications/${APP}
     - export AWS_PROFILE=$ENV
     - aws configure list
     - |
