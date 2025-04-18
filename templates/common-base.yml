@@ -51,10 +51,10 @@
       else
         echo "Detected changed APP(s): $changed"
         # Take first app if multiple changed (or modify as needed)
-        export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.nexdev.net";
+        export VAULT_ENV=local;export VAULT_ADDR="https://vault.nexdev.net";
         APP=$(echo "$changed" | head -n1)
         echo "APP=$APP" >> app.env
-        echo "VAULT_ENV=$ENV" >> app.env
+        echo "VAULT_ENV=$VAULT_ENV" >> app.env
         echo "VAULT_ADDR=$VAULT_ADDR" >> app.env
       fi
     - if [ -f app.env ]; then cat app.env; else echo "No app.env created"; fi
