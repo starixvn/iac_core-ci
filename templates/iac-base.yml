@@ -22,7 +22,7 @@
     - git config --global url."https://ansible:$CI_JOB_TOKEN@$CI_SERVER_HOST".insteadOf "https://$CI_SERVER_HOST"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
     - terraform --version
-    - terraform init -backend=false -input=false
+#    - terraform init -backend=false -input=false
 
 .iac_validate:
   <<: *iac_init
@@ -33,6 +33,7 @@
     - echo "app $APP"
     - ls $CI_PROJECT_DIR
     - cd $CI_PROJECT_DIR/applications/${APP}
+    - terraform init -backend=false -input=false
     - terraform validate
     - terraform fmt 
     #-check -recursive
