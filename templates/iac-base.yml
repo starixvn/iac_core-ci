@@ -72,9 +72,9 @@
         vault token lookup
     - export AWS_PROFILE=$VAULT_ENV
     - aws configure list
+    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
     - (terraform workspace select ${VAULT_ENV} ||
       terraform workspace new ${VAULT_ENV})
-    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
     - echo "Preparing Terraform configuration for ${APP} in ${ENVIRONMENT}"
     - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
     - terraform plan -var-file="$CI_PROJECT_DIR/environments/${ENV}/${APP}.tfvars" -out=${PLAN}
@@ -102,9 +102,9 @@
         vault token lookup
     - export AWS_PROFILE=$VAULT_ENV
     - aws configure list
+    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
     - (terraform workspace select ${VAULT_ENV} ||
       terraform workspace new ${VAULT_ENV})
-    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
     - echo "🚀 Deploying Terraform configuration for ${APP} in ${ENVIRONMENT}"
     #- cd applications/${APP}
     #- terraform apply -auto-approve tfplan
