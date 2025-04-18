@@ -16,6 +16,9 @@
     - |
       echo "ansible-lint --exclude=galaxy-roles/ ansible/"
       echo "yamllint ansible/"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 .eac_security:
   stage: security
@@ -24,6 +27,9 @@
   script:
     - |
       echo "Scanning security ..."
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 .eac_deploy:
   <<: *eac_init
