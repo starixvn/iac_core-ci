@@ -37,9 +37,9 @@
         vault token lookup
     - export AWS_PROFILE=$VAULT_ENV
     - aws configure list
+    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
     - (terraform workspace select ${VAULT_ENV} ||
       terraform workspace new ${VAULT_ENV})
-    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
     - terraform validate
     - terraform fmt 
     #-check -recursive
