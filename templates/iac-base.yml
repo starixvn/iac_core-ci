@@ -60,8 +60,8 @@
   script:
     - echo "App $APP | Env $ENV | $TF_CLI_CONFIG_FILE"
     #- cd applications/${APP}
-    - export AWS_PROFILE=$ENV
-    - aws configure list
+#    - export AWS_PROFILE=$ENV
+#    - aws configure list
     - |
         echo "** Getting credentials"
         vault --version
