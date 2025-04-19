@@ -15,7 +15,7 @@
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - cd $CI_PROJECT_DIR/applications/${APP}
+    - cd $CI_PROJECT_DIR/applications/${APP_MAIN}/${APP}
     - git config --global user.email "ansible@nexdev.net"
     - git config --global user.name "ansible"
     - git config --global url."https://ansible:$CI_JOB_TOKEN@$CI_SERVER_HOST".insteadOf "https://$CI_SERVER_HOST"
@@ -28,7 +28,7 @@
   script:
     - echo "app $APP"
     - ls $CI_PROJECT_DIR
-    - cd $CI_PROJECT_DIR/applications/${APP}
+    - cd $CI_PROJECT_DIR/applications/${APP_MAIN}/${APP}
     - |
         echo "** Getting credentials - Project_ID $CI_PROJECT_ID"
         vault --version
@@ -36,7 +36,7 @@
         vault token lookup
     - export AWS_PROFILE=$VAULT_ENV
     - aws configure list
-    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
+    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP_MAIN}/${APP}.hcl"
     - (terraform workspace select ${VAULT_ENV} ||
       terraform workspace new ${VAULT_ENV})
     - terraform validate
@@ -69,20 +69,20 @@
         vault token lookup
     - export AWS_PROFILE=$VAULT_ENV
     - aws configure list
-    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
+    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP_MAIN}/${APP}.hcl"
     - (terraform workspace select ${VAULT_ENV} ||
       terraform workspace new ${VAULT_ENV})
     - echo "Preparing Terraform configuration for ${APP} in ${ENVIRONMENT}"
     - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
-    - terraform plan -var-file="$CI_PROJECT_DIR/environments/${ENV}/${APP}.tfvars" -out=${PLAN}
+    - terraform plan -var-file="$CI_PROJECT_DIR/environments/${ENV}/${APP_MAIN}/${APP}.tfvars" -out=${PLAN}
     - "terraform show -json $PLAN | convert_report > ${JSON_PLAN_FILE}"
   artifacts:
     name: $APP-$ENV
     reports:
-      terraform: ${CI_PROJECT_DIR}/applications/${APP}/${JSON_PLAN_FILE}
+      terraform: ${CI_PROJECT_DIR}/applications/${APP_MAIN}/${APP}/${JSON_PLAN_FILE}
     paths:
-      - $CI_PROJECT_DIR/applications/${APP}/${JSON_PLAN_FILE}
-      - $CI_PROJECT_DIR/applications/${APP}/${PLAN}
+      - $CI_PROJECT_DIR/applications/${APP_MAIN}/${APP}/${JSON_PLAN_FILE}
+      - $CI_PROJECT_DIR/applications/${APP_MAIN}/${APP}/${PLAN}
     expire_in: 1 week
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy-.+-.+$/'
@@ -98,7 +98,7 @@
         vault token lookup
     - export AWS_PROFILE=$VAULT_ENV
     - aws configure list
-    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP}.hcl"
+    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP_MAIN}/${APP}.hcl"
     - (terraform workspace select ${VAULT_ENV} ||
       terraform workspace new ${VAULT_ENV})
     - echo "🚀 Deploying Terraform configuration for ${APP} in ${ENVIRONMENT}"
