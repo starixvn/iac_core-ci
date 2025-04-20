@@ -47,10 +47,12 @@
         echo "VAULT_ADDR=${VAULT_ADDR:-https://vault.nexdev.net}" >> vars.env
         echo "APP_TOOL_CHANGED=true" >> vars.env
         echo "Extracted APP_TOOL_CHANGED APP_MAIN=$APP_MAIN, APP=$APP, ENV=$ENV | $VAULT_ENV , $VAULT_ADDR"
-      elif echo "$CHANGED" | grep -E 'environment/([^/]+)/([^/]+)/' ; then 
-        APP_MAIN=$(echo "$CI_COMMIT_TAG" | cut -d'/' -f2)
-        APP=$(echo "$CI_COMMIT_TAG" | cut -d'/' -f3)
-        ENV=$(echo "$CI_COMMIT_TAG" | cut -d'/' -f1)
+      elif echo "$CHANGED" | grep -E 'environments/([^/]+)/([^/]+)/' ; then 
+        APP_MAIN=$(git diff --name-only HEAD~1 | grep -E 'environments/([^/]+)/([^/]+)/' | cut -d'/' -f2 | sort | uniq)
+        APP=$(git diff --name-only HEAD~1 | grep -E 'environments/([^/]+)/([^/]+)/' | cut -d'/' -f3 | sort | uniq)
+        ENV=$(git diff --name-only HEAD~1 | grep -E 'environments/([^/]+)/([^/]+)/' | cut -d'/' -f1 | sort | uniq)
+        echo "APP_MAIN=$APP_MAIN" >> vars.env
+        echo "APP=$APP" >> vars.env
         echo "APP_MAIN=$APP_MAIN" >> vars.env
         echo "APP=$APP" >> vars.env
         echo "ENV=$ENV" >> vars.env
