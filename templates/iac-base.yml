@@ -21,6 +21,8 @@
     - git config --global url."https://ansible:$CI_JOB_TOKEN@$CI_SERVER_HOST".insteadOf "https://$CI_SERVER_HOST"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
     - terraform --version
+  rules:
+    - if: '$RUN_INIT_VALIDATE == "true" || $RUN_FULL_PIPELINE == "true"'
 
 .iac_validate:
   <<: *iac_init
@@ -43,8 +45,7 @@
     - terraform fmt 
 
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: '$RUN_INIT_VALIDATE == "true" || $RUN_FULL_PIPELINE == "true"'
  
 .iac_security_tf:
   stage: security
@@ -53,8 +54,7 @@
     - echo "app $APP"
     - echo "Scanning TF - Security... ${APP}"
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: '$RUN_INIT_VALIDATE == "true"'
 
 .iac_security_helm:
   stage: security
@@ -63,8 +63,7 @@
     - echo "app $APP"
     - echo "Scanning HELM - Security... ${APP}"
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: '$RUN_INIT_VALIDATE == "true"'
 
 
 .iac_plan:
@@ -96,6 +95,7 @@
     expire_in: 1 week
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy-.+-.+$/'
+    - if: '$RUN_FULL_PIPELINE == "true"'
 
 .iac_deploy:
   <<: *iac_init
@@ -115,4 +115,5 @@
     #- terraform apply -auto-approve $PLAN
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy-.+-.+$/'
+    - if: '$RUN_INIT_VALIDATE == "true" || $RUN_FULL_PIPELINE == "true"'
       when: manual
