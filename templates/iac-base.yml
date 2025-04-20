@@ -22,7 +22,7 @@
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
     - terraform --version
   rules:
-    - if: '$RUN_INIT_VALIDATE == "true" || $RUN_FULL_PIPELINE == "true"'
+    - if: '$APPS_TOOL_CHANGED == "true" || $ENV_TOOL_CHANGED == "true"'
 
 .iac_validate:
   <<: *iac_init
@@ -45,7 +45,7 @@
     - terraform fmt 
 
   rules:
-    - if: '$RUN_INIT_VALIDATE == "true" || $RUN_FULL_PIPELINE == "true"'
+    - if: '$APPS_TOOL_CHANGED == "true" || $ENV_TOOL_CHANGED == "true"'
  
 .iac_security_tf:
   stage: security
