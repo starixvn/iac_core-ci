@@ -101,7 +101,7 @@
     - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP_MAIN}/${APP}/${VAULT_ENV}.hcl"
     - (terraform workspace select ${VAULT_ENV} ||
       terraform workspace new ${VAULT_ENV})
-    - echo "🚀 Deploying Terraform configuration for ${APP} in ${ENVIRONMENT}"
+    - echo "🚀 Deploying Terraform configuration for ${APP} - ${APP} in ${VAULT_ENV}"
     #- terraform apply -auto-approve $PLAN
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy-.+-.+$/'
