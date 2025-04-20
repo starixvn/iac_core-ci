@@ -82,7 +82,7 @@
     - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP_MAIN}/${APP}/${VAULT_ENV}.hcl"
     - (terraform workspace select ${VAULT_ENV} ||
       terraform workspace new ${VAULT_ENV})
-    - echo "Preparing Terraform configuration for ${APP} in ${ENVIRONMENT}"
+    - echo "Preparing Terraform configuration for ${APP} in ${ENV}"
     - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
     - terraform plan -var-file="$CI_PROJECT_DIR/environments/${ENV}/${APP_MAIN}/${APP}/${VAULT_ENV}.tfvars" -out=${PLAN}
     - "terraform show -json $PLAN | convert_report > ${JSON_PLAN_FILE}"
