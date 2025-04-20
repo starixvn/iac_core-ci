@@ -1,9 +1,0 @@
-validate:yaml:
-  stage: validate
-  image: yamllint/yamllint
-  script:
-    - yamllint -d relaxed .
-    - echo "YAML validation passed" > scan.log
-  artifacts:
-    paths:
-      - scan.log

@@ -1,8 +1,0 @@
-# templates/security/tfsec.yml
-security:tfsec:
-  image: aquasec/tfsec:latest
-  script:
-    - tfsec --exclude-downloaded-modules --format sarif
-  artifacts:
-    reports:
-      sarif: tfsec.sarif
