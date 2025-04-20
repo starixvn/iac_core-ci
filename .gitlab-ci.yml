@@ -1,7 +1,6 @@
 # Core CI Pipeline Template Repository
 include:
   - local: '/templates/iac-base.yml'
-  - local: '/templates/eac-base.yml'
   - local: '/templates/notify.yml'
 
 stages:
