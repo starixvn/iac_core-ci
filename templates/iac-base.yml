@@ -43,8 +43,12 @@
     - terraform fmt 
 
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - changes:
+        - applications/*/*
+        - applications/*/*/*
+        - environments/*/*/*
+        - environments/*/*/*/*
+    - when: never
  
 .iac_security_tf:
   stage: security
@@ -53,8 +57,12 @@
     - echo "app $APP"
     - echo "Scanning TF - Security... ${APP}"
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - changes:
+        - applications/*/*
+        - applications/*/*/*
+        - environments/*/*/*
+        - environments/*/*/*/*
+    - when: never
 
 .iac_security_helm:
   stage: security
@@ -63,8 +71,10 @@
     - echo "app $APP"
     - echo "Scanning HELM - Security... ${APP}"
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - changes:
+        - applications/*/*
+        - applications/*/*/*
+    - when: never
 
 #####################################
 .iac_plan_env:
