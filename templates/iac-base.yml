@@ -95,7 +95,10 @@
       - $CI_PROJECT_DIR/applications/${APP_MAIN}/${APP}/${PLAN}
     expire_in: 1 week
   rules:
-    - if: '$ENV_TOOL_CHANGED == "true"'
+    - changes:
+        - environments/**
+      when: always
+    - when: never  # default disable
 
 .iac_deploy_env:
   <<: *iac_init
@@ -114,8 +117,10 @@
     - echo "🚀 Deploying Terraform configuration for ${APP} - ${APP} in ${VAULT_ENV}"
     #- terraform apply -auto-approve $PLAN
   rules:
-    - if: '$ENV_TOOL_CHANGED == "true"'
+    - changes:
+        - environments/**
       when: manual
+    - when: never  # default disable
 
 
 #####################################
