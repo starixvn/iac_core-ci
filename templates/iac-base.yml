@@ -41,6 +41,7 @@
         APP=$(echo "$tool" | cut -d'/' -f2)
         echo "🔧 validate $APP_MAIN / $APP | $VAULT_ENV ...";
         echo "$CI_PROJECT_DIR/applications/$APP_MAIN/$APP ";
+        cd $CI_PROJECT_DIR/applications/$APP_MAIN/$APP
         terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP_MAIN}/${APP}/${VAULT_ENV}.hcl"
         (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
         terraform validate
@@ -86,7 +87,7 @@
   <<: *iac_init
   stage: plan
   script:
-    - echo "App $APP | Env $ENV | $TF_CLI_CONFIG_FILE"
+    - echo "App $APP_MAIN / $APP | Env $ENV | $TF_CLI_CONFIG_FILE"
     - |
         echo "** Getting credentials - Project_ID $CI_PROJECT_ID"
         vault --version
@@ -94,10 +95,10 @@
         vault token lookup
     - export AWS_PROFILE=$VAULT_ENV
     - aws configure list
+    - cd $CI_PROJECT_DIR/applications/$APP_MAIN/$APP
     - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${APP_MAIN}/${APP}/${VAULT_ENV}.hcl"
-    - (terraform workspace select ${VAULT_ENV} ||
-      terraform workspace new ${VAULT_ENV})
-    - echo "Preparing Terraform configuration for ${APP} in ${ENV}"
+    - (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
+    - echo "Preparing Terraform configuration for ${APP_MAIN} ${APP} in ${ENV}"
     - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
     - terraform plan -var-file="$CI_PROJECT_DIR/environments/${ENV}/${APP_MAIN}/${APP}/${VAULT_ENV}.tfvars" -out=${PLAN}
     - "terraform show -json $PLAN | convert_report > ${JSON_PLAN_FILE}"
