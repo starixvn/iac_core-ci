@@ -52,9 +52,10 @@
         APP_MAIN=$(git diff --name-only HEAD~1 | grep -E 'environments/([^/]+)/([^/]+)/' | cut -d'/' -f3 | sort | uniq);
         APP=$(git diff --name-only HEAD~1 | grep -E 'environments/([^/]+)/([^/]+)/' | cut -d'/' -f4 | sort | uniq);
         ENV=$(git diff --name-only HEAD~1 | grep -E 'environments/([^/]+)/([^/]+)/' | cut -d'/' -f2 | sort | uniq);
-        if echo $ENV | grep -q "local"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.nexdev.net";
-        elif echo $ENV | grep -q "dev"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault-dev.nexdev.net";
-        elif echo $ENV | grep -q "uat"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.starixuat.com";
+        if echo ${ENV:-local} | grep -q "local"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.nexdev.net";
+        elif echo ${ENV:-local} | grep -q "dev"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault-dev.nexdev.net";
+        elif echo ${ENV:-local} | grep -q "uat"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.starixuat.com";
+        fi;
         echo "APP_MAIN=$APP_MAIN" >> vars.env
         echo "APP=$APP" >> vars.env
         echo "APP_MAIN=$APP_MAIN" >> vars.env
@@ -65,9 +66,6 @@
         echo "ENV_TOOL_CHANGED=true" >> vars.env
         echo "RUN_FULL_PIPELINE=true" >> vars.env
         echo "Extracted ENV_TOOL_CHANGED APP_MAIN=$APP_MAIN, APP=$APP, ENV=$ENV | $VAULT_ENV , $VAULT_ADDR"
-        else
-        echo "FAIL"
-        fi;
       fi
   artifacts:
     reports:
