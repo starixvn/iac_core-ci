@@ -96,8 +96,8 @@
     expire_in: 1 week
   rules:
     - changes:
-        - environments/*
-        - environments/*/**
+        - environments/*/*
+        - environments/*/*/*
     - when: never  # default disable
 
 
@@ -119,8 +119,8 @@
     #- terraform apply -auto-approve $PLAN
   rules:
     - changes:
-        - environments/*
-        - environments/*/**
+        - environments/*/*
+        - environments/*/*/*
       when: manual
     - when: never  # default disable
 
