@@ -44,6 +44,7 @@
 
       echo "CHANGED_TOOLS=$changed_tools" >> tools.env
       echo "ENV=${ENV:-local}" >> tools.env
+      echo "VAULT_ENV=${ENV:-local}" >> tools.env
       echo "Detected tools: $changed_tools"
   artifacts:
     reports:
