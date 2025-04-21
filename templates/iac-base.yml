@@ -46,6 +46,9 @@
         terraform validate
         terraform fmt 
       done
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
  
 .iac_security_tf:
   stage: security
@@ -58,6 +61,9 @@
         APP=$(echo "$tool" | cut -d'/' -f2)
         echo "Scanning TF - Security $APP_MAIN / $APP ...";
       done
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
 .iac_security_helm:
   stage: security
@@ -70,6 +76,9 @@
         APP=$(echo "$tool" | cut -d'/' -f2)
         echo "Scanning HELM - Security $APP_MAIN / $APP ...";
       done
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
 #####################################
 #####################################
