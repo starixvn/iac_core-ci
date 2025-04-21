@@ -52,7 +52,8 @@
       dotenv: tools.env
   rules:
     - changes:
-        #- applications/**
         - applications/*/*
         - applications/*/*/*
-    - when: never  # default disable
+        - environments/*/*/*
+        - environments/*/*/*/*
+    - when: never
