@@ -21,6 +21,7 @@
     - git config --global url."https://ansible:$CI_JOB_TOKEN@$CI_SERVER_HOST".insteadOf "https://$CI_SERVER_HOST"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
     - terraform --version
+  needs: ["detect-app"]
   rules:
     - if: '$APPS_TOOL_CHANGED == "true" || $ENV_TOOL_CHANGED == "true"'
 
@@ -43,7 +44,7 @@
       terraform workspace new ${VAULT_ENV})
     - terraform validate
     - terraform fmt 
-
+  needs: ["detect-app"]
   rules:
     - if: '$APPS_TOOL_CHANGED == "true" || $ENV_TOOL_CHANGED == "true"'
  
