@@ -66,15 +66,15 @@
     - git diff --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA" | grep '^environments/' | awk -F'/' '{print $3 "/" $4}' | sort -u | xargs
     - |
       changed_tools=$(git diff --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA" \
-        | grep '^applications/' \
+        | grep '^environments/' \
         | awk -F'/' '{print $3 "/" $4}' \
         | sort -u \
         | xargs)
 
       echo "CHANGED_TOOLS=$changed_tools" >> vars.env
-      echo "ENV=${ENV:-local}" >> vars.env
-      echo "VAULT_ENV=${ENV:-local}" >> vars.env
-      echo "VAULT_ADDR=https://vault.nexdev.net" >> vars.env
+      echo "ENV=${ENV}" >> vars.env
+      echo "VAULT_ENV=${ENV}" >> vars.env
+      echo "VAULT_ADDR=${VAULT_ADDR}" >> vars.env
       echo "Detected tools: $changed_tools"
   artifacts:
     reports:
