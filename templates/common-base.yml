@@ -54,6 +54,33 @@
     - changes:
         - applications/*/*
         - applications/*/*/*
+    - when: never
+
+.detect_env:
+  stage: detect
+  image: hub.nexdev.net/base/alpine:git-3.21
+  script:
+    - echo "Checking for changes between $CI_COMMIT_BEFORE_SHA and $CI_COMMIT_SHA"
+    - echo "Modified files:"
+    - git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA || true
+    - git diff --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA" | grep '^environments/' | awk -F'/' '{print $3 "/" $4}' | sort -u | xargs
+    - |
+      changed_tools=$(git diff --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA" \
+        | grep '^applications/' \
+        | awk -F'/' '{print $3 "/" $4}' \
+        | sort -u \
+        | xargs)
+
+      echo "CHANGED_TOOLS=$changed_tools" >> vars.env
+      echo "ENV=${ENV:-local}" >> vars.env
+      echo "VAULT_ENV=${ENV:-local}" >> vars.env
+      echo "VAULT_ADDR=https://vault.nexdev.net" >> vars.env
+      echo "Detected tools: $changed_tools"
+  artifacts:
+    reports:
+      dotenv: vars.env
+  rules:
+    - changes:
         - environments/*/*/*
         - environments/*/*/*/*
     - when: never
