@@ -10,7 +10,7 @@
     name: $DOCKER_REG_LOCAL_URL/base/hashicorp/terraform:1.4.5-vault
     entrypoint: ["/usr/bin/env"]
   before_script:
-    - echo "${APP_MAIN} - ${APP} | $VAULT_ENV | $CI_SERVER_HOST | $CI_JOB_TOKEN | $TF_CLI_CONFIG_FILE"
+    - echo "${APP} | $VAULT_ENV | $CI_SERVER_HOST | $CI_JOB_TOKEN | $TF_CLI_CONFIG_FILE"
     - echo -e "credentials \"$CI_SERVER_HOST\" {\n  token = \"$CI_JOB_TOKEN\"\n}" > $TF_CLI_CONFIG_FILE
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
@@ -21,9 +21,6 @@
     - git config --global url."https://ansible:$CI_JOB_TOKEN@$CI_SERVER_HOST".insteadOf "https://$CI_SERVER_HOST"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
     - terraform --version
-  needs: ["detect-app"]
-  rules:
-    - if: '$APPS_TOOL_CHANGED == "true" || $ENV_TOOL_CHANGED == "true"'
 
 .iac_validate:
   <<: *iac_init
@@ -44,9 +41,10 @@
       terraform workspace new ${VAULT_ENV})
     - terraform validate
     - terraform fmt 
-  needs: ["detect-app"]
+
   rules:
-    - if: '$APPS_TOOL_CHANGED == "true" || $ENV_TOOL_CHANGED == "true"'
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
  
 .iac_security_tf:
   stage: security
@@ -55,7 +53,8 @@
     - echo "app $APP"
     - echo "Scanning TF - Security... ${APP}"
   rules:
-    - if: '$RUN_INIT_VALIDATE == "true"'
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 .iac_security_helm:
   stage: security
@@ -64,7 +63,8 @@
     - echo "app $APP"
     - echo "Scanning HELM - Security... ${APP}"
   rules:
-    - if: '$RUN_INIT_VALIDATE == "true"'
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 
 .iac_plan:
@@ -96,7 +96,6 @@
     expire_in: 1 week
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy-.+-.+$/'
-    - if: '$RUN_FULL_PIPELINE == "true"'
 
 .iac_deploy:
   <<: *iac_init
@@ -116,5 +115,4 @@
     #- terraform apply -auto-approve $PLAN
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy-.+-.+$/'
-    - if: '$RUN_INIT_VALIDATE == "true" || $RUN_FULL_PIPELINE == "true"'
       when: manual
