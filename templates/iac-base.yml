@@ -46,14 +46,6 @@
         terraform validate
         terraform fmt 
       done
-
-  rules:
-    - changes:
-        - applications/*/*
-        - applications/*/*/*
-        - environments/*/*/*
-        - environments/*/*/*/*
-    - when: never
  
 .iac_security_tf:
   stage: security
@@ -66,13 +58,6 @@
         APP=$(echo "$tool" | cut -d'/' -f2)
         echo "Scanning TF - Security $APP_MAIN / $APP ...";
       done
-  rules:
-    - changes:
-        - applications/*/*
-        - applications/*/*/*
-        - environments/*/*/*
-        - environments/*/*/*/*
-    - when: never
 
 .iac_security_helm:
   stage: security
@@ -85,13 +70,6 @@
         APP=$(echo "$tool" | cut -d'/' -f2)
         echo "Scanning HELM - Security $APP_MAIN / $APP ...";
       done
-  rules:
-    - changes:
-        - applications/*/*
-        - applications/*/*/*
-        - environments/*/*/*
-        - environments/*/*/*/*
-    - when: never
 
 #####################################
 .iac_plan_env:
@@ -121,11 +99,6 @@
       - $CI_PROJECT_DIR/applications/${APP_MAIN}/${APP}/${JSON_PLAN_FILE}
       - $CI_PROJECT_DIR/applications/${APP_MAIN}/${APP}/${PLAN}
     expire_in: 1 week
-  rules:
-    - changes:
-        - environments/*/*/*
-        - environments/*/*/*/*
-    - when: never
 
 
 .iac_deploy_env:
@@ -144,12 +117,6 @@
       terraform workspace new ${VAULT_ENV})
     - echo "🚀 Deploying Terraform configuration for ${APP} - ${APP} in ${VAULT_ENV}"
     #- terraform apply -auto-approve $PLAN
-  rules:
-    - changes:
-        - environments/*/*/*
-        - environments/*/*/*/*
-      when: manual
-    - when: never
 
 
 #####################################
@@ -180,8 +147,7 @@
       - $CI_PROJECT_DIR/applications/${APP_MAIN}/${APP}/${JSON_PLAN_FILE}
       - $CI_PROJECT_DIR/applications/${APP_MAIN}/${APP}/${PLAN}
     expire_in: 1 week
-  rules:
-    - if: '$CI_COMMIT_TAG =~ /^deploy-.+-.+$/'
+  
 
 .iac_deploy:
   <<: *iac_init
@@ -199,6 +165,3 @@
       terraform workspace new ${VAULT_ENV})
     - echo "🚀 Deploying Terraform configuration for ${APP} - ${APP} in ${VAULT_ENV}"
     #- terraform apply -auto-approve $PLAN
-  rules:
-    - if: '$CI_COMMIT_TAG =~ /^deploy-.+-.+$/'
-      when: manual
