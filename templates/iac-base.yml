@@ -59,8 +59,13 @@
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
-    - echo "app $APP"
-    - echo "Scanning TF - Security... ${APP}"
+    - echo "$CHANGED_TOOLS"
+    - |
+      for tool in $CHANGED_TOOLS; do
+        APP_MAIN=$(echo "$tool" | cut -d'/' -f1)
+        APP=$(echo "$tool" | cut -d'/' -f2)
+        echo "Scanning TF - Security $APP_MAIN / $APP ...";
+      done
   rules:
     - changes:
         - applications/*/*
@@ -73,12 +78,19 @@
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
-    - echo "app $APP"
-    - echo "Scanning HELM - Security... ${APP}"
+    - echo "$CHANGED_TOOLS"
+    - |
+      for tool in $CHANGED_TOOLS; do
+        APP_MAIN=$(echo "$tool" | cut -d'/' -f1)
+        APP=$(echo "$tool" | cut -d'/' -f2)
+        echo "Scanning HELM - Security $APP_MAIN / $APP ...";
+      done
   rules:
     - changes:
         - applications/*/*
         - applications/*/*/*
+        - environments/*/*/*
+        - environments/*/*/*/*
     - when: never
 
 #####################################
