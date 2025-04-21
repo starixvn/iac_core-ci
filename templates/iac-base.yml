@@ -96,9 +96,10 @@
     expire_in: 1 week
   rules:
     - changes:
-        - environments/**
-      when: always
-    - when: never  # default disable
+        - environments/*
+        - environments/*/*
+        - environments/*/*/*
+        - environments/*/*/*/*
 
 .iac_deploy_env:
   <<: *iac_init
