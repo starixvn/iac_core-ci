@@ -58,8 +58,6 @@
         fi;
         echo "APP_MAIN=$APP_MAIN" >> vars.env
         echo "APP=$APP" >> vars.env
-        echo "APP_MAIN=$APP_MAIN" >> vars.env
-        echo "APP=$APP" >> vars.env
         echo "ENV=$ENV" >> vars.env
         echo "VAULT_ENV=$VAULT_ENV" >> vars.env
         echo "VAULT_ADDR=$VAULT_ADDR" >> vars.env
@@ -71,4 +69,5 @@
     reports:
       dotenv: vars.env
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
