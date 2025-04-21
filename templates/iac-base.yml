@@ -24,8 +24,9 @@
       for tool in $CHANGED_TOOLS; do
         APP_MAIN=$(echo "$tool" | cut -d'/' -f1)
         APP=$(echo "$tool" | cut -d'/' -f2)
-        echo "🔧 Init $APP_MAIN / $APP | $VAULT_ENV "
-        ls $CI_PROJECT_DIR/applications/${APP_MAIN}/${APP}
+        echo "🔧 Init $APP_MAIN / $APP | $VAULT_ENV ...";
+        echo "$CI_PROJECT_DIR/applications/$APP_MAIN/$APP ";
+        ls $CI_PROJECT_DIR/applications/$APP_MAIN/$APP
       done
 
 .iac_validate:
