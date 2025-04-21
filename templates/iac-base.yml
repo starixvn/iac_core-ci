@@ -98,7 +98,7 @@
     - changes:
         - environments/*/*/*
         - environments/*/*/*/*
-    - when: never  # default disable
+    - when: never
 
 
 .iac_deploy_env:
@@ -122,7 +122,7 @@
         - environments/*/*/*
         - environments/*/*/*/*
       when: manual
-    - when: never  # default disable
+    - when: never
 
 
 #####################################
