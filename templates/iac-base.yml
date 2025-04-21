@@ -10,23 +10,29 @@
     name: $DOCKER_REG_LOCAL_URL/base/hashicorp/terraform:1.4.5-vault
     entrypoint: ["/usr/bin/env"]
   before_script:
-    - echo "${APP} | $VAULT_ENV | $CI_SERVER_HOST | $CI_JOB_TOKEN | $TF_CLI_CONFIG_FILE"
+    - echo "$CHANGED_TOOLS | $CI_SERVER_HOST | $CI_JOB_TOKEN | $TF_CLI_CONFIG_FILE"
     - echo -e "credentials \"$CI_SERVER_HOST\" {\n  token = \"$CI_JOB_TOKEN\"\n}" > $TF_CLI_CONFIG_FILE
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - cd $CI_PROJECT_DIR/applications/${APP_MAIN}/${APP}
     - git config --global user.email "ansible@nexdev.net"
     - git config --global user.name "ansible"
     - git config --global url."https://ansible:$CI_JOB_TOKEN@$CI_SERVER_HOST".insteadOf "https://$CI_SERVER_HOST"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
     - terraform --version
+    - |
+      for tool in $CHANGED_TOOLS; do
+        APP_MAIN=$(echo "$tool" | cut -d'/' -f1)
+        APP=$(echo "$tool" | cut -d'/' -f2)
+        echo "🔧 Init $APP_MAIN / $APP | $VAULT_ENV "
+        ls $CI_PROJECT_DIR/applications/${APP_MAIN}/${APP}
+      done
 
 .iac_validate:
   <<: *iac_init
   stage: validate
   script:
-    - echo "app $APP"
+    - echo "validate $CHANGED_TOOLS"
     - ls $CI_PROJECT_DIR
     - cd $CI_PROJECT_DIR/applications/${APP_MAIN}/${APP}
     - |
