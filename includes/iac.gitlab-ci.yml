@@ -1,5 +1,12 @@
 ---
 # IaC Base Template
+.unit_test:
+  stage: security
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
+  script:
+    - |
+      echo "Debug: TOOL=${TOOL}, MODULE=${MODULE}"
+####################
 .predefined_id_tokens:
   id_tokens:
     VAULT_ID_TOKEN:
@@ -13,9 +20,6 @@
     - |
       echo "Debug: TOOL=${TOOL}, MODULE=${MODULE}, ORG=${ORG}, ENV=${ENV}"
       echo "Current path: $(pwd) | CI_PROJECT_DIR ${CI_PROJECT_DIR}"
-    - ls $CI_PROJECT_DIR/$TOOL/$MODULE
-    - ls $CI_PROJECT_DIR/$TOOL/$MODULE/variable.d
-    - ls $CI_PROJECT_DIR/$TOOL/$MODULE/variable.d/${ORG}/${VAULT_ENV}
     - |
       if echo ${ENV} | grep -q "local"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.nexdev.net";
       elif echo ${ENV} | grep -q "dev"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault-dev.nexdev.net";
