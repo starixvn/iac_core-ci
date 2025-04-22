@@ -79,7 +79,7 @@
     - aws configure list
     - |
         cd $CI_PROJECT_DIR/$TOOL/$MODULE
-        terraform init -backend-config="$CI_PROJECT_DIR/$TOOL/$MODULE/variable.d/${VAULT_ENV}/backend.conf"
+        terraform init -backend-config="$CI_PROJECT_DIR/$TOOL/$MODULE/variable.d/${VAULT_ENV}/backend.hcl"
         (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
     - echo "Preparing Terraform configuration for ${MODULE} ${MODULE} in ${ENV}"
     - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
