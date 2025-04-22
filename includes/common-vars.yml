@@ -11,24 +11,3 @@ variables:
   JSON_PLAN_FILE: tfplan.json
   TF_ROOT: "${CI_PROJECT_DIR}/applications"
   TF_CLI_CONFIG_FILE: $CI_PROJECT_DIR/.terraformrc
-
-  GIT_CLEAN_TAG_IMAGE: "alpine/git:v2.36.3"
-  GITLAB_API_URL: "https://gitlab.nexdev.net/api/v4"
-  
-  # Ansible
-  ANSIBLE_FORCE_COLOR: "1"
-  ANSIBLE_HOST_KEY_CHECKING: "false"
-  ANSIBLE_SSH_ARGS: "-o ControlMaster=auto -o ControlPersist=60s"
-  
-  # Kubernetes
-  KUBECONFIG: "/tmp/kubeconfig"
-  
-  # ArgoCD
-  ARGOCD_VERSION: "2.7.4"
-  ARGOCD_SERVER: "argocd.yourdomain.com"
-  ARGOCD_OPTS: "--grpc-web --insecure"
-  
-  # Defaults
-  ENV: ${ENV:-local}
-  #ENVIRONMENT: "dev"
-  #CLUSTER: "cluster1"
