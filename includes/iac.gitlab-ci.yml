@@ -109,8 +109,9 @@
         vault token lookup
     - export AWS_PROFILE=$VAULT_ENV
     - aws configure list
-    - terraform init -backend-config="$CI_PROJECT_DIR/environments/${VAULT_ENV}/${MODULE_MAIN}/${MODULE}/${VAULT_ENV}.hcl"
-    - (terraform workspace select ${VAULT_ENV} ||
-      terraform workspace new ${VAULT_ENV})
+    - |
+        cd $CI_PROJECT_DIR/$TOOL/$MODULE
+        terraform init -backend-config="$CI_PROJECT_DIR/$TOOL/$MODULE/variable.d/${ORG}/${VAULT_ENV}/backend.conf"
+        (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
     - echo "🚀 Deploying Terraform configuration for ${MODULE} - ${MODULE} in ${VAULT_ENV}"
     #- terraform apply -auto-approve $PLAN

@@ -11,3 +11,8 @@ variables:
   JSON_PLAN_FILE: tfplan.json
   TF_ROOT: "${CI_PROJECT_DIR}/applications"
   TF_CLI_CONFIG_FILE: $CI_PROJECT_DIR/.terraformrc
+
+cache:
+  - key: ${TOOL}-$MODULE-$ORG-$ENV-terraform
+    paths:
+      - $CI_PROJECT_DIR/.terraform
