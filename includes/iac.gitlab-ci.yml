@@ -15,7 +15,7 @@
       echo "Current path: $(pwd) | CI_PROJECT_DIR ${CI_PROJECT_DIR}"
     - ls $CI_PROJECT_DIR/$TOOL/$MODULE
     - ls $CI_PROJECT_DIR/$TOOL/$MODULE/variable.d
-    - ls $CI_PROJECT_DIR/$TOOL/$MODULE/variable.d/${VAULT_ENV}/${ORG}
+    - ls $CI_PROJECT_DIR/$TOOL/$MODULE/variable.d/${ORG}/${VAULT_ENV}
     - |
       if echo ${ENV} | grep -q "local"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.nexdev.net";
       elif echo ${ENV} | grep -q "dev"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault-dev.nexdev.net";
@@ -49,7 +49,7 @@
         echo "🔧 validate $TOOL / $MODULE | $VAULT_ENV ...";
         echo "$CI_PROJECT_DIR/$TOOL/$MODULE ";
         cd $CI_PROJECT_DIR/$TOOL/$MODULE
-        terraform init -backend-config="$CI_PROJECT_DIR/$TOOL/$MODULE/variable.d/${VAULT_ENV}/${ORG}/backend.conf"
+        terraform init -backend-config="$CI_PROJECT_DIR/$TOOL/$MODULE/variable.d/${ORG}/${VAULT_ENV}/backend.conf"
         (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
         terraform validate
         terraform fmt 
@@ -82,11 +82,11 @@
     - aws configure list
     - |
         cd $CI_PROJECT_DIR/$TOOL/$MODULE
-        terraform init -backend-config="$CI_PROJECT_DIR/$TOOL/$MODULE/variable.d/${VAULT_ENV}/${ORG}/backend.conf"
+        terraform init -backend-config="$CI_PROJECT_DIR/$TOOL/$MODULE/variable.d/${ORG}/${VAULT_ENV}/backend.conf"
         (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
     - echo "Preparing Terraform configuration for ${MODULE} ${MODULE} in ${ENV}"
     - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
-    - terraform plan -var-file="$CI_PROJECT_DIR/$TOOL/$MODULE/variable.d/${VAULT_ENV}/${ORG}/variables.tfvars" -out=${PLAN}
+    - terraform plan -var-file="$CI_PROJECT_DIR/$TOOL/$MODULE/variable.d/${ORG}/${VAULT_ENV}/variables.tfvars" -out=${PLAN}
     - "terraform show -json $PLAN | convert_report > ${JSON_PLAN_FILE}"
   artifacts:
     name: $TOOL-$MODULE-$ENV
