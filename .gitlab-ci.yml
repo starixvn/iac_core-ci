@@ -1,18 +1,1 @@
-# Core CI Pipeline Template Repository
-include:
-  - local: '/templates/iac-base.yml'
-  - local: '/templates/notify.yml'
-
-stages:
-  - validate
-  - test
-  - security
-  - plan
-  - deploy
-  - notify
-
-# workflow:
-#   rules:
-#     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-#     - if: $CI_COMMIT_TAG =~ /^deploy-.+-.+/
+#

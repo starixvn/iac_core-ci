@@ -9,7 +9,7 @@ variables:
   TF_VAR_vault_role: vault_jwt_auth_backend-pipeline
   PLAN: plan.tfplan
   JSON_PLAN_FILE: tfplan.json
-  TF_ROOT: "${CI_PROJECT_DIR}/applications"
+  TF_ROOT: "${CI_PROJECT_DIR}"
   TF_CLI_CONFIG_FILE: $CI_PROJECT_DIR/.terraformrc
 
 cache:
