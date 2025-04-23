@@ -1,5 +1,37 @@
 ---
-# Job 1: Detect changes
+# Job 1: Extract Tag vars
+.extract_tag_vars:
+  stage: extract
+  image: hub.nexdev.net/base/alpine:git-3.21
+  script:
+    - echo "checking deploy tag $CI_COMMIT_TAG ..."
+    - |
+      if [[ -n "$CI_COMMIT_TAG" ]]; then
+        APP=$(echo "$CI_COMMIT_TAG" | cut -d'-' -f2)
+        MODULE=$(echo "$CI_COMMIT_TAG" | cut -d'-' -f3)
+        ORG=$(echo "$CI_COMMIT_TAG" | cut -d'-' -f4)
+        ENV=$(echo "$CI_COMMIT_TAG" | cut -d'-' -f5)
+        if echo ${ENV:-local} | grep -q "local"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.nexdev.net";
+        elif echo ${ENV:-local} | grep -q "dev"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault-dev.nexdev.net";
+        elif echo ${ENV:-local} | grep -q "uat"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.starixuat.com";
+        fi;
+            echo "APP=$APP" >> tag_vars.env
+            echo "MODULE=$MODULE" >> tag_vars.env
+            echo "ORG=$ORG" >> tag_vars.env
+            echo "ENV=$ENV" >> tag_vars.env
+            echo "VAULT_ENV=$VAULT_ENV" >> tag_vars.env
+            echo "VAULT_ADDR=$VAULT_ADDR" >> tag_vars.env
+            echo "Extracted APP=$APP, MODULE=$MODULE, ORG=$ORG, ENV=$ENV | $VAULT_ENV , $VAULT_ADDR"
+      else
+        echo "FAIL with tag $CI_COMMIT_TAG"
+      fi
+  artifacts:
+    reports:
+      dotenv: tag_vars.env
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy-.+-.+$/'
+
+# Job 2: Detect changes
 detect_changes:
   stage: .pre
   script:
@@ -22,21 +54,21 @@ detect_changes:
         for file in "${CHANGED_FILES[@]}"; do
         # Case 1: variable.d changes (tool/module/variable.d/org/env/...)
         if [[ "$file" =~ ^([^/]+)/([^/]+)/variable\.d/([^/]+)/([^/]+)/ ]]; then
-          TOOL="${BASH_REMATCH[1]}"
+          APP="${BASH_REMATCH[1]}"
           MODULE="${BASH_REMATCH[2]}"
           ORG="${BASH_REMATCH[3]}"
           ENV="${BASH_REMATCH[4]}"
-          KEY="${TOOL}_${MODULE}_${ORG}_${ENV}"
+          KEY="${APP}_${MODULE}_${ORG}_${ENV}"
           UNIQUE_PATHS["$KEY"]=1
 
         # Case 2: General file changes inside tool/module/ but not in variable.d/
         elif [[ "$file" =~ ^([^/]+)/([^/]+)/(.*)$ ]]; then
-          TOOL="${BASH_REMATCH[1]}"
+          APP="${BASH_REMATCH[1]}"
           MODULE="${BASH_REMATCH[2]}"
           SUBPATH="${BASH_REMATCH[3]}"
           
           if [[ ! "$SUBPATH" =~ ^variable\.d/ ]]; then
-            KEY="${TOOL}_${MODULE}"
+            KEY="${APP}_${MODULE}"
             UNIQUE_PATHS["$KEY"]=1
           fi
         fi
@@ -54,7 +86,7 @@ detect_changes:
       - changed_vars.env
     when: always
 
-# Job 2: Generate dynamic jobs
+# Job 3: Generate dynamic jobs
 .generate_dynamic_jobs:
   stage: .pre
   script:
@@ -95,58 +127,58 @@ detect_changes:
         echo "Processing detected changes..."
         while IFS='=' read -r var_name _; do
           if [[ "$var_name" =~ ^([^_]+)_([^_]+)_([^_]+)_([^_]+)_CHANGED$ ]]; then
-            TOOL="${BASH_REMATCH[1]}"
+            APP="${BASH_REMATCH[1]}"
             MODULE="${BASH_REMATCH[2]}"
             ORG="${BASH_REMATCH[3]}"
             ENV="${BASH_REMATCH[4]}"
-            echo "Generating full ENV jobs for ${TOOL}_${MODULE}_${ORG}_${ENV}..."
+            echo "Generating full ENV jobs for ${APP}_${MODULE}_${ORG}_${ENV}..."
 
             cat >> generated-jobs.yml <<EOF
 
-      ${TOOL}_${MODULE}_${ORG}_${ENV}_validate:
+      ${APP}_${MODULE}_${ORG}_${ENV}_validate:
         stage: validate
         extends: [".iac_validate",".predefined_id_tokens"]
         variables:
-          TOOL: ${TOOL}
+          APP: ${APP}
           MODULE: ${MODULE}
           ORG: ${ORG}
           ENV: ${ENV}
 
-      ${TOOL}_${MODULE}_${ORG}_${ENV}_scan:
+      ${APP}_${MODULE}_${ORG}_${ENV}_scan:
         stage: validate
         extends: [".iac_security_tf"]
         variables:
-          TOOL: ${TOOL}
+          APP: ${APP}
           MODULE: ${MODULE}
           ORG: ${ORG}
           ENV: ${ENV}
 
-      ${TOOL}_${MODULE}_${ORG}_${ENV}_plan:
+      ${APP}_${MODULE}_${ORG}_${ENV}_plan:
         stage: plan
         extends: [".iac_plan",".predefined_id_tokens"]
-        needs: ["${TOOL}_${MODULE}_${ORG}_${ENV}_validate","${TOOL}_${MODULE}_${ORG}_${ENV}_scan"]
+        needs: ["${APP}_${MODULE}_${ORG}_${ENV}_validate","${APP}_${MODULE}_${ORG}_${ENV}_scan"]
         variables:
-          TOOL: ${TOOL}
+          APP: ${APP}
           MODULE: ${MODULE}
           ORG: ${ORG}
           ENV: ${ENV}
 
-      ${TOOL}_${MODULE}_${ORG}_${ENV}_deploy:
+      ${APP}_${MODULE}_${ORG}_${ENV}_deploy:
         stage: deploy
         extends: [".iac_deploy",".predefined_id_tokens"]
-        needs: ["${TOOL}_${MODULE}_${ORG}_${ENV}_plan"]
+        needs: ["${APP}_${MODULE}_${ORG}_${ENV}_plan"]
         variables:
-          TOOL: ${TOOL}
+          APP: ${APP}
           MODULE: ${MODULE}
           ORG: ${ORG}
           ENV: ${ENV}
 
-      ${TOOL}_${MODULE}_${ORG}_${ENV}_notify:
+      ${APP}_${MODULE}_${ORG}_${ENV}_notify:
         stage: notify
         extends: [".notify_slack"]
-        needs: ["${TOOL}_${MODULE}_${ORG}_${ENV}_deploy"]
+        needs: ["${APP}_${MODULE}_${ORG}_${ENV}_deploy"]
         variables:
-          TOOL: ${TOOL}
+          APP: ${APP}
           MODULE: ${MODULE}
           ORG: ${ORG}
           ENV: ${ENV}
@@ -154,33 +186,33 @@ detect_changes:
             CHANGED_MODULES=$((CHANGED_MODULES + 1))
 
       elif [[ "$var_name" =~ ^([^_]+)_([^_]+)_CHANGED$ ]]; then
-        TOOL="${BASH_REMATCH[1]}"
+        APP="${BASH_REMATCH[1]}"
         MODULE="${BASH_REMATCH[2]}"
-        echo "Generating basic MODULE jobs for ${TOOL}_${MODULE}..."
+        echo "Generating basic MODULE jobs for ${APP}_${MODULE}..."
 
         cat >> generated-jobs.yml <<EOF
 
-      ${TOOL}_${MODULE}_unit_test:
+      ${APP}_${MODULE}_unit_test:
         stage: validate
         extends: [".unit_test"]
         variables:
-          TOOL: ${TOOL}
+          APP: ${APP}
           MODULE: ${MODULE}
 
-      ${TOOL}_${MODULE}_scan:
+      ${APP}_${MODULE}_scan:
         stage: security
         extends: [".iac_security_tf"]
-        needs: ["${TOOL}_${MODULE}_unit_test"]
+        needs: ["${APP}_${MODULE}_unit_test"]
         variables:
-          TOOL: ${TOOL}
+          APP: ${APP}
           MODULE: ${MODULE}
 
-      ${TOOL}_${MODULE}_notify:
+      ${APP}_${MODULE}_notify:
         stage: notify
         extends: [".notify_slack"]
-        needs: ["${TOOL}_${MODULE}_unit_test","${TOOL}_${MODULE}_scan"]
+        needs: ["${APP}_${MODULE}_unit_test","${APP}_${MODULE}_scan"]
         variables:
-          TOOL: ${TOOL}
+          APP: ${APP}
           MODULE: ${MODULE}
       EOF
             CHANGED_MODULES=$((CHANGED_MODULES + 1))
