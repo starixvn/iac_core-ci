@@ -119,3 +119,4 @@
         (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
     - echo "🚀 Deploying Terraform configuration for ${MODULE} - ${MODULE} in ${VAULT_ENV}"
     #- terraform apply -auto-approve $PLAN
+  when: manual
