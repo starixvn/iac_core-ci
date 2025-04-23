@@ -115,7 +115,6 @@ detect_changes:
       ${TOOL}_${MODULE}_${ORG}_${ENV}_scan:
         stage: validate
         extends: [".iac_security_tf"]
-        needs: ["${TOOL}_${MODULE}_${ORG}_${ENV}_validate"]
         variables:
           TOOL: ${TOOL}
           MODULE: ${MODULE}
