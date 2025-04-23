@@ -55,9 +55,8 @@ detect_changes:
     when: always
 
 # Job 2: Generate dynamic jobs
-generate_dynamic_jobs:
+.generate_dynamic_jobs:
   stage: .pre
-  needs: ["detect_changes"]
   script:
     - |
       cat > generated-jobs.yml <<'EOF'
