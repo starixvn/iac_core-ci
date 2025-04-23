@@ -113,7 +113,7 @@ detect_changes:
           ENV: ${ENV}
 
       ${TOOL}_${MODULE}_${ORG}_${ENV}_scan:
-        stage: security
+        stage: validate
         extends: [".iac_security_tf"]
         needs: ["${TOOL}_${MODULE}_${ORG}_${ENV}_validate"]
         variables:
@@ -125,7 +125,7 @@ detect_changes:
       ${TOOL}_${MODULE}_${ORG}_${ENV}_plan:
         stage: plan
         extends: [".iac_plan",".predefined_id_tokens"]
-        needs: ["${TOOL}_${MODULE}_${ORG}_${ENV}_validate"]
+        needs: ["${TOOL}_${MODULE}_${ORG}_${ENV}_validate","${TOOL}_${MODULE}_${ORG}_${ENV}_scan"]
         variables:
           TOOL: ${TOOL}
           MODULE: ${MODULE}
