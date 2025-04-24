@@ -29,7 +29,7 @@
           elif echo ${ENV} | grep -q "prod"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://prod";
           fi;
         fi;
-
+      fi
   artifacts:
     reports:
       dotenv: tag_vars.env
