@@ -21,9 +21,23 @@
       echo "Debug: APP=${APP}, MODULE=${MODULE}, ORG=${ORG}, ENV=${ENV}"
       echo "Current path: $(pwd) | CI_PROJECT_DIR ${CI_PROJECT_DIR}"
     - |
-      if echo ${ENV} | grep -q "local"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.nexdev.net";
-      elif echo ${ENV} | grep -q "dev"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault-dev.nexdev.net";
-      elif echo ${ENV} | grep -q "uat"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.starixuat.com";
+      if [ "$ORG" == "starix" ];
+      then
+        if echo ${ENV} | grep -q "local"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.nexdev.net";
+        elif echo ${ENV} | grep -q "dev"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault-dev.nexdev.net";
+        elif echo ${ENV} | grep -q "uat"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.starixuat.com";
+        elif echo ${ENV} | grep -q "sit"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.playonesit.com";
+        elif echo ${ENV} | grep -q "kldr"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vn-st-vault.byb6181.com";
+        elif echo ${ENV} | grep -q "prod"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.starixplay.com";
+        fi;
+      elif [ "$ORG" == "lumi" ];
+      then
+        if echo ${ENV} | grep -q "local"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.lumigame.com";
+        elif echo ${ENV} | grep -q "uat"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://uat";
+        elif echo ${ENV} | grep -q "sit"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://sit";
+        elif echo ${ENV} | grep -q "kldr"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://kldr";
+        elif echo ${ENV} | grep -q "prod"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://prod";
+        fi;
       fi;
     - echo "Debug VAULT_ENV=${VAULT_ENV}, VAULT_ADDR=${VAULT_ADDR}"
     - echo "$CI_SERVER_HOST | $CI_JOB_TOKEN | $TF_CLI_CONFIG_FILE"

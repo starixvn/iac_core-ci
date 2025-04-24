@@ -11,20 +11,25 @@
         MODULE=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f3)
         ORG=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f4)
         ENV=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f5)
-        if echo ${ENV:-local} | grep -q "local"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.nexdev.net";
-        elif echo ${ENV:-local} | grep -q "dev"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault-dev.nexdev.net";
-        elif echo ${ENV:-local} | grep -q "uat"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.starixuat.com";
+        if [ "$ORG" == "starix" ];
+        then
+          if echo ${ENV} | grep -q "local"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.nexdev.net";
+          elif echo ${ENV} | grep -q "dev"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault-dev.nexdev.net";
+          elif echo ${ENV} | grep -q "uat"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.starixuat.com";
+          elif echo ${ENV} | grep -q "sit"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.playonesit.com";
+          elif echo ${ENV} | grep -q "kldr"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vn-st-vault.byb6181.com";
+          elif echo ${ENV} | grep -q "prod"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.starixplay.com";
+          fi;
+        elif [ "$ORG" == "lumi" ];
+        then
+          if echo ${ENV} | grep -q "local"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://vault.lumigame.com";
+          elif echo ${ENV} | grep -q "uat"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://uat";
+          elif echo ${ENV} | grep -q "sit"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://sit";
+          elif echo ${ENV} | grep -q "kldr"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://kldr";
+          elif echo ${ENV} | grep -q "prod"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://prod";
+          fi;
         fi;
-            echo "APP=$APP" >> tag_vars.env
-            echo "MODULE=$MODULE" >> tag_vars.env
-            echo "ORG=$ORG" >> tag_vars.env
-            echo "ENV=$ENV" >> tag_vars.env
-            echo "VAULT_ENV=$VAULT_ENV" >> tag_vars.env
-            echo "VAULT_ADDR=$VAULT_ADDR" >> tag_vars.env
-            echo "Extracted APP=$APP, MODULE=$MODULE, ORG=$ORG, ENV=$ENV | $VAULT_ENV , $VAULT_ADDR"
-      else
-        echo "FAIL with tag $CI_COMMIT_TAG"
-      fi
+
   artifacts:
     reports:
       dotenv: tag_vars.env
