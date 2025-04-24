@@ -29,7 +29,17 @@
           elif echo ${ENV} | grep -q "prod"; then export VAULT_ENV=$ENV;export VAULT_ADDR="https://prod";
           fi;
         fi;
+        echo "APP=$APP" >> tag_vars.env
+        echo "MODULE=$MODULE" >> tag_vars.env
+        echo "ORG=$ORG" >> tag_vars.env
+        echo "ENV=$ENV" >> tag_vars.env
+        echo "VAULT_ENV=$VAULT_ENV" >> tag_vars.env
+        echo "VAULT_ADDR=$VAULT_ADDR" >> tag_vars.env
+        echo "Extracted APP=$APP, MODULE=$MODULE, ORG=$ORG, ENV=$ENV | $VAULT_ENV , $VAULT_ADDR"
+      else
+        echo "FAIL with tag $CI_COMMIT_TAG"
       fi
+
   artifacts:
     reports:
       dotenv: tag_vars.env
