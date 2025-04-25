@@ -195,17 +195,7 @@ detect_changes:
 
       ${APP}_${MODULE}_${ORG}_${ENV}_notify_success:
         stage: notify
-        extends: [".notify_slack"]
-        needs: ["${APP}_${MODULE}_${ORG}_${ENV}_deploy"]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-          ORG: ${ORG}
-          ENV: ${ENV}
-
-      ${APP}_${MODULE}_${ORG}_${ENV}_notify_failure:
-        stage: notify
-        extends: [".notify_slack_failure"]
+        extends: [".notify_job_success"]
         needs: ["${APP}_${MODULE}_${ORG}_${ENV}_deploy"]
         variables:
           APP: ${APP}
@@ -240,15 +230,7 @@ detect_changes:
 
       ${APP}_${MODULE}_notify_success:
         stage: notify
-        extends: [".notify_slack"]
-        needs: ["${APP}_${MODULE}_unit_test","${APP}_${MODULE}_scan"]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-
-      ${APP}_${MODULE}_notify_failure:
-        stage: notify
-        extends: [".notify_slack_failure"]
+        extends: [".notify_job_success"]
         needs: ["${APP}_${MODULE}_unit_test","${APP}_${MODULE}_scan"]
         variables:
           APP: ${APP}

@@ -71,18 +71,24 @@
         (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
         terraform validate
         terraform fmt 
+  after_script:
+    - !reference [.notify_job_failure, script]
  
 .iac_security_tf:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - echo "Scanning TF - Security $APP / $MODULE ...";
+  after_script:
+    - !reference [.notify_job_failure, script]
 
 .iac_security_helm:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - echo "Scanning HELM - Security $APP / $MODULE ...";
+  after_script:
+    - !reference [.notify_job_failure, script]
 
 #####################################
 #####################################
@@ -114,6 +120,8 @@
       - $CI_PROJECT_DIR/${APP}/${MODULE}/${JSON_PLAN_FILE}
       - $CI_PROJECT_DIR/${APP}/${MODULE}/${PLAN}
     expire_in: 1 week
+  after_script:
+    - !reference [.notify_job_failure, script]
   
 
 .iac_deploy:
@@ -133,6 +141,8 @@
         (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
     - echo "🚀 Deploying Terraform configuration for ${MODULE} - ${MODULE} in ${VAULT_ENV}"
     #- terraform apply -auto-approve $PLAN
+  after_script:
+    - !reference [.notify_job_failure, script]
   when: manual
 
 ##################################### Deploy TAGs
