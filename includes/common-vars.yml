@@ -12,6 +12,7 @@ variables:
   TF_ROOT: "${CI_PROJECT_DIR}"
   TF_CLI_CONFIG_FILE: $CI_PROJECT_DIR/.terraformrc
   SLACK_WEBHOOK_URL: "https://hooks.slack.com/services/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"
+  SLACK_CHANNEL: "nexops-deployment"
 
 cache:
   - key: ${TOOL}-$MODULE-$ORG-$ENV-terraform
