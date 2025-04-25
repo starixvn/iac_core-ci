@@ -2,18 +2,20 @@
 .notify_slack:
   stage: notify
   script:
+    - echo "1 webhook $SLACK_WEBHOOK_URL | channel $SLACK_CHANNEL"
     - |
       if [ "$CI_JOB_STATUS" == "success" ]; then
-        echo " webhook $SLACK_WEBHOOK_URL | channel $SLACK_CHANNEL"
+        echo "2 webhook $SLACK_WEBHOOK_URL | channel $SLACK_CHANNEL"
       fi
   when: on_success
 
 .notify_slack_failure:
   stage: notify
   script:
+    - echo "1 webhook $SLACK_WEBHOOK_URL | channel $SLACK_CHANNEL"
     - |
-      if [ "$CI_JOB_STATUS" == "failed" ]; then
-        echo " webhook $SLACK_WEBHOOK_URL | channel $SLACK_CHANNEL"
+      if [ "$CI_JOB_STATUS" == "success" ]; then
+        echo "2 webhook $SLACK_WEBHOOK_URL | channel $SLACK_CHANNEL"
       fi
 
 .notify_slack_tag:
