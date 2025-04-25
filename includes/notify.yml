@@ -3,9 +3,8 @@
   stage: notify
   script:
     - |
-      MESSAGE=":rocket: *[SUCCESS] Deployment ${APP} / ${MODULE} by $GITLAB_USER_NAME Completed* 
-        • *Environment:* \`${ENV:-$VAULT_ENV}\`
-        • *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\`
+      MESSAGE=":rocket: [SUCCESS] Deployment* ${APP} / ${MODULE} *by $GITLAB_USER_NAME
+        • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\`
         • *Pipeline:* <$CI_PIPELINE_URL|#$CI_PIPELINE_ID>
         • *Commit:* <$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>"
         
@@ -35,13 +34,13 @@
   stage: notify
   script:
     - |
-      echo "[FAILED] Pipeline Error , Job failed at $CI_JOB_STAGE stage"
+      echo "[FAILED] Pipeline Error , Job failed at $CI_JOB_STAGE stage "
     - |
-      MESSAGE=":fire: *[FAILED] Pipeline Error , Job failed at $CI_JOB_STAGE stage * 
-        • *Duration:* $(($CI_JOB_FINISHED_AT - $CI_JOB_STARTED_AT)) seconds
+      MESSAGE=":fire: [FAILED] Pipeline Error , Job failed at* $CI_JOB_STAGE *by $GITLAB_USER_NAME 
         • *Pipeline:* <$CI_PIPELINE_URL|#$CI_PIPELINE_ID>
         • *Commit:* <$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>
-        • *Error Details:* Check the failed job log for more information | *Failed Job:* <$CI_JOB_URL|$CI_JOB_NAME>"
+        • *Error Details:* Check the failed job log for more information
+        • *Failed Job:* <$CI_JOB_URL|$CI_JOB_NAME>"
         
         curl -X POST -H 'Content-type: application/json' \
           --data "{
