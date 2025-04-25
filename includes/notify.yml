@@ -3,17 +3,16 @@
   stage: notify
   script:
     - |
-      MESSAGE=":rocket: *[SUCCESS] Deployment | ${APP} / ${MODULE} Triggered by $GITLAB_USER_NAME | Completed* 
+      MESSAGE=":rocket: *[SUCCESS] Deployment ${APP} / ${MODULE} by $GITLAB_USER_NAME Completed* 
         • *Environment:* \`${ENV:-$VAULT_ENV}\`
         • *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\`
-        • *Duration:* $(($CI_JOB_FINISHED_AT - $CI_JOB_STARTED_AT)) seconds
         • *Pipeline:* <$CI_PIPELINE_URL|#$CI_PIPELINE_ID>
         • *Commit:* <$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>"
         
         curl -X POST -H 'Content-type: application/json' \
           --data "{
             \"channel\": \"$SLACK_CHANNEL\",
-            \"username\": \"GitLab CICD Bot\",
+            \"username\": \"GitLab CICD\",
             \"attachments\": [
               {
                 \"color\": \"#36a64f\",
