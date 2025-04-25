@@ -36,7 +36,7 @@
   stage: notify
   script:
     - |
-      MESSAGE=":fire: *[FAILED] Pipeline Error | ${APP} / ${MODULE} Triggered by $GITLAB_USER_NAME | *Error Details:* Job failed at $CI_JOB_STAGE stage * 
+      MESSAGE=":fire: *[FAILED] Pipeline Error , Job failed at $CI_JOB_STAGE stage * 
         • *Environment:* \`${ENV:-$VAULT_ENV}\`
         • *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\`
         • *Stage:* \`$CI_JOB_STAGE\`
