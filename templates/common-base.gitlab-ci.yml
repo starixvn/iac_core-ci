@@ -204,6 +204,7 @@ detect_changes:
           ENV: ${ENV}
 
       ${APP}_${MODULE}_${ORG}_${ENV}_notify_failure:
+        stage: notify
         extends: [".notify_slack_failure"]
         needs: ["${APP}_${MODULE}_${ORG}_${ENV}_deploy"]
         variables:
@@ -237,13 +238,22 @@ detect_changes:
           APP: ${APP}
           MODULE: ${MODULE}
 
-      ${APP}_${MODULE}_notify:
+      ${APP}_${MODULE}_notify_success:
         stage: notify
         extends: [".notify_slack"]
         needs: ["${APP}_${MODULE}_unit_test","${APP}_${MODULE}_scan"]
         variables:
           APP: ${APP}
           MODULE: ${MODULE}
+
+      ${APP}_${MODULE}_notify_failure:
+        stage: notify
+        extends: [".notify_slack_failure"]
+        needs: ["${APP}_${MODULE}_unit_test","${APP}_${MODULE}_scan"]
+        variables:
+          APP: ${APP}
+          MODULE: ${MODULE}
+
       EOF
             CHANGED_MODULES=$((CHANGED_MODULES + 1))
           fi
