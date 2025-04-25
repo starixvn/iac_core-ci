@@ -71,6 +71,8 @@
         (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
         terraform validate
         terraform fmt 
+  after_script:
+    - !reference [.notify_job_failure, script]
  
 .iac_security_tf:
   stage: security
