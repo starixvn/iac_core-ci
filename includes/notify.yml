@@ -34,9 +34,7 @@
   stage: notify
   script:
     - |
-      echo "[FAILED] Pipeline Error"
-    - |
-      MESSAGE=":fire: *[FAILED] Pipeline Error , Job failed at $CI_JOB_NAME*
+      MESSAGE=":fire: *[FAILED] Pipeline Error*
         • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\` | by $GITLAB_USER_NAME
         • *Pipeline:* <$CI_PIPELINE_URL|#$CI_PIPELINE_ID>
         • *Commit:* <$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>
@@ -45,7 +43,7 @@
         curl -X POST -H 'Content-type: application/json' \
           --data "{
             \"channel\": \"$SLACK_CHANNEL\",
-            \"username\": \"GitLab CICD Bot\",
+            \"username\": \"GitLab CICD\",
             \"attachments\": [
               {
                 \"color\": \"#36a64f\",
