@@ -228,14 +228,6 @@ detect_changes:
           APP: ${APP}
           MODULE: ${MODULE}
 
-      ${APP}_${MODULE}_notify_success:
-        stage: notify
-        extends: [".notify_job_success"]
-        needs: ["${APP}_${MODULE}_unit_test","${APP}_${MODULE}_scan"]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-
       EOF
             CHANGED_MODULES=$((CHANGED_MODULES + 1))
           fi
