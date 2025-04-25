@@ -157,7 +157,7 @@ detect_changes:
 
       ${APP}_${MODULE}_${ORG}_${ENV}_validate:
         stage: validate
-        extends: [".iac_validate",".predefined_id_tokens"]
+        extends: [".iac_validate",".predefined_id_tokens",".notify_job_failure"]
         variables:
           APP: ${APP}
           MODULE: ${MODULE}
@@ -166,7 +166,7 @@ detect_changes:
 
       ${APP}_${MODULE}_${ORG}_${ENV}_scan:
         stage: validate
-        extends: [".iac_security_tf"]
+        extends: [".iac_security_tf",".notify_job_failure"]
         variables:
           APP: ${APP}
           MODULE: ${MODULE}
@@ -175,7 +175,7 @@ detect_changes:
 
       ${APP}_${MODULE}_${ORG}_${ENV}_plan:
         stage: plan
-        extends: [".iac_plan",".predefined_id_tokens"]
+        extends: [".iac_plan",".predefined_id_tokens",".notify_job_failure"]
         needs: ["${APP}_${MODULE}_${ORG}_${ENV}_validate","${APP}_${MODULE}_${ORG}_${ENV}_scan"]
         variables:
           APP: ${APP}
@@ -185,7 +185,7 @@ detect_changes:
 
       ${APP}_${MODULE}_${ORG}_${ENV}_deploy:
         stage: deploy
-        extends: [".iac_deploy",".predefined_id_tokens"]
+        extends: [".iac_deploy",".predefined_id_tokens",".notify_job_failure"]
         needs: ["${APP}_${MODULE}_${ORG}_${ENV}_plan"]
         variables:
           APP: ${APP}
@@ -215,14 +215,14 @@ detect_changes:
 
       ${APP}_${MODULE}_unit_test:
         stage: validate
-        extends: [".unit_test"]
+        extends: [".unit_test",".notify_job_failure"]
         variables:
           APP: ${APP}
           MODULE: ${MODULE}
 
       ${APP}_${MODULE}_scan:
         stage: security
-        extends: [".iac_security_tf"]
+        extends: [".iac_security_tf",".notify_job_failure"]
         needs: ["${APP}_${MODULE}_unit_test"]
         variables:
           APP: ${APP}
