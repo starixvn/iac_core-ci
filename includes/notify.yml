@@ -4,14 +4,7 @@
   script:
     - |
       if [ "$CI_JOB_STATUS" == "success" ]; then
-        echo " webhook $SLACK_WEBHOOK_URL | channel $SLACK_CHANNEL - :rocket: *[SUCCESS] Deployment Completed* 
-        • *Project:* \`$CI_PROJECT_NAME\`
-        • *Environment:* \`${ENV:-$VAULT_ENV}\`
-        • *Module:* \`${MODULE}\`
-        • *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\`
-        • *Pipeline:* <$CI_PIPELINE_URL|#$CI_PIPELINE_ID>
-        • *Commit:* <$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>
-        • *Triggered by:* $GITLAB_USER_NAME"
+        echo " webhook $SLACK_WEBHOOK_URL | channel $SLACK_CHANNEL"
       fi
   when: on_success
 
@@ -20,14 +13,7 @@
   script:
     - |
       if [ "$CI_JOB_STATUS" == "failed" ]; then
-        echo " webhook $SLACK_WEBHOOK_URL | channel $SLACK_CHANNEL - :rocket: *[SUCCESS] Deployment Completed* 
-        • *Project:* \`$CI_PROJECT_NAME\`
-        • *Environment:* \`${ENV:-$VAULT_ENV}\`
-        • *Module:* \`${MODULE}\`
-        • *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\`
-        • *Pipeline:* <$CI_PIPELINE_URL|#$CI_PIPELINE_ID>
-        • *Commit:* <$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>
-        • *Triggered by:* $GITLAB_USER_NAME"
+        echo " webhook $SLACK_WEBHOOK_URL | channel $SLACK_CHANNEL"
       fi
 
 .notify_slack_tag:
