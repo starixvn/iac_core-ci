@@ -62,7 +62,6 @@
           $SLACK_WEBHOOK_URL
   rules:
     - when: on_failure
-  allow_failure: true
 
 .notify_slack_tag_success:
   stage: notify
