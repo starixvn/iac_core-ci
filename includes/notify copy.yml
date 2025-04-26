@@ -1,0 +1,86 @@
+---
+.notify_job_success:
+  stage: notify
+  script:
+    - |
+      MESSAGE=":rocket: *[SUCCESS] Deployment* ${APP} / ${MODULE}*
+        • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\` | by $GITLAB_USER_NAME
+        • *Pipeline:* <$CI_PIPELINE_URL|#$CI_PIPELINE_ID>
+        • *Commit:* <$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>"
+        
+        curl -X POST -H 'Content-type: application/json' \
+          --data "{
+            \"channel\": \"$SLACK_CHANNEL\",
+            \"username\": \"GitLab CICD\",
+            \"attachments\": [
+              {
+                \"color\": \"#36a64f\",
+                \"blocks\": [
+                  {
+                    \"type\": \"section\",
+                    \"text\": {
+                      \"type\": \"mrkdwn\",
+                      \"text\": \"$MESSAGE\"
+                    }
+                  }
+                ]
+              }
+            ]
+          }" \
+          $SLACK_WEBHOOK_URL
+  when: on_success
+
+.notify_job_failure:
+  stage: notify
+  script:
+    - |
+      MESSAGE=":fire: *[FAILED] Pipeline Error*
+        • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\` | by $GITLAB_USER_NAME
+        • *Pipeline:* <$CI_PIPELINE_URL|#$CI_PIPELINE_ID>
+        • *Commit:* <$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>
+        • *Failed Job:* <$CI_JOB_URL|$CI_JOB_NAME>"
+        
+        curl -X POST -H 'Content-type: application/json' \
+          --data "{
+            \"channel\": \"$SLACK_CHANNEL\",
+            \"username\": \"GitLab CICD\",
+            \"attachments\": [
+              {
+                \"color\": \"#36a64f\",
+                \"blocks\": [
+                  {
+                    \"type\": \"section\",
+                    \"text\": {
+                      \"type\": \"mrkdwn\",
+                      \"text\": \"$MESSAGE\"
+                    }
+                  }
+                ]
+              }
+            ]
+          }" \
+          $SLACK_WEBHOOK_URL
+  rules:
+    - when: on_failure
+
+.notify_slack_tag_success:
+  stage: notify
+  extends: .notify_job_success
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
+      when: on_success
+
+.cleanup_tag:
+  stage: cleanup
+  image: hub.nexdev.net/base/alpine:git-3.21
+  script:
+    - echo "cleaning up tag ..."
+    - |
+      curl --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}" \
+          --request DELETE \
+          "${GITLAB_API_URL}/projects/${CI_PROJECT_ID}/repository/tags/${CI_COMMIT_TAG}"
+    - echo "Successfully deleted tag ${CI_COMMIT_TAG}"
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
+      when: always
+  allow_failure: true

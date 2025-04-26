@@ -194,22 +194,19 @@ detect_changes:
         extends: [".iac_deploy",".predefined_id_tokens"]
         needs: ["${APP}_${MODULE}_${ORG}_${ENV}_plan"]
         after_script:
-          - !reference [.notify_job_failure, script]
+          - !reference [.notify_stage_failure, script]
         variables:
           APP: ${APP}
           MODULE: ${MODULE}
           ORG: ${ORG}
           ENV: ${ENV}
 
-      ${APP}_${MODULE}_${ORG}_${ENV}_notify_success:
-        stage: notify
-        extends: [".notify_job_success"]
-        needs: ["${APP}_${MODULE}_${ORG}_${ENV}_deploy"]
+      ${APP}_${MODULE}_${ORG}_${ENV}_pipeline_notify:
+        extends: .notify_pipeline_success
+        needs: ["deploy"]
         variables:
           APP: ${APP}
           MODULE: ${MODULE}
-          ORG: ${ORG}
-          ENV: ${ENV}
       
       EOF
             CHANGED_MODULES=$((CHANGED_MODULES + 1))
