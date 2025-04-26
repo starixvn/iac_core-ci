@@ -40,12 +40,8 @@
 
 .notify_pipeline_failure:
   <<: *notify_base
-  rules:
-    - when: on_failure
-  needs: []
-  allow_failure: true
-  variables:
-    CI_FAILED_JOB_SCRIPT: "true"
+  when: on_failure
+  #allow_failure: true
 
 ############### TAG
 
