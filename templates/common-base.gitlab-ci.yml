@@ -159,7 +159,7 @@ detect_changes:
         stage: validate
         extends: [".iac_validate",".predefined_id_tokens"]
         after_script:
-          - !reference [.notify_pipeline_failure, script]
+          - !reference [.notify_job_failure, script]
         variables:
           APP: ${APP}
           MODULE: ${MODULE}
@@ -180,7 +180,7 @@ detect_changes:
         extends: [".iac_plan",".predefined_id_tokens"]
         needs: ["${APP}_${MODULE}_${ORG}_${ENV}_validate","${APP}_${MODULE}_${ORG}_${ENV}_scan"]
         after_script:
-          - !reference [.notify_pipeline_failure, script]
+          - !reference [.notify_job_failure, script]
         variables:
           APP: ${APP}
           MODULE: ${MODULE}
@@ -192,7 +192,7 @@ detect_changes:
         extends: [".iac_deploy",".predefined_id_tokens"]
         needs: ["${APP}_${MODULE}_${ORG}_${ENV}_plan"]
         after_script:
-          - !reference [.notify_pipeline_failure, script]
+          - !reference [.notify_job_failure, script]
         variables:
           APP: ${APP}
           MODULE: ${MODULE}
@@ -200,7 +200,7 @@ detect_changes:
           ENV: ${ENV}
 
       ${APP}_${MODULE}_${ORG}_${ENV}_pipeline_notify:
-        extends: .notify_pipeline_success
+        extends: .notify_deploy_success
         needs: ["${APP}_${MODULE}_${ORG}_${ENV}_deploy"]
         variables:
           APP: ${APP}
