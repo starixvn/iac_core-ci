@@ -197,7 +197,7 @@ detect_changes:
 
       ${APP}_${MODULE}_${ORG}_${ENV}_pipeline_notify:
         extends: .notify_pipeline_success
-        needs: ["deploy"]
+        needs: ["${APP}_${MODULE}_${ORG}_${ENV}_deploy"]
         variables:
           APP: ${APP}
           MODULE: ${MODULE}
