@@ -16,7 +16,7 @@
       COLOR="$([ "$STATUS" = "SUCCESS" ] && echo "#36a64f" || echo "#ff0000")"
       EMOJI="$([ "$STATUS" = "SUCCESS" ] && echo ":rocket:" || echo ":fire:")"
       
-      MESSAGE="$EMOJI *[SUCCESS] Deployment* ${APP} / ${MODULE}*
+      MESSAGE="$EMOJI *[SUCCESS] Deployment ${APP} - ${MODULE}*
       • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\` | by $GITLAB_USER_NAME
       • *Pipeline:* <$CI_PIPELINE_URL|#$CI_PIPELINE_ID>
       • *Commit:* <$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>"
