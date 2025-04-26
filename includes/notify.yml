@@ -33,14 +33,13 @@
 .notify_pipeline_success:
   <<: *notify_base
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      when: always
+    - when: always
 
 .notify_pipeline_failure:
   <<: *notify_base
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      when: always
+    - when: always
+  needs: []
 
 .notify_stage_failure:
   <<: *notify_base
