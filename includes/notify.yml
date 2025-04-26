@@ -37,7 +37,9 @@
         }" \
         "$SLACK_WEBHOOK_URL"
   rules:
-    - if: '$CI_JOB_NAME =~ /deploy/ && $CI_JOB_STATUS == "success"'
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+/'
+      when: on_success
+    - when: on_success
 
 .notify_pipeline_failure:
   <<: *notify_base
