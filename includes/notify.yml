@@ -42,7 +42,6 @@
   <<: *notify_base
   rules:
     - when: on_failure
-  needs: []
 
 .notify_stage_failure:
   <<: *notify_base
