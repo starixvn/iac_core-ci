@@ -52,6 +52,7 @@
       STATUS="$([ "$CI_JOB_STATUS" = "success" ] && echo "SUCCESS" || echo "FAILED")"
       COLOR="$([ "$STATUS" = "SUCCESS" ] && echo "#36a64f" || echo "#ff0000")"
       EMOJI="$([ "$STATUS" = "SUCCESS" ] && echo ":rocket:" || echo ":fire:")"
+      FOOTER_DATE=$(TZ="Asia/Bangkok" date +'%Y-%m-%d %H:%M:%S GMT+7')
       if [ "$STATUS" = "FAILED" ]; then
         MESSAGE="$EMOJI *[FAILED] Pipeline Error ${CI_JOB_NAME}*
         • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\` | by $GITLAB_USER_NAME
@@ -65,7 +66,7 @@
           \"attachments\": [{
             \"color\": \"$COLOR\",
             \"text\": \"$MESSAGE\",
-            \"footer\": \"$(date -u +'%Y-%m-%d %H:%M:%S UTC')\"
+            \"footer\": \"$FOOTER_DATE\"
           }]
         }" \
         "$SLACK_WEBHOOK_URL"
