@@ -199,7 +199,7 @@ detect_changes:
           ORG: ${ORG}
           ENV: ${ENV}
 
-      ${APP}_${MODULE}_${ORG}_${ENV}_pipeline_notify:
+      ${APP}_${MODULE}_${ORG}_${ENV}_notify:
         extends: .notify_pipeline_success
         needs: ["${APP}_${MODULE}_${ORG}_${ENV}_deploy"]
         variables:
