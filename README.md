@@ -1,17 +1,66 @@
-# Infrastructure as Code (IaC) Pipeline Guidelines
+# Infrastructure as Code (EaC) Pipeline Guidelines
 
 ## Table of Contents
-1. [Pipeline Structure](#pipeline-structure)
-2. [Job Naming Conventions](#job-naming-conventions)
-3. [Environment Variables](#environment-variables)
-4. [Terraform Configuration](#terraform-configuration)
-5. [Vault Integration](#vault-integration)
-6. [Dynamic Job Generation](#dynamic-job-generation)
-7. [Tag-based Deployment](#tag-based-deployment)
-8. [Notification System](#notification-system)
-9. [Security Practices](#security-practices)
-10. [Artifact Management](#artifact-management)
+1. [Folder Structure](#folder-structure)
+2. [Pipeline Structure](#pipeline-structure)
+3. [Job Naming Conventions](#job-naming-conventions)
+4. [Environment Variables](#environment-variables)
+5. [Terraform Configuration](#terraform-configuration)
+6. [Vault Integration](#vault-integration)
+7. [Dynamic Job Generation](#dynamic-job-generation)
+8. [Tag-based Deployment](#tag-based-deployment)
+9. [Notification System](#notification-system)
+10. [Security Practices](#security-practices)
+11. [Artifact Management](#artifact-management)
+12. [Use Cases](#use-cases)
 
+## Folder Structure
+
+### Standard Project Layout
+```text
+project-root/
+│
+├── app1/                  # Application 1
+│   ├── module1/           # Module 1
+│   │   ├── main.tf              # Main Terraform config
+│   │   ├── variables.tf         # Variable declarations
+│   │   ├── outputs.tf           # Output definitions
+│   │   └── variable.d/          # Environment-specific variables
+│   │       ├── org1/            # Organization 1
+│   │       │   ├── dev/         # Dev environment
+│   │       │   │   ├── backend.conf
+│   │       │   │   └── variables.tfvars
+│   │       │   └── uat/
+│   │       └── org2/
+│   │           └── prod/
+│   └── module2/
+│       └── ...
+│
+├── app2/
+│   └── ...
+│
+└── .gitlab-ci.yml         # CI/CD pipeline configuration
+```
+### Stage Flow
+```mermaid
+graph TD
+  A[project-root] --> B[app1]
+  B --> B1[module1]
+  B1 --> B1a[main.tf]
+  B1 --> B1b[variables.tf]
+  B1 --> B1c[outputs.tf]
+  B1 --> B1d[variable.d]
+  B1d --> B1d1[org1]
+  B1d1 --> B1d1a[dev]
+  B1d1a --> B1d1a1[backend.conf]
+  B1d1a --> B1d1a2[variables.tfvars]
+  B1d1 --> B1d1b[uat]
+  B1d --> B1d2[org2]
+  B1d2 --> B1d2a[prod]
+  B --> B2[module2]
+  A --> C[app2]
+  A --> D[.gitlab-ci.yml]
+```
 ## Pipeline Structure
 
 ### Stages
@@ -90,15 +139,34 @@ The pipeline consists of the following stages:
 - Token obtained via `vault write auth/jwt/login`
 - Role configured via `TF_VAR_vault_role`
 
-### Environment Setup
-```bash
-if echo ${ENV} | grep -q "local"; then 
-  export VAULT_ENV=$ENV
-  export VAULT_ADDR="https://vault.nexdev.net"
-elif echo ${ENV} | grep -q "dev"; then 
-  export VAULT_ENV=$ENV
-  export VAULT_ADDR="https://vault-dev.nexdev.net"
-elif echo ${ENV} | grep -q "uat"; then 
-  export VAULT_ENV=$ENV
-  export VAULT_ADDR="https://vault.starixuat.com"
-fi
+## Use Cases
+
+### 1. Standard Module Development
+**Scenario**: Developer working on a module1 in app1
+
+1. Make changes to Terraform files in `app1/module1/`
+2. Push changes to branch
+3. Pipeline automatically:
+   - Detects changes in `app1/module1/`
+   - Runs unit tests and security scans
+   - Notifies team of results
+
+**Example Job Flow**:
+app1_module1_unit_test → app1_module1_scan → app1_module1_notify
+
+### 2. Environment-specific Deployment
+**Scenario**: Deploying module1 to UAT environment
+
+1. Create deployment tag:
+   ```bash
+   git tag -a deploy-app1-module1-org1-uat -m "Deploy to UAT"
+   git push origin deploy-app1-module1-org1-uat
+
+2. Pipeline automatically:
+    - Extracts variables from tag
+    - Sets up Vault connection for UAT
+    - Runs Terraform plan
+    - Waits for manual approval
+    - Deploys when approved
+    - Notifies team
+    - Cleans up tag

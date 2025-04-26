@@ -2,7 +2,7 @@
 # Job 1: Extract Tag vars
 .extract_tag_vars:
   stage: .pre
-  image: hub.nexdev.net/base/alpine:git-3.21
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - echo "checking deploy tag $CI_COMMIT_TAG ..."
     - |
