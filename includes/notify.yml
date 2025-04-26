@@ -37,7 +37,6 @@
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
       when: always
-  needs: []
 
 .notify_pipeline_failure:
   <<: *notify_base
