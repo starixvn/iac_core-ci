@@ -192,7 +192,7 @@ detect_changes:
         extends: [".iac_deploy",".predefined_id_tokens"]
         needs: ["${APP}_${MODULE}_${ORG}_${ENV}_plan"]
         after_script:
-          - !reference [.notify_stage_failure, script]
+          - !reference [.notify_pipeline_failure, script]
         variables:
           APP: ${APP}
           MODULE: ${MODULE}
