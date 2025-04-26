@@ -201,6 +201,8 @@ detect_changes:
         variables:
           APP: ${APP}
           MODULE: ${MODULE}
+          ORG: ${ORG}
+          ENV: ${ENV}
       
       EOF
             CHANGED_MODULES=$((CHANGED_MODULES + 1))
