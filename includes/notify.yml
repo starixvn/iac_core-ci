@@ -6,7 +6,7 @@
     - when: never # Disable by default
   script:
     - | 
-      echo "${APP}/${MODULE} -  $ENV"
+      echo "${APP}/${MODULE} -  $ENV - $CI_JOB_STATUS"
     - |
       STATUS="$([ "$CI_JOB_STATUS" = "success" ] && echo "SUCCESS" || echo "FAILED")"
       COLOR="$([ "$STATUS" = "SUCCESS" ] && echo "#36a64f" || echo "#ff0000")"
@@ -33,12 +33,12 @@
 .notify_pipeline_success:
   <<: *notify_base
   rules:
-    - when: always
+    - when: on_success
 
 .notify_pipeline_failure:
   <<: *notify_base
   rules:
-    - when: always
+    - when: on_failure
   needs: []
 
 .notify_stage_failure:
