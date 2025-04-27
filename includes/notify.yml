@@ -15,9 +15,6 @@
       STATUS="$([ "$CI_JOB_STATUS" = "success" ] && echo "SUCCESS" || echo "FAILED")"
       COLOR="$([ "$STATUS" = "SUCCESS" ] && echo "#36a64f" || echo "#ff0000")"
       EMOJI="$([ "$STATUS" = "SUCCESS" ] && echo ":rocket:" || echo ":fire:")"
-      if date -j -f "%Y-%m-%dT%H:%M:%SZ" "$CI_JOB_STARTED_AT" +%s >/dev/null 2>&1; then
-        START_TIME=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$CI_JOB_STARTED_AT" +%s)
-      fi
       FOOTER_DATE=$(date -d '+7 hours' +'%Y-%m-%d %H:%M:%S GMT+7' 2>/dev/null || date +'%Y-%m-%d %H:%M:%S UTC')
 
       MESSAGE="$EMOJI *[${ENV} - DEPLOYED] ${APP} - ${MODULE}*
