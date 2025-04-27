@@ -54,7 +54,7 @@
       COLOR="$([ "$STATUS" = "SUCCESS" ] && echo "#36a64f" || echo "#ff0000")"
       EMOJI="$([ "$STATUS" = "SUCCESS" ] && echo ":rocket:" || echo ":fire:")"
       export TZ="Asia/Bangkok"
-      FOOTER_DATE=$(date +'%Y-%m-%d %H:%M:%S GMT+7')
+      FOOTER_DATE=$(date +'%Y-%m-%d %H:%M:%S')
       if [ "$STATUS" = "FAILED" ]; then
         MESSAGE="$EMOJI *[FAILED] Pipeline Error ${CI_JOB_NAME}*
         • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\` | by $GITLAB_USER_NAME
