@@ -15,11 +15,15 @@
       STATUS="$([ "$CI_JOB_STATUS" = "success" ] && echo "SUCCESS" || echo "FAILED")"
       COLOR="$([ "$STATUS" = "SUCCESS" ] && echo "#36a64f" || echo "#ff0000")"
       EMOJI="$([ "$STATUS" = "SUCCESS" ] && echo ":rocket:" || echo ":fire:")"
-      DURATION_SECONDS=$(( $(date +%s) - $(date -d "$CI_JOB_STARTED_AT" +%s) ))
-      DURATION_READABLE=$(printf '%dh %dm %ds' $((DURATION_SECONDS/3600)) $((DURATION_SECONDS%3600/60)) $((DURATION_SECONDS%60)))
-      FOOTER_DATE=$(TZ="Asia/Bangkok" date +'%Y-%m-%d %H:%M:%S GMT+7')
+      if date -j -f "%Y-%m-%dT%H:%M:%SZ" "$CI_JOB_STARTED_AT" +%s >/dev/null 2>&1; then
+        START_TIME=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$CI_JOB_STARTED_AT" +%s)
+      fi
+      export TZ="Asia/Bangkok"
+      DURATION=$(( $(date +%s) - START_TIME ))
+      DURATION_READABLE=$(printf '%dh %dm %ds' $((DURATION/3600)) $((DURATION%3600/60)) $((DURATION%60)))
+      FOOTER_DATE=$(date +'%Y-%m-%d %H:%M:%S GMT+7')
 
-      MESSAGE="$EMOJI *[DEPLOYED] ${APP} - ${MODULE}*
+      MESSAGE="$EMOJI *[${ENV} - DEPLOYED] ${APP} - ${MODULE}*
       • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\` | by $GITLAB_USER_NAME
       • *Pipeline:* <$CI_PIPELINE_URL|#$CI_PIPELINE_ID>
       • *Commit:* <$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>
@@ -52,7 +56,10 @@
       STATUS="$([ "$CI_JOB_STATUS" = "success" ] && echo "SUCCESS" || echo "FAILED")"
       COLOR="$([ "$STATUS" = "SUCCESS" ] && echo "#36a64f" || echo "#ff0000")"
       EMOJI="$([ "$STATUS" = "SUCCESS" ] && echo ":rocket:" || echo ":fire:")"
-      FOOTER_DATE=$(TZ="Asia/Bangkok" date +'%Y-%m-%d %H:%M:%S GMT+7')
+      export TZ="Asia/Bangkok"
+      DURATION=$(( $(date +%s) - START_TIME ))
+      DURATION_READABLE=$(printf '%dh %dm %ds' $((DURATION/3600)) $((DURATION%3600/60)) $((DURATION%60)))
+      FOOTER_DATE=$(date +'%Y-%m-%d %H:%M:%S GMT+7')
       if [ "$STATUS" = "FAILED" ]; then
         MESSAGE="$EMOJI *[FAILED] Pipeline Error ${CI_JOB_NAME}*
         • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\` | by $GITLAB_USER_NAME
