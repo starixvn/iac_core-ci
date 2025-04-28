@@ -71,8 +71,8 @@
         echo "🔧 validate $APP / $MODULE | $VAULT_ENV ...";
         echo "$CI_PROJECT_DIR/$APP/$MODULE ";
         cd $CI_PROJECT_DIR/$APP/$MODULE
-        terraform init -backend-config="$CI_PROJECT_DIR/$APP/$MODULE/variable.d/${ORG}/${VAULT_ENV}/backend.conf"
-        (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
+        terraform init -backend-config="$CI_PROJECT_DIR/$APP/$MODULE/variable.d/${ORG}/${ENV}/backend.conf"
+        (terraform workspace select ${ENV} || terraform workspace new ${ENV})
         terraform validate
         terraform fmt 
  
@@ -104,11 +104,11 @@
     - aws configure list
     - |
         cd $CI_PROJECT_DIR/$APP/$MODULE
-        terraform init -backend-config="$CI_PROJECT_DIR/$APP/$MODULE/variable.d/${ORG}/${VAULT_ENV}/backend.conf"
-        (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
+        terraform init -backend-config="$CI_PROJECT_DIR/$APP/$MODULE/variable.d/${ORG}/${ENV}/backend.conf"
+        (terraform workspace select ${ENV} || terraform workspace new ${ENV})
     - echo "Preparing Terraform configuration for ${MODULE} ${MODULE} in ${ENV}"
     - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
-    - terraform plan -var-file="$CI_PROJECT_DIR/$APP/$MODULE/variable.d/${ORG}/${VAULT_ENV}/variables.tfvars" -out=${PLAN}
+    - terraform plan -var-file="$CI_PROJECT_DIR/$APP/$MODULE/variable.d/${ORG}/${ENV}/variables.tfvars" -out=${PLAN}
     - "terraform show -json $PLAN | convert_report > ${JSON_PLAN_FILE}"
   artifacts:
     name: $APP-$MODULE-$ENV
@@ -133,9 +133,9 @@
     - aws configure list
     - |
         cd $CI_PROJECT_DIR/$APP/$MODULE
-        terraform init -backend-config="$CI_PROJECT_DIR/$APP/$MODULE/variable.d/${ORG}/${VAULT_ENV}/backend.conf"
-        (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
-    - echo "🚀 Deploying Terraform configuration for ${MODULE} - ${MODULE} in ${VAULT_ENV}"
+        terraform init -backend-config="$CI_PROJECT_DIR/$APP/$MODULE/variable.d/${ORG}/${ENV}/backend.conf"
+        (terraform workspace select ${ENV} || terraform workspace new $ENV})
+    - echo "🚀 Deploying Terraform configuration for ${MODULE} - ${MODULE} in ${ENV}"
     #- terraform apply -auto-approve $PLAN
   when: manual
 
@@ -155,11 +155,11 @@
     - aws configure list
     - |
         cd $CI_PROJECT_DIR/$APP/$MODULE
-        terraform init -backend-config="$CI_PROJECT_DIR/$APP/$MODULE/variable.d/${ORG}/${VAULT_ENV}/backend.conf"
-        (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
+        terraform init -backend-config="$CI_PROJECT_DIR/$APP/$MODULE/variable.d/${ORG}/${ENV}/backend.conf"
+        (terraform workspace select ${ENV} || terraform workspace new ${ENV})
     - echo "Preparing Terraform configuration for ${MODULE} ${MODULE} in ${ENV}"
     - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
-    - terraform plan -var-file="$CI_PROJECT_DIR/$APP/$MODULE/variable.d/${ORG}/${VAULT_ENV}/variables.tfvars" -out=${PLAN}
+    - terraform plan -var-file="$CI_PROJECT_DIR/$APP/$MODULE/variable.d/${ORG}/${ENV}/variables.tfvars" -out=${PLAN}
     - "terraform show -json $PLAN | convert_report > ${JSON_PLAN_FILE}"
   artifacts:
     name: $APP-$MODULE-$ENV
@@ -185,9 +185,9 @@
     - aws configure list
     - |
         cd $CI_PROJECT_DIR/$APP/$MODULE
-        terraform init -backend-config="$CI_PROJECT_DIR/$APP/$MODULE/variable.d/${ORG}/${VAULT_ENV}/backend.conf"
-        (terraform workspace select ${VAULT_ENV} || terraform workspace new ${VAULT_ENV})
-    - echo "🚀 Deploying Terraform configuration for ${MODULE} - ${MODULE} in ${VAULT_ENV}"
+        terraform init -backend-config="$CI_PROJECT_DIR/$APP/$MODULE/variable.d/${ORG}/${ENV}/backend.conf"
+        (terraform workspace select ${ENV} || terraform workspace new ${ENV})
+    - echo "🚀 Deploying Terraform configuration for ${MODULE} - ${MODULE} in ${ENV}"
     #- terraform apply -auto-approve $PLAN
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
