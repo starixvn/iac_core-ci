@@ -22,25 +22,25 @@
       echo "Current path: $(pwd) | CI_PROJECT_DIR ${CI_PROJECT_DIR}"
     - |
       if [[ "${APP}" == "vault" ]]; then
-        VAULT_ENV=${ENV}
-        VAULT_ADDR="https://vault.unknown"
+        export VAULT_ENV=${ENV}
+        export VAULT_ADDR="https://vault.unknown"
         if [[ "${ORG}" == "starix" ]]; then
           case "${ENV}" in
-            dev)    VAULT_ADDR="https://vault-dev.nexdev.net" ;;
-            local)  VAULT_ADDR="https://vault.nexdev.net" ;;
-            sit)    VAULT_ADDR="https://vault.playonesit.com" ;;
-            uat)    VAULT_ADDR="https://vault.starixuat.com" ;;
-            prod)   VAULT_ADDR="https://vault.starixplay.com" ;;
-            kldr)   VAULT_ADDR="https://vn-st-vault.byb6181.com" ;;
+            dev)    export VAULT_ADDR="https://vault-dev.nexdev.net" ;;
+            local)  export VAULT_ADDR="https://vault.nexdev.net" ;;
+            sit)    export VAULT_ADDR="https://vault.playonesit.com" ;;
+            uat)    export VAULT_ADDR="https://vault.starixuat.com" ;;
+            prod)   export VAULT_ADDR="https://vault.starixplay.com" ;;
+            kldr)   export VAULT_ADDR="https://vn-st-vault.byb6181.com" ;;
           esac
-        elif [[ "$ORG" == "lumi" ]]; then
-          case "$ENV" in
-            local)  VAULT_ADDR="https://vault.lumigame.com" ;;
+        elif [[ "${ORG}" == "lumi" ]]; then
+          case "${ENV}" in
+            local)  export VAULT_ADDR="https://vault.lumigame.com" ;;
           esac
         fi
       else
-        VAULT_ENV="local"
-        VAULT_ADDR="https://vault.nexdev.net"
+        export VAULT_ENV="local"
+        export VAULT_ADDR="https://vault.nexdev.net"
       fi
       
     - echo "Debug VAULT_ENV=${VAULT_ENV}, VAULT_ADDR=${VAULT_ADDR}"
