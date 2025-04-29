@@ -5,7 +5,7 @@
   rules:
     - when: never # Disable by default
   script:
-    - | 
+    - |
       echo "${APP}/${MODULE} -  $ENV - $CI_JOB_STATUS"
 
 .notify_pipeline_success:

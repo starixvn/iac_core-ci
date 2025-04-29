@@ -10,11 +10,11 @@ variables:
   PLAN: plan.tfplan
   JSON_PLAN_FILE: tfplan.json
   TF_ROOT: "${CI_PROJECT_DIR}"
-  TF_CLI_CONFIG_FILE: $CI_PROJECT_DIR/.terraformrc
+  TF_CLI_CONFIG_FILE: ${CI_PROJECT_DIR}/.terraformrc
   SLACK_WEBHOOK_URL: "https://hooks.slack.com/services/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"
   SLACK_CHANNEL: "deploy-command-center"
 
 cache:
-  - key: ${TOOL}-$MODULE-$ORG-$ENV-terraform
+  - key: ${TOOL}-${MODULE}-${ORG}-${ENV}-terraform
     paths:
-      - $CI_PROJECT_DIR/.terraform
+      - ${CI_PROJECT_DIR}/.terraform
