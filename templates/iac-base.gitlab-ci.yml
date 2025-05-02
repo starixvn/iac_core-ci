@@ -115,13 +115,14 @@
     - terraform plan -var-file="${TF_CONF_PATH}/variables.tfvars" -out=${PLAN}
     - terraform show -json $PLAN | convert_report > ${JSON_PLAN_FILE}
   artifacts:
-    name: ${APP}-${MODULE}-${ENV}
+    name: $APP-$MODULE-$ENV
     reports:
-      terraform: ${TF_HOME_PATH}/${JSON_PLAN_FILE}
+      terraform: ${CI_PROJECT_DIR}/${APP}/${MODULE}/${JSON_PLAN_FILE}
     paths:
-      - ${TF_HOME_PATH}/${JSON_PLAN_FILE}
-      - ${TF_HOME_PATH}/${PLAN}
+      - $CI_PROJECT_DIR/${APP}/${MODULE}/${JSON_PLAN_FILE}
+      - $CI_PROJECT_DIR/${APP}/${MODULE}/${PLAN}
     expire_in: 1 week
+
   
 
 .iac_deploy:
