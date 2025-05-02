@@ -63,16 +63,16 @@
   <<: *iac_init
   stage: validate
   script:
-    - echo "validate ${VAULT_ENV}"
+    - echo "validate ${ENV}"
     - |
       echo "** Getting credentials - Project_ID ${CI_PROJECT_ID}"
       vault --version
       export VAULT_TOKEN="$(vault write -field=token auth/jwt/login role="${TF_VAR_vault_role}" jwt=${VAULT_ID_TOKEN})"
       vault token lookup
-    - export AWS_PROFILE=${VAULT_ENV}
+    - export AWS_PROFILE=${ENV}
     - aws configure list
     - |
-      echo "🔧 validate ${APP} / ${MODULE} | ${VAULT_ENV} ...";
+      echo "🔧 validate ${APP} / ${MODULE} | ${ENV} ...";
       echo "Source: ${TF_HOME_PATH} ";
       cd ${TF_HOME_PATH}
       terraform init -backend-config="${TF_CONF_PATH}/backend.conf"
