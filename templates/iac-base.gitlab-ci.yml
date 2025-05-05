@@ -141,7 +141,7 @@
       terraform init -backend-config="${TF_CONF_PATH}/backend.conf"
       (terraform workspace select ${ENV} || terraform workspace new ${ENV}})
     - echo "🚀 Deploying Terraform configuration for ${APP} - ${MODULE} in ${ENV}"
-    #- terraform apply -auto-approve $PLAN
+    - terraform apply -auto-approve $PLAN
   when: manual
 
 ##################################### Deploy TAGs
