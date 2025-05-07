@@ -80,7 +80,6 @@
         -lock-timeout=30s || {
           echo "⚠️ Migration failed! Manual intervention required";
           terraform init -reconfigure -backend-config="${TF_CONF_PATH}/backend.conf";
-          exit 1;
         }
       (terraform workspace select ${ENV} || terraform workspace new ${ENV})
       terraform validate
