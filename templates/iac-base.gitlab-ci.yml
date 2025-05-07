@@ -75,7 +75,13 @@
       echo "🔧 validate ${APP} / ${MODULE} | ${ENV} ...";
       echo "Source: ${TF_HOME_PATH} ";
       cd ${TF_HOME_PATH}
-      terraform init -backend-config="${TF_CONF_PATH}/backend.conf" -migrate-state || { echo "⚠️ Migration failed! Manual intervention required"; exit 1; }
+      terraform init \
+        -backend-config="${TF_CONF_PATH}/backend.conf" \
+        -lock-timeout=30s || {
+          echo "⚠️ Migration failed! Manual intervention required";
+          terraform init -reconfigure -backend-config="${TF_CONF_PATH}/backend.conf";
+          exit 1;
+        }
       (terraform workspace select ${ENV} || terraform workspace new ${ENV})
       terraform validate
       terraform fmt 
@@ -108,7 +114,7 @@
     - aws configure list
     - |
       cd ${TF_HOME_PATH}
-      terraform init -backend-config="${TF_CONF_PATH}/backend.conf" -migrate-state || { echo "⚠️ Migration failed! Manual intervention required"; exit 1; }
+      terraform init -backend-config="${TF_CONF_PATH}/backend.conf"
       (terraform workspace select ${ENV} || terraform workspace new ${ENV})
     - echo "Preparing Terraform configuration for ${APP} - ${MODULE} in ${ENV}"
     - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
@@ -138,7 +144,7 @@
     - aws configure list
     - |
       cd ${TF_HOME_PATH}
-      terraform init -backend-config="${TF_CONF_PATH}/backend.conf" -migrate-state || { echo "⚠️ Migration failed! Manual intervention required"; exit 1; }
+      terraform init -backend-config="${TF_CONF_PATH}/backend.conf"
       (terraform workspace select ${ENV} || terraform workspace new ${ENV})
     - echo "🚀 Deploying Terraform configuration for ${APP} - ${MODULE} in ${ENV}"
     - terraform apply -auto-approve $PLAN
