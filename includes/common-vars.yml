@@ -18,3 +18,7 @@ cache:
   - key: ${APP}-${MODULE}-${ORG}-${ENV}-terraform
     paths:
       - ${CI_PROJECT_DIR}/${APP}/${MODULE}/.terraform
+
+  - key: ${APP}-${MODULE}-${ORG}-${ENV}-terraform.lock.hcl
+    paths:
+      - ${CI_PROJECT_DIR}/${APP}/${MODULE}/.terraform.lock.hcl
