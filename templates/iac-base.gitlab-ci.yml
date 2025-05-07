@@ -107,6 +107,8 @@
     - export AWS_PROFILE=${ENV}
     - aws configure list
     - |
+      ls -l ${TF_HOME_PATH}
+      ls -l ${TF_HOME_PATH}/.terraform
       cd ${TF_HOME_PATH}
       terraform init -backend-config="${TF_CONF_PATH}/backend.conf"
       (terraform workspace select ${ENV} || terraform workspace new ${ENV})
@@ -137,6 +139,8 @@
     - export AWS_PROFILE=${ENV}
     - aws configure list
     - |
+      ls -l ${TF_HOME_PATH}
+      ls -l ${TF_HOME_PATH}/.terraform
       cd ${TF_HOME_PATH}
       terraform init -backend-config="${TF_CONF_PATH}/backend.conf"
       (terraform workspace select ${ENV} || terraform workspace new ${ENV})
