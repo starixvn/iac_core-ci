@@ -1,7 +1,7 @@
 ---
 variables:
   # Docker registry
-  DOCKER_REG_LOCAL_URL: "${CI_REGISTRY}"
+  #DOCKER_REG_LOCAL_URL: "${CI_REGISTRY}"
   # Terraform related
   TF_ROOT: ${APP}/${MODULE}
   PLAN: plan.tfplan
