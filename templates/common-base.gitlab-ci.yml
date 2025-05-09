@@ -114,7 +114,6 @@ detect_changes:
     - if: '$CI_COMMIT_TAG'
       when: never
     - when: always
-      
 
 # Job 3: Generate dynamic jobs
 .generate_dynamic_jobs:
