@@ -1,5 +1,6 @@
 ---
 .generate_dynamic_jobs:
+  stage: .pre
   script:
     - |
       echo "Tạo jobs động..."
@@ -7,16 +8,30 @@
       cat > generated-jobs.yml << 'EOL'
       ---
       include:
-        - local: '/templates/base/common.yml'
-        - local: '/templates/base/variables.yml'
-        - local: '/templates/base/stages.yml'
-        - local: '/templates/jobs/validate/lint.yml'
-        - local: '/templates/jobs/validate/security.yml'
-        - local: '/templates/jobs/plan/terraform.yml'
-        - local: '/templates/jobs/deploy/terraform.yml'
-        - local: '/templates/jobs/notify/notify.yml'
-        - local: '/templates/jobs/cleanup/cleanup.yml'
-
+        - project: 'iac/core-ci'
+            file: '/templates/base/common.yml'
+            ref: dev
+        - project: 'iac/core-ci'
+            file: '/templates/base/variables.yml'
+            ref: dev
+        - project: 'iac/core-ci'
+            file: '/templates/base/stages.yml'
+            ref: dev
+        - project: 'iac/core-ci'
+            file: '/templates/jobs/validate/lint.yml'
+            ref: dev
+        - project: 'iac/core-ci'
+            file: '/templates/jobs/validate/security.yml'
+            ref: dev
+        - project: 'iac/core-ci'
+            file: '/templates/jobs/plan/terraform.yml'
+            ref: dev
+        - project: 'iac/core-ci'
+            file: '/templates/jobs/notify/notify.yml'
+            ref: dev
+        - project: 'iac/core-ci'
+            file: '/templates/jobs/cleanup/cleanup.yml'
+            ref: dev
       stages:
         - validate
         - security
@@ -60,4 +75,12 @@
       cleanup:
         extends: .cleanup
         stage: cleanup
-      EOL
+      EOF
+  artifacts:
+    paths:
+      - generated-jobs.yml
+    expire_in: 1 hour
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: never
+    - when: always

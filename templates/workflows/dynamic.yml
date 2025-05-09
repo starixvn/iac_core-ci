@@ -29,92 +29,8 @@ detect_changes:
 
 # Tạo jobs động
 generate_dynamic_jobs:
-  stage: .pre
+  extends: .generate_dynamic_jobs
   needs: ["detect_changes"]
-  script:
-    - |
-      echo "# Generated at $(date)" > generated-jobs.yml
-      echo "# Version: 1.0" >> generated-jobs.yml
-      
-      cat > generated-jobs.yml <<'EOF'
-      include:
-        - project: 'iac/core-ci'
-            file: '/templates/base/common.yml'
-            ref: dev
-        - project: 'iac/core-ci'
-            file: '/templates/base/variables.yml'
-            ref: dev
-        - project: 'iac/core-ci'
-            file: '/templates/base/stages.yml'
-            ref: dev
-        - project: 'iac/core-ci'
-            file: '/templates/jobs/validate/lint.yml'
-            ref: dev
-        - project: 'iac/core-ci'
-            file: '/templates/jobs/validate/security.yml'
-            ref: dev
-        - project: 'iac/core-ci'
-            file: '/templates/jobs/plan/terraform.yml'
-            ref: dev
-        - project: 'iac/core-ci'
-            file: '/templates/jobs/notify/notify.yml'
-            ref: dev
-        - project: 'iac/core-ci'
-            file: '/templates/jobs/cleanup/cleanup.yml'
-            ref: dev
-
-      stages:
-        - validate
-        - security
-        - plan
-        - deploy
-        - notify
-        - cleanup
-
-      # Validate jobs
-      lint:
-        extends: .terraform_lint
-        stage: validate
-
-      security_scan:
-        extends: .terraform_security
-        stage: security
-
-      # Plan job
-      plan:
-        extends: .terraform_plan
-        stage: plan
-
-      # Deploy job  
-      deploy:
-        extends: .terraform_apply
-        stage: deploy
-        needs: ["plan"]
-
-      # Notify jobs
-      notify_success:
-        extends: .notify_success
-        stage: notify
-        needs: ["deploy"]
-
-      notify_failure:
-        extends: .notify_failure
-        stage: notify
-        needs: ["deploy"]
-
-      # Cleanup
-      cleanup:
-        extends: .cleanup
-        stage: cleanup
-      EOF
-  artifacts:
-    paths:
-      - generated-jobs.yml
-    expire_in: 1 hour
-  rules:
-    - if: '$CI_COMMIT_TAG'
-      when: never
-    - when: always
 
 # Kích hoạt pipeline con
 trigger_dynamic:
@@ -133,7 +49,7 @@ trigger_dynamic:
       when: always
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       when: always
-    - when: manual
+#    - when: manual
 
 workflow:
   rules:
