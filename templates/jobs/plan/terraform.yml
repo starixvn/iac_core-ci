@@ -31,7 +31,7 @@
 ##################################### Deploy TAGs
 #####################################
 .iac_plan_tag:
-  <<: *iac_init
+  extends: .base_terraform
   stage: plan
   script:
     - echo "App ${APP}_MAIN / ${MODULE} | Env ${ENV} | ${TF_CLI_CONFIG_FILE}"
