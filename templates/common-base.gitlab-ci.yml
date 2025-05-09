@@ -92,7 +92,6 @@ detect_changes:
           APP="${BASH_REMATCH[1]}"
           MODULE="${BASH_REMATCH[2]}"
           SUBPATH="${BASH_REMATCH[3]}"
-          
           if [[ ! "$SUBPATH" =~ ^variable\.d/ ]]; then
             KEY="${APP}_${MODULE}"
             UNIQUE_PATHS["$KEY"]=1
