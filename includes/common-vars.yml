@@ -16,7 +16,7 @@ variables:
   SLACK_CHANNEL: ${CI_SLACK_CHANNEL}
 
 cache:
-  - key: 
+  - key:
       files:
         - ${CI_PROJECT_DIR}/${APP}/${MODULE}/variable.d/${ORG}/${ENV}/variables.tfvars
     paths:
