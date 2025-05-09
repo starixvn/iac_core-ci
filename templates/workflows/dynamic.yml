@@ -13,6 +13,113 @@ include:
   - local: '/templates/jobs/notify/notify.yml'
   - local: '/templates/jobs/cleanup/cleanup.yml'
 
+stages:
+  - .pre
+  - init
+  - validate
+  - security
+  - plan
+  - deploy
+  - notify
+  - cleanup
+
+# Phát hiện thay đổi
+detect_changes:
+  extends: .detect_changes
+
+# Tạo jobs động
+generate_dynamic_jobs:
+  stage: .pre
+  needs: ["detect_changes"]
+  script:
+    - |
+      echo "# Generated at $(date)" > generated-jobs.yml
+      echo "# Version: 1.0" >> generated-jobs.yml
+      
+      cat > generated-jobs.yml <<'EOF'
+      include:
+        - local: '/templates/base/common.yml'
+        - local: '/templates/base/variables.yml'
+        - local: '/templates/base/stages.yml'
+        - local: '/templates/jobs/validate/lint.yml'
+        - local: '/templates/jobs/validate/security.yml'
+        - local: '/templates/jobs/plan/terraform.yml'
+        - local: '/templates/jobs/deploy/terraform.yml'
+        - local: '/templates/jobs/notify/notify.yml'
+        - local: '/templates/jobs/cleanup/cleanup.yml'
+
+      stages:
+        - validate
+        - security
+        - plan
+        - deploy
+        - notify
+        - cleanup
+
+      # Validate jobs
+      lint:
+        extends: .terraform_lint
+        stage: validate
+
+      security_scan:
+        extends: .terraform_security
+        stage: security
+
+      # Plan job
+      plan:
+        extends: .terraform_plan
+        stage: plan
+
+      # Deploy job  
+      deploy:
+        extends: .terraform_apply
+        stage: deploy
+        needs: ["plan"]
+
+      # Notify jobs
+      notify_success:
+        extends: .notify_success
+        stage: notify
+        needs: ["deploy"]
+
+      notify_failure:
+        extends: .notify_failure
+        stage: notify
+        needs: ["deploy"]
+
+      # Cleanup
+      cleanup:
+        extends: .cleanup
+        stage: cleanup
+      EOF
+  artifacts:
+    paths:
+      - generated-jobs.yml
+    expire_in: 1 hour
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: never
+    - when: always
+
+# Kích hoạt pipeline con
+trigger_dynamic:
+  stage: init
+  needs:
+    - job: generate_dynamic_jobs
+      artifacts: true
+  trigger:
+    include:
+      - artifact: generated-jobs.yml
+        job: generate_dynamic_jobs
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: always
+    - when: manual
+
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
