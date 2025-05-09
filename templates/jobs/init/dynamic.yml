@@ -7,19 +7,34 @@
       echo "# Generated at $(date)" > generated-jobs.yml
       echo "# Version: 1.0" >> generated-jobs.yml
       cat > generated-jobs.yml <<'EOF'
-      include:
-        - project: 'iac/core-ci'
-          file: '/includes/common-vars.yml'
+      - project: 'iac/core-ci'
+          file: '/templates/base/common.yml'
           ref: dev
         - project: 'iac/core-ci'
-          file: '/templates/iac-base.gitlab-ci.yml'
+          file: '/templates/base/variables.yml'
           ref: dev
         - project: 'iac/core-ci'
-          file: '/includes/notify.yml'
+          file: '/templates/base/stages.yml'
           ref: dev
-
+        - project: 'iac/core-ci'
+          file: '/templates/jobs/validate/lint.yml'
+          ref: dev
+        - project: 'iac/core-ci'
+          file: '/templates/jobs/validate/security.yml'
+          ref: dev
+        - project: 'iac/core-ci'
+          file: '/templates/jobs/plan/terraform.yml'
+          ref: dev
+        - project: 'iac/core-ci'
+          file: '/templates/jobs/deploy/terraform.yml'
+          ref: dev
+        - project: 'iac/core-ci'
+          file: '/templates/jobs/notify/notify.yml'
+          ref: dev
+        - project: 'iac/core-ci'
+          file: '/templates/jobs/cleanup/cleanup.yml'
+          ref: dev
       stages:
-        - init
         - validate
         - security
         - plan
@@ -27,118 +42,42 @@
         - notify
         - cleanup
 
-      no_changes:
-        stage: init
-        script:
-          - echo "No changes detected in any module"
-        rules:
-          - if: '$CI_PIPELINE_SOURCE == "push"'
-            when: never
-          - when: on_success
-      EOF
-
-      CHANGED_MODULES=0
-      if [ -f changed_vars.env ]; then
-        echo "Processing detected changes..."
-        while IFS='=' read -r var_name _; do
-          if [[ "$var_name" =~ ^([^_]+)_([^_]+)_([^_]+)_([^_]+)_CHANGED$ ]]; then
-            APP="${BASH_REMATCH[1]}"
-            MODULE="${BASH_REMATCH[2]}"
-            ORG="${BASH_REMATCH[3]}"
-            ENV="${BASH_REMATCH[4]}"
-            echo "Generating full ENV jobs for ${APP}_${MODULE}_${ORG}_${ENV}..."
-
-            cat >> generated-jobs.yml <<EOF
-
-      ${APP}_${MODULE}_${ORG}_${ENV}_validate:
+      # Validate jobs
+      lint:
+        extends: .terraform_lint
         stage: validate
-        extends: [".iac_validate",".predefined_id_tokens"]
-        after_script:
-          - !reference [.notify_pipeline_failure, script]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-          ORG: ${ORG}
-          ENV: ${ENV}
 
-      ${APP}_${MODULE}_${ORG}_${ENV}_scan:
-        stage: validate
-        extends: [".iac_security_tf"]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-          ORG: ${ORG}
-          ENV: ${ENV}
-
-      ${APP}_${MODULE}_${ORG}_${ENV}_plan:
-        stage: plan
-        extends: [".iac_plan",".predefined_id_tokens"]
-        needs: ["${APP}_${MODULE}_${ORG}_${ENV}_validate","${APP}_${MODULE}_${ORG}_${ENV}_scan"]
-        after_script:
-          - !reference [.notify_pipeline_failure, script]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-          ORG: ${ORG}
-          ENV: ${ENV}
-
-      ${APP}_${MODULE}_${ORG}_${ENV}_deploy:
-        stage: deploy
-        extends: [".iac_deploy",".predefined_id_tokens"]
-        needs: ["${APP}_${MODULE}_${ORG}_${ENV}_plan"]
-        after_script:
-          - !reference [.notify_pipeline_failure, script]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-          ORG: ${ORG}
-          ENV: ${ENV}
-
-      ${APP}_${MODULE}_${ORG}_${ENV}_notify:
-        extends: .notify_pipeline_success
-        needs: ["${APP}_${MODULE}_${ORG}_${ENV}_deploy"]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-          ORG: ${ORG}
-          ENV: ${ENV}
-          CI_JOB_STATUS: "success"
-      EOF
-            CHANGED_MODULES=$((CHANGED_MODULES + 1))
-
-      elif [[ "$var_name" =~ ^([^_]+)_([^_]+)_CHANGED$ ]]; then
-        APP="${BASH_REMATCH[1]}"
-        MODULE="${BASH_REMATCH[2]}"
-        echo "Generating basic MODULE jobs for ${APP}_${MODULE}..."
-
-        cat >> generated-jobs.yml <<EOF
-
-      ${APP}_${MODULE}_unit_test:
-        stage: validate
-        extends: [".unit_test"]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-
-      ${APP}_${MODULE}_scan:
+      security_scan:
+        extends: .terraform_security
         stage: security
-        extends: [".iac_security_tf"]
-        needs: ["${APP}_${MODULE}_unit_test"]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
 
+      # Plan job
+      plan:
+        extends: .terraform_plan
+        stage: plan
+
+      # Deploy job  
+      deploy:
+        extends: .terraform_apply
+        stage: deploy
+        needs: ["plan"]
+
+      # Notify jobs
+      notify_success:
+        extends: .notify_success
+        stage: notify
+        needs: ["deploy"]
+
+      notify_failure:
+        extends: .notify_failure
+        stage: notify
+        needs: ["deploy"]
+      
+      # Cleanup
+      cleanup:
+        extends: .cleanup
+        stage: cleanup
       EOF
-            CHANGED_MODULES=$((CHANGED_MODULES + 1))
-          fi
-        done < changed_vars.env
-      else
-        echo "No module changes detected."
-      fi
-
-      if [ $CHANGED_MODULES -gt 0 ]; then
-        sed -i '/no_changes:/,/when: on_success/d' generated-jobs.yml
-      fi
       echo "Generated jobs.yml content:"
       cat generated-jobs.yml
   artifacts:
