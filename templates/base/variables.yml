@@ -2,16 +2,13 @@
 variables:
   # Docker registry
   DOCKER_REG_LOCAL_URL: "${CI_REGISTRY}"
-  
   # Terraform related
   TF_ROOT: ${APP}/${MODULE}
   PLAN: plan.tfplan
   JSON_PLAN_FILE: tfplan.json
   TF_CLI_CONFIG_FILE: ${CI_PROJECT_DIR}/.terraformrc
-  
   # Vault related
   TF_VAR_vault_role: "terraform-${ORG}-${ENV}"
-  
   # Default values
   DEFAULT_BRANCH: "main"
   SLACK_CHANNEL: "#devops-notification"
