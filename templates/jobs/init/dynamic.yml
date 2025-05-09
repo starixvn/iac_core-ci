@@ -47,32 +47,62 @@
       lint:
         extends: .terraform_lint
         stage: validate
+        variables:
+          APP: ${APP}
+          MODULE: ${MODULE}
+          ORG: ${ORG}
+          ENV: ${ENV}
 
       security_scan:
         extends: .terraform_security
         stage: security
+        variables:
+          APP: ${APP}
+          MODULE: ${MODULE}
+          ORG: ${ORG}
+          ENV: ${ENV}
 
       # Plan job
       plan:
         extends: .terraform_plan
         stage: plan
+        variables:
+          APP: ${APP}
+          MODULE: ${MODULE}
+          ORG: ${ORG}
+          ENV: ${ENV}
 
       # Deploy job  
       deploy:
         extends: .terraform_apply
         stage: deploy
         needs: ["plan"]
+        variables:
+          APP: ${APP}
+          MODULE: ${MODULE}
+          ORG: ${ORG}
+          ENV: ${ENV}
 
       # Notify jobs
       notify_success:
         extends: .notify_success
         stage: notify
         needs: ["deploy"]
+        variables:
+          APP: ${APP}
+          MODULE: ${MODULE}
+          ORG: ${ORG}
+          ENV: ${ENV}
 
       notify_failure:
         extends: .notify_failure
         stage: notify
         needs: ["deploy"]
+        variables:
+          APP: ${APP}
+          MODULE: ${MODULE}
+          ORG: ${ORG}
+          ENV: ${ENV}
       
       # Cleanup
       cleanup:
