@@ -1,5 +1,5 @@
 ---
-.iac_deploy:
+.terraform_apply:
   extends: .base_terraform
   stage: deploy
   script:
