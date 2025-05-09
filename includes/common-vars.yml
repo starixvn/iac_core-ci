@@ -23,7 +23,6 @@ cache:
       - ${CI_PROJECT_DIR}/${APP}/${MODULE}/.terraform
     policy: pull-push
     when: always
-    expire_in: 1 week
 
   - key: ${CI_COMMIT_REF_SLUG}-${APP}-${MODULE}-${ORG}-${ENV}-terraform.lock.hcl
     paths:
