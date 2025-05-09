@@ -19,7 +19,7 @@
   when: manual
 
 .iac_deploy_tag:
-  <<: *iac_init
+  extends: .base_terraform
   stage: deploy
   script:
     - |
