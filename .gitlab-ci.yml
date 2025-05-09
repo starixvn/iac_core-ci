@@ -13,16 +13,16 @@ lint_ci_files:
   stage: validate
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
-    - |
+    - >
+      CHANGED_FILES=""
       if [ -n "$CI_MERGE_REQUEST_CHANGED_PATHS" ]; then
         CHANGED_FILES="$CI_MERGE_REQUEST_CHANGED_PATHS"
       else
         CHANGED_FILES=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA)
       fi
       
-      # Kiểm tra các file yml thay đổi
       for file in $CHANGED_FILES; do
-        if [[ "$file" =~ \.(yml|yaml)$ ]]; then
+        if [[ "$file" =~ \.yml$ ]] || [[ "$file" =~ \.yaml$ ]]; then
           echo "Checking syntax for $file"
           if ! yamllint -c .yamllint "$file"; then
             echo "❌ Syntax check failed for $file"
