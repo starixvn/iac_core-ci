@@ -50,3 +50,4 @@ generate_dynamic_jobs:
 # Kích hoạt pipeline con
 trigger_dynamic:
   extends: .trigger_dynamic
+  needs: ["generate_dynamic_jobs"]

@@ -29,3 +29,7 @@
     reports:
       dotenv: vars.env
     when: on_success
+  rules:
+  - if: '$CI_COMMIT_TAG =~ /^deploy-/'
+    when: always
+  - when: never
