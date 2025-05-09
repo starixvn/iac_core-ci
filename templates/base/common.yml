@@ -1,0 +1,19 @@
+---
+# Định nghĩa các job base
+.base_job:
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
+
+.predefined_id_tokens:
+  id_tokens:
+    VAULT_ID_TOKEN:
+      aud: https://vault.nexdev.net
+
+.base_terraform:
+  extends: .base_job
+  variables:
+    TF_ROOT: ${APP}/${MODULE}
+
+.image:
+  image:
+    name: ${DOCKER_REG_LOCAL_URL}/base/hashicorp/terraform:1.11.4-vault
+    entrypoint: ["/usr/bin/env"]

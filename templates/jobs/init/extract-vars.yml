@@ -1,0 +1,22 @@
+---
+.extract_vars:
+  stage: init
+  extends: .base_job
+  script:
+    - |
+      echo "Extracting variables..."
+      # Extract APP, MODULE, ORG, ENV from path
+      if [[ "$CI_COMMIT_REF_NAME" =~ ^([^/]+)/([^/]+)/([^/]+)/([^/]+)$ ]]; then
+        APP="${BASH_REMATCH[1]}"
+        MODULE="${BASH_REMATCH[2]}"
+        ORG="${BASH_REMATCH[3]}"
+        ENV="${BASH_REMATCH[4]}"
+        
+        echo "APP=$APP" >> vars.env
+        echo "MODULE=$MODULE" >> vars.env
+        echo "ORG=$ORG" >> vars.env
+        echo "ENV=$ENV" >> vars.env
+      fi
+  artifacts:
+    reports:
+      dotenv: vars.env

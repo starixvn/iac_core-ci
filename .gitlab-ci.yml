@@ -1,6 +1,9 @@
 ---
 include:
-  - local: '/includes/common-vars.yml'
+  - local: '/templates/base/common.yml'
+  - local: '/templates/base/variables.yml'
+  - local: '/templates/base/stages.yml'
+  - local: '/templates/jobs/validate/lint.yml'
   - local: '/includes/notify.yml'
 
 stages:
@@ -9,9 +12,10 @@ stages:
   - test
   - deploy
 
+# Kiểm tra cú pháp file YAML
 lint_ci_files:
+  extends: .base_job
   stage: validate
-  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   before_script:
     - apk add --no-cache yamllint
   script:
@@ -42,9 +46,10 @@ lint_ci_files:
         - "**/*.yml"
         - "**/*.yaml"
 
+# Kiểm tra đường dẫn include
 validate_templates:
+  extends: .base_job
   stage: validate
-  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - |
       for template in $(find . -name "*.yml" -o -name "*.yaml"); do

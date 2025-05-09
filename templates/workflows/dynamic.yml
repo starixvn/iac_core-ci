@@ -1,0 +1,16 @@
+---
+include:
+  - local: '/templates/base/common.yml'
+  - local: '/templates/base/variables.yml'
+  - local: '/templates/base/stages.yml'
+  - local: '/templates/jobs/init/detect-changes.yml'
+  - local: '/templates/jobs/init/extract-vars.yml'
+  - local: '/templates/jobs/validate/lint.yml'
+  - local: '/templates/jobs/validate/security.yml'
+  - local: '/templates/jobs/plan/terraform.yml'
+  - local: '/templates/jobs/deploy/terraform.yml'
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH'
