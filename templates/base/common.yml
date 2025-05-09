@@ -1,7 +1,9 @@
 ---
 # Định nghĩa các job base
 .base_job:
-  image: $DOCKER_REG_LOCAL_URL/hashicorp/terraform:1.5.7
+  image:
+    name: ${DOCKER_REG_LOCAL_URL}/base/hashicorp/terraform:1.11.4-vault
+    entrypoint: ["/usr/bin/env"]
 #image: ${DOCKER_REG_LOCAL_URL}/base/alpine:git-3.21
 
 .predefined_id_tokens:
