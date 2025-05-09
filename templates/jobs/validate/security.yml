@@ -1,11 +1,11 @@
 ---
-.iac_security_tf:
+.terraform_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - echo "Scanning TF - Security ${APP} / ${MODULE} ..."
 
-.iac_security_helm:
+.helm_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
