@@ -75,3 +75,22 @@ validate_templates:
       changes:
         - "**/*.yml"
         - "**/*.yaml"
+
+extract_tag_vars:
+  stage: .pre
+  script:
+    - |
+      if [[ $CI_COMMIT_TAG =~ ^deploy_([^_]+)_([^_]+)_([^_]+)_([^_]+)$ ]]; then
+        echo "APP=${BASH_REMATCH[1]}" >> variables.env
+        echo "MODULE=${BASH_REMATCH[2]}" >> variables.env
+        echo "ORG=${BASH_REMATCH[3]}" >> variables.env
+        echo "ENV=${BASH_REMATCH[4]}" >> variables.env
+      else
+        echo "Invalid tag format. Expected: deploy_APP_MODULE_ORG_ENV"
+        exit 1
+      fi
+  artifacts:
+    reports:
+      dotenv: variables.env
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+_.+_.+$/'
