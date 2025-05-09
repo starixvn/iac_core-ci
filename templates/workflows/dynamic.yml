@@ -3,15 +3,15 @@ include:
   - local: '/templates/base/common.yml'
   - local: '/templates/base/variables.yml'
   - local: '/templates/base/stages.yml'
-  - local: '/templates/jobs/notify/notify.yml'
-  - local: '/templates/jobs/cleanup/cleanup.yml'
-  - local: '/templates/jobs/init/init.yml'
+  - local: '/templates/jobs/init/dynamic.yml'
   - local: '/templates/jobs/init/detect-changes.yml'
   - local: '/templates/jobs/init/extract-vars.yml'
   - local: '/templates/jobs/validate/lint.yml'
   - local: '/templates/jobs/validate/security.yml'
   - local: '/templates/jobs/plan/terraform.yml'
   - local: '/templates/jobs/deploy/terraform.yml'
+  - local: '/templates/jobs/notify/notify.yml'
+  - local: '/templates/jobs/cleanup/cleanup.yml'
 
 workflow:
   rules:
