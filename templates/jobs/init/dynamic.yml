@@ -8,7 +8,7 @@
       echo "# Version: 1.0" >> generated-jobs.yml
       cat > generated-jobs.yml <<'EOF'
       include:
-      - project: 'iac/core-ci'
+        - project: 'iac/core-ci'
           file: '/templates/base/common.yml'
           ref: dev
         - project: 'iac/core-ci'
@@ -88,4 +88,22 @@
   rules:
     - if: '$CI_COMMIT_TAG'
       when: never
+    - when: always
+
+.trigger_dynamic:
+  stage: init
+  needs:
+    - job: generate_dynamic_jobs
+      artifacts: true
+  trigger:
+    include:
+      - artifact: generated-jobs.yml
+        job: generate_dynamic_jobs
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: always
     - when: always
