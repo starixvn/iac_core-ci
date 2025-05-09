@@ -14,23 +14,7 @@ stages:
 
 extract_tag_vars:
   stage: .pre
-  script:
-    - |
-      if [[ $CI_COMMIT_TAG =~ ^deploy_([^_]+)_([^_]+)_([^_]+)$ ]]; then
-        echo "Extracting variables from tag $CI_COMMIT_TAG"
-        echo "APP=${BASH_REMATCH[1]}" >> build.env
-        echo "MODULE=${BASH_REMATCH[2]}" >> build.env
-        echo "ENV=${BASH_REMATCH[3]}" >> build.env
-      else
-        echo "No deployment tag found or invalid format"
-        echo "APP=default" >> build.env
-        echo "MODULE=default" >> build.env 
-        echo "ENV=default" >> build.env
-      fi
-  artifacts:
-    reports:
-      dotenv: build.env
-
+  extends: .extract_vars
 # Kiểm tra cú pháp file YAML
 lint_ci_files:
   extends: .base_job
