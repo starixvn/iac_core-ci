@@ -1,0 +1,14 @@
+---
+.cleanup:
+  stage: cleanup
+  script:
+    - |
+      echo "Bắt đầu dọn dẹp..."
+      # Xóa các file tạm
+      rm -f ${PLAN} ${JSON_PLAN_FILE} || true
+      # Xóa các file cache không cần thiết
+      rm -rf .terraform/.terraform/providers/* || true
+      echo "Hoàn thành dọn dẹp!"
+  rules:
+    - when: always
+  allow_failure: true
