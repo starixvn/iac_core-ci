@@ -220,7 +220,6 @@ detect_changes:
           ORG: ${ORG}
           ENV: ${ENV}
           CI_JOB_STATUS: "success"
-      
       EOF
             CHANGED_MODULES=$((CHANGED_MODULES + 1))
 
