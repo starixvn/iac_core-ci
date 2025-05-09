@@ -269,8 +269,3 @@ detect_changes:
     - if: '$CI_COMMIT_TAG'
       when: never
     - when: always
-      # Thêm validation cho generated jobs
-      if [ ! -s generated-jobs.yml ]; then
-        echo "Error: Generated jobs file is empty"
-        exit 1
-      fi
