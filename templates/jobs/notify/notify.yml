@@ -1,0 +1,36 @@
+---
+.notify_success:
+  stage: notify
+  script:
+    - |
+      echo "Pipeline thành công!"
+      # Thông báo qua Slack/Teams
+      if [ -n "${SLACK_WEBHOOK}" ]; then
+        curl -X POST -H 'Content-type: application/json' \
+          --data "{
+            \"text\":\"✅ Pipeline *${CI_PROJECT_PATH}* thành công!\n
+            - Branch: ${CI_COMMIT_REF_NAME}\n
+            - Commit: ${CI_COMMIT_SHA}\n
+            - Author: ${GITLAB_USER_NAME}\"
+          }" ${SLACK_WEBHOOK}
+      fi
+  rules:
+    - when: on_success
+
+.notify_failure:
+  stage: notify
+  script:
+    - |
+      echo "Pipeline thất bại!"
+      # Thông báo qua Slack/Teams
+      if [ -n "${SLACK_WEBHOOK}" ]; then
+        curl -X POST -H 'Content-type: application/json' \
+          --data "{
+            \"text\":\"❌ Pipeline *${CI_PROJECT_PATH}* thất bại!\n
+            - Branch: ${CI_COMMIT_REF_NAME}\n
+            - Commit: ${CI_COMMIT_SHA}\n
+            - Author: ${GITLAB_USER_NAME}\"
+          }" ${SLACK_WEBHOOK}
+      fi
+  rules:
+    - when: on_failure
