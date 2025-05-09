@@ -1,5 +1,5 @@
 ---
-.iac_plan:
+.terraform_plan:
   extends: .base_terraform
   stage: plan
   script:

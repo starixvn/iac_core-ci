@@ -1,7 +1,14 @@
 ---
+.base_terraform:
+  image: $DOCKER_REG_LOCAL_URL/hashicorp/terraform:1.5.7
+  variables:
+    TF_ROOT: ${CI_PROJECT_DIR}
+  before_script:
+    - cd ${TF_ROOT}
+
 .iac_init:
+  extends: .base_terraform
   stage: init
-  extends: .base_job
   script:
     - |
       echo "Debug: APP=${APP}, MODULE=${MODULE}, ORG=${ORG}, ENV=${ENV}"
