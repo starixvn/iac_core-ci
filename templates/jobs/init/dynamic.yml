@@ -27,6 +27,9 @@
             file: '/templates/jobs/plan/terraform.yml'
             ref: dev
         - project: 'iac/core-ci'
+            file: '/templates/jobs/deploy/terraform.yml'
+            ref: dev
+        - project: 'iac/core-ci'
             file: '/templates/jobs/notify/notify.yml'
             ref: dev
         - project: 'iac/core-ci'
