@@ -12,9 +12,6 @@ stages:
   - test
   - deploy
 
-extract_tag_vars:
-  stage: .pre
-  extends: .extract_vars
 # Kiểm tra cú pháp file YAML
 lint_ci_files:
   extends: .base_job
