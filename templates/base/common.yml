@@ -4,6 +4,48 @@
   image:
     name: ${DOCKER_REG_LOCAL_URL}/base/hashicorp/terraform:1.11.4-vault
     entrypoint: ["/usr/bin/env"]
+  before_script:
+    - |
+      echo "Debug: APP=${APP}, MODULE=${MODULE}, ORG=${ORG}, ENV=${ENV}"
+      echo "Current path: $(pwd) | CI_PROJECT_DIR ${CI_PROJECT_DIR}"
+    - |
+      if [[ "${APP}" == "vault" ]]; then
+        export VAULT_ENV=${ENV}
+        export VAULT_ADDR="https://vault.unknown"
+        if [[ "${ORG}" == "starix" ]]; then
+          case "${ENV}" in
+            dev)    export VAULT_ADDR="https://vault-dev.nexdev.net" ;;
+            local)  export VAULT_ADDR="https://vault.nexdev.net" ;;
+            sit)    export VAULT_ADDR="https://vault.playonesit.com" ;;
+            uat)    export VAULT_ADDR="https://vault.starixuat.com" ;;
+            prod)   export VAULT_ADDR="https://vault.starixplay.com" ;;
+            kldr)   export VAULT_ADDR="https://vn-st-vault.byb6181.com" ;;
+          esac
+        elif [[ "${ORG}" == "lumi" ]]; then
+          case "${ENV}" in
+            local)  export VAULT_ADDR="https://vault.lumigame.com" ;;
+          esac
+        fi
+      else
+        export VAULT_ENV="local"
+        export VAULT_ADDR="https://vault.nexdev.net"
+      fi
+
+    - |
+      export TF_HOME_PATH="${CI_PROJECT_DIR}/${APP}/${MODULE}"
+      export TF_CONF_PATH="${TF_HOME_PATH}/variable.d/${ORG}/${ENV}"
+      
+    - echo "Debug VAULT_ENV=${VAULT_ENV}, VAULT_ADDR=${VAULT_ADDR}"
+    - echo "${CI_SERVER_HOST} | ${CI_JOB_TOKEN} | ${TF_CLI_CONFIG_FILE}"
+    - echo -e "credentials \"${CI_SERVER_HOST}\" {\n  token = \"${CI_JOB_TOKEN}\"\n}" > ${TF_CLI_CONFIG_FILE}
+    - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - git config --global user.email "ansible@nexdev.net"
+    - git config --global user.name "ansible"
+    - git config --global url."https://ansible:${CI_JOB_TOKEN}@${CI_SERVER_HOST}".insteadOf "https://${CI_SERVER_HOST}"
+    - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
+    
 #image: ${DOCKER_REG_LOCAL_URL}/base/alpine:git-3.21
 
 .predefined_id_tokens:

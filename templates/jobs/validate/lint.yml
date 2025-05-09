@@ -3,8 +3,6 @@
   stage: validate
   extends: .base_terraform
   script:
-    - |
-      cd ${TF_HOME_PATH}
-      terraform init -backend=false
-      terraform fmt -check
-      terraform validate
+    - terraform --version
+    - terraform fmt -check
+    - terraform validate
