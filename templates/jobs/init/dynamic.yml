@@ -7,6 +7,7 @@
       echo "# Generated at $(date)" > generated-jobs.yml
       echo "# Version: 1.0" >> generated-jobs.yml
       cat > generated-jobs.yml <<'EOF'
+      include:
       - project: 'iac/core-ci'
           file: '/templates/base/common.yml'
           ref: dev
