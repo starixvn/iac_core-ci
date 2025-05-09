@@ -7,6 +7,9 @@ include:
     file: '/templates/base/variables.yml'
     ref: dev
   - project: 'iac/core-ci'
+    file: '/templates/jobs/init/dynamic.yml'
+    ref: dev
+  - project: 'iac/core-ci'
     file: '/templates/base/stages.yml'
     ref: dev
   - project: 'iac/core-ci'
