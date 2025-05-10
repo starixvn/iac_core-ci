@@ -51,7 +51,7 @@
 .predefined_id_tokens:
   id_tokens:
     VAULT_ID_TOKEN:
-      aud: https://vault.nexdev.net
+      aud: 'https://gitlab.nexdev.net'
 
 .base_terraform:
   extends: .base_job
