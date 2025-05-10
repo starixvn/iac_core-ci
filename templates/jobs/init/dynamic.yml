@@ -35,7 +35,12 @@
         - project: 'iac/core-ci'
           file: '/templates/jobs/cleanup/cleanup.yml'
           ref: dev
+      default:
+        tags:
+          - "${RUNNER_TAG}"
+
       stages:
+        - init
         - validate
         - security
         - plan
@@ -43,6 +48,14 @@
         - notify
         - cleanup
 
+      no_changes:
+        stage: init
+        script:
+          - echo "No changes detected in any module"
+        rules:
+          - if: '$CI_PIPELINE_SOURCE == "push"'
+            when: never
+          - when: on_success
       EOF
 
       CHANGED_MODULES=0
@@ -58,59 +71,74 @@
 
             cat >> generated-jobs.yml <<EOF
 
+      ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer:
+        stage: init
+        script:
+          - echo "Preparing environment variables..."
+          - >
+            {
+              echo "APP=${APP}";
+              echo "MODULE=${MODULE}";
+              echo "ORG=${ORG}";
+              echo "ENV=${ENV}"
+            } > shared_vars.env
+          - echo "Environment variables exported:"
+          - cat shared_vars.env
+        variables:
+          APP: ${APP}
+          MODULE: ${MODULE}
+          ORG: ${ORG}
+          ENV: ${ENV}
+        artifacts:
+          paths:
+            - shared_vars.env
+          expire_in: 15 min
+          reports:
+            dotenv: shared_vars.env  # Optional: makes vars available via GitLab predefined variable expansion
+        allow_failure: false
+
+
       ${APP}_${MODULE}_${ORG}_${ENV}_validate:
         stage: validate
         extends: [".terraform_lint",".predefined_id_tokens"]
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
         after_script:
-          - !reference [.notify_failure, script]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-          ORG: ${ORG}
-          ENV: ${ENV}
+          - !reference [.notify_pipeline_failure, script]
 
       ${APP}_${MODULE}_${ORG}_${ENV}_scan:
         stage: validate
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
         extends: [".terraform_security"]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-          ORG: ${ORG}
-          ENV: ${ENV}
 
       ${APP}_${MODULE}_${ORG}_${ENV}_plan:
         stage: plan
         extends: [".terraform_plan",".predefined_id_tokens"]
-        needs: ["${APP}_${MODULE}_${ORG}_${ENV}_validate","${APP}_${MODULE}_${ORG}_${ENV}_scan"]
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_scan
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_validate
         after_script:
-          - !reference [.notify_failure, script]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-          ORG: ${ORG}
-          ENV: ${ENV}
+          - !reference [.notify_pipeline_failure, script]
 
       ${APP}_${MODULE}_${ORG}_${ENV}_deploy:
         stage: deploy
         extends: [".terraform_apply",".predefined_id_tokens"]
-        needs: ["${APP}_${MODULE}_${ORG}_${ENV}_plan"]
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_plan
         after_script:
-          - !reference [.notify_failure, script]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-          ORG: ${ORG}
-          ENV: ${ENV}
+          - !reference [.notify_pipeline_failure, script]
 
       ${APP}_${MODULE}_${ORG}_${ENV}_notify:
-        extends: .notify_success
-        needs: ["${APP}_${MODULE}_${ORG}_${ENV}_deploy"]
+        extends: .notify_pipeline_success
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_deploy
         variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-          ORG: ${ORG}
-          ENV: ${ENV}
           CI_JOB_STATUS: "success"
+
       EOF
             CHANGED_MODULES=$((CHANGED_MODULES + 1))
 
@@ -124,17 +152,15 @@
       ${APP}_${MODULE}_unit_test:
         stage: validate
         extends: [".unit_test"]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
 
       ${APP}_${MODULE}_scan:
         stage: security
-        extends: [".iac_security_tf"]
-        needs: ["${APP}_${MODULE}_unit_test"]
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
+        extends: [".terraform_security"]
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+          - job: ${APP}_${MODULE}_unit_test
 
       EOF
             CHANGED_MODULES=$((CHANGED_MODULES + 1))

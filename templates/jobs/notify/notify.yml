@@ -10,7 +10,7 @@
     - |
       echo "${APP}/${MODULE} -  $ENV - $CI_JOB_STATUS"
 
-.notify_success:
+.notify_pipeline_success:
   <<: *notify_base
   script:
     - |
@@ -44,7 +44,7 @@
       when: on_success
     - when: on_success
 
-.notify_failure:
+.notify_pipeline_failure:
   <<: *notify_base
   script:
     - |
