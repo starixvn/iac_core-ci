@@ -1,7 +1,9 @@
 ---
 .notify_base: &notify_base
   stage: notify
-  image: ${DOCKER_REG_LOCAL_URL}/base/alpine:git-3.21
+  image:
+    name: ${DOCKER_REG_LOCAL_URL}/base/hashicorp/terraform:1.11.4-vault
+    entrypoint: ["/usr/bin/env"]
   rules:
     - when: never # Disable by default
   script:
