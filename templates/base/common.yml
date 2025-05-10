@@ -34,7 +34,6 @@
     - |
       export TF_HOME_PATH="${CI_PROJECT_DIR}/${APP}/${MODULE}"
       export TF_CONF_PATH="${TF_HOME_PATH}/variable.d/${ORG}/${ENV}"
-      
     - echo "Debug VAULT_ENV=${VAULT_ENV}, VAULT_ADDR=${VAULT_ADDR}"
     - echo "${CI_SERVER_HOST} | ${CI_JOB_TOKEN} | ${TF_CLI_CONFIG_FILE}"
     - echo -e "credentials \"${CI_SERVER_HOST}\" {\n  token = \"${CI_JOB_TOKEN}\"\n}" > ${TF_CLI_CONFIG_FILE}
@@ -45,9 +44,7 @@
     - git config --global user.name "ansible"
     - git config --global url."https://ansible:${CI_JOB_TOKEN}@${CI_SERVER_HOST}".insteadOf "https://${CI_SERVER_HOST}"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
-    
 #image: ${DOCKER_REG_LOCAL_URL}/base/alpine:git-3.21
-
 .predefined_id_tokens:
   id_tokens:
     VAULT_ID_TOKEN:
