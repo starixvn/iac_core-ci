@@ -71,7 +71,7 @@
 
       ${APP}_${MODULE}_${ORG}_${ENV}_scan:
         stage: validate
-        extends: [".iac_security_tf"]
+        extends: [".terraform_security"]
         variables:
           APP: ${APP}
           MODULE: ${MODULE}
@@ -80,7 +80,7 @@
 
       ${APP}_${MODULE}_${ORG}_${ENV}_plan:
         stage: plan
-        extends: [".iac_plan",".predefined_id_tokens"]
+        extends: [".terraform_plan",".predefined_id_tokens"]
         needs: ["${APP}_${MODULE}_${ORG}_${ENV}_validate","${APP}_${MODULE}_${ORG}_${ENV}_scan"]
         after_script:
           - !reference [.notify_failure, script]
@@ -92,7 +92,7 @@
 
       ${APP}_${MODULE}_${ORG}_${ENV}_deploy:
         stage: deploy
-        extends: [".iac_deploy",".predefined_id_tokens"]
+        extends: [".terraform_apply",".predefined_id_tokens"]
         needs: ["${APP}_${MODULE}_${ORG}_${ENV}_plan"]
         after_script:
           - !reference [.notify_failure, script]
