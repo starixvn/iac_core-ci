@@ -13,6 +13,8 @@
   <<: *notify_base
   script:
     - |
+      echo "${APP}/${MODULE} -  $ENV - $CI_JOB_STATUS"
+    - |
       STATUS="$([ "$CI_JOB_STATUS" = "success" ] && echo "SUCCESS" || echo "FAILED")"
       COLOR="$([ "$STATUS" = "SUCCESS" ] && echo "#36a64f" || echo "#ff0000")"
       EMOJI="$([ "$STATUS" = "SUCCESS" ] && echo ":rocket:" || echo ":fire:")"
