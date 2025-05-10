@@ -35,7 +35,6 @@
         - project: 'iac/core-ci'
           file: '/templates/jobs/cleanup/cleanup.yml'
           ref: dev
-      
       stages:
         - validate
         - security
@@ -168,4 +167,3 @@
     include:
       - artifact: generated-jobs.yml
         job: generate_dynamic_jobs
-
