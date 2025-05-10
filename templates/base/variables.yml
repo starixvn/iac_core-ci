@@ -7,8 +7,11 @@ variables:
   PLAN: plan.tfplan
   JSON_PLAN_FILE: tfplan.json
   TF_CLI_CONFIG_FILE: ${CI_PROJECT_DIR}/.terraformrc
+  TF_CLI_ARGS: "-no-color"
+  TF_CLI_ARGS_plan: "-lock-timeout=300s"
+  TF_CLI_ARGS_apply: "-lock-timeout=300s"
   # Vault related
-  TF_VAR_vault_role: "terraform-${ORG}-${ENV}"
+  TF_VAR_vault_role: "vault_jwt_auth_backend-pipeline"
   # Default values
-  DEFAULT_BRANCH: "main"
-  SLACK_CHANNEL: "#devops-notification"
+  #DEFAULT_BRANCH: "main"
+  SLACK_CHANNEL: "deploy-command-center"
