@@ -10,12 +10,6 @@ include:
     file: '/templates/base/stages.yml'
     ref: dev
   - project: 'iac/core-ci'
-    file: '/templates/jobs/init/detect-changes.yml'
-    ref: dev
-  - project: 'iac/core-ci'
-    file: '/templates/jobs/init/extract-vars.yml'
-    ref: dev
-  - project: 'iac/core-ci'
     file: '/templates/jobs/deploy/terraform.yml'
     ref: dev
   
