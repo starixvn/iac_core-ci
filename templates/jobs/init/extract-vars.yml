@@ -2,22 +2,51 @@
 .extract_vars:
   stage: .pre
   script:
+    - echo "checking deploy tag $CI_COMMIT_TAG ..."
     - |
-      if [[ $CI_COMMIT_TAG =~ ^deploy_([^_]+)_([^_]+)_([^_]+)$ ]]; then
-        echo "Extracting variables from tag $CI_COMMIT_TAG"
-        echo "APP=${BASH_REMATCH[1]}" >> build.env
-        echo "MODULE=${BASH_REMATCH[2]}" >> build.env
-        echo "ENV=${BASH_REMATCH[3]}" >> build.env
+      if [[ -n "$CI_COMMIT_TAG" ]]; then
+        APP=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f2)
+        MODULE=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f3)
+        ORG=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f4)
+        ENV=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f5)
+
+        if [[ "${APP}" == "vault" ]]; then
+          VAULT_ENV=${ENV}
+          VAULT_ADDR="https://vault.unknown"
+          if [[ "${ORG}" == "starix" ]]; then
+            case "${ENV}" in
+              dev)    VAULT_ADDR="https://vault-dev.nexdev.net" ;;
+              local)  VAULT_ADDR="https://vault.nexdev.net" ;;
+              sit)    VAULT_ADDR="https://vault.playonesit.com" ;;
+              uat)    VAULT_ADDR="https://vault.starixuat.com" ;;
+              prod)   VAULT_ADDR="https://vault.starixplay.com" ;;
+              kldr)   VAULT_ADDR="https://vn-st-vault.byb6181.com" ;;
+            esac
+          elif [[ "$ORG" == "lumi" ]]; then
+            case "$ENV" in
+              local)  VAULT_ADDR="https://vault.lumigame.com" ;;
+            esac
+          fi
+        else
+          VAULT_ENV="local"
+          VAULT_ADDR="https://vault.nexdev.net"
+        fi
+
+        echo "APP=$APP" >> tag_vars.env
+        echo "MODULE=$MODULE" >> tag_vars.env
+        echo "ORG=$ORG" >> tag_vars.env
+        echo "ENV=$ENV" >> tag_vars.env
+        echo "VAULT_ENV=$VAULT_ENV" >> tag_vars.env
+        echo "VAULT_ADDR=$VAULT_ADDR" >> tag_vars.env
+        echo "Extracted APP=$APP, MODULE=$MODULE, ORG=$ORG, ENV=$ENV | $VAULT_ENV , $VAULT_ADDR"
       else
-        echo "No deployment tag found or invalid format"
-        echo "APP=default" >> build.env
-        echo "MODULE=default" >> build.env 
-        echo "ENV=default" >> build.env
+        echo "FAIL with tag $CI_COMMIT_TAG"
       fi
+
   artifacts:
     reports:
-      dotenv: build.env
+      dotenv: tag_vars.env
   rules:
-  - if: '$CI_COMMIT_TAG =~ /^deploy-/'
-    when: always
-  - when: never
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
+      when: always
+    - when: never
