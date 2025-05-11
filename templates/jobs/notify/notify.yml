@@ -48,14 +48,12 @@
       fi
       curl -sS -X POST -H 'Content-type: application/json' \
       --data "{
-        "channel": "deploy-command-center",
-        "username": "GitLab CI/CD",
-        "attachments": [
-          {
-            "color": "#36a64f",
-            "text": "$MESSAGE",
-          }
-        ]
+          \"channel\": \"$SLACK_CHANNEL\",
+          \"username\": \"GitLab CI/CD\",
+          \"attachments\": [{
+            \"color\": \"$COLOR\",
+            \"text\": \"$MESSAGE\",
+          }]
       }" \
       "https://hooks.slack.com/services/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"
   when: on_failure
