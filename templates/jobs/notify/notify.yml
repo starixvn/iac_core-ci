@@ -3,9 +3,9 @@
 .notify_base: &notify_base
   stage: notify
   rules:
-    - when: never # Disable by default
+    - when: never
   script:
-    - | 
+    - |
       echo "${APP}/${MODULE} -  $ENV - $CI_JOB_STATUS"
 
 .notify_pipeline_success:
@@ -61,7 +61,7 @@
           \"channel\": \"$SLACK_CHANNEL\",
           \"username\": \"GitLab CI/CD\",
           \"attachments\": [{
-            \"color\": \"$COLOR\",
+          \"color\": \"$COLOR\",
             \"text\": \"$MESSAGE\",
             \"footer\": \"$FOOTER_DATE\"
           }]
