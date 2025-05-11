@@ -9,12 +9,6 @@ include:
   - project: 'iac/core-ci'
     file: '/templates/base/stages.yml'
     ref: dev
-  - project: 'iac/core-ci'
-    file: '/templates/jobs/deploy/terraform.yml'
-    ref: dev
-  
-  ## Workflows
-  - local: '/templates/workflows/dynamic.yml'
 
 # Kiểm tra cú pháp file YAML
 lint_ci_files:
