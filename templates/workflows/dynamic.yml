@@ -45,3 +45,6 @@ generate_dynamic_jobs:
 trigger_dynamic:
   extends: .trigger_dynamic
   needs: ["generate_dynamic_jobs"]
+
+# cleanup:
+#   extends: .cleanup
