@@ -1,9 +1,19 @@
 ---
 include:
-  - local: '/templates/base/common.yml'
-  - local: '/templates/base/variables.yml'
-  - local: '/templates/base/stages.yml'
+  # Base configurations
+  - local: '/templates/base/common.yml'     # Common configurations
+  - local: '/templates/base/variables.yml'  # Global variables
+  - local: '/templates/base/stages.yml'     # Stage definitions
+  
+  # Core jobs
+  - local: '/templates/jobs/init/detect-changes.yml'
   - local: '/templates/jobs/validate/lint.yml'
+  - local: '/templates/jobs/validate/security.yml'
+  - local: '/templates/jobs/deploy/terraform.yml'
+  - local: '/templates/jobs/notify/notify.yml'
+  
+  # Workflows
+  - local: '/templates/workflows/dynamic.yml'
 
 
 stages:
