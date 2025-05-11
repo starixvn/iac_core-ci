@@ -1,5 +1,5 @@
 ---
-.extract_tag_vars_job:
+extract_tag_vars:
   stage: .pre
   script:
     - |
