@@ -4,7 +4,7 @@ include:
   - local: '/templates/base/variables.yml'
   - local: '/templates/base/stages.yml'
   - local: '/templates/jobs/validate/lint.yml'
-  - local: '/includes/notify.yml'
+
 
 stages:
   - .pre
