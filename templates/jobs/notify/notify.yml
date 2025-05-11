@@ -54,6 +54,26 @@
         • *Commit:* <$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>"
         echo "$SLACK_CHANNEL - $MESSAGE"
       fi
+      curl -X POST -H 'Content-type: application/json' \
+      --data '{
+        "channel": "deploy-command-center",
+        "username": "GitLab CI/CD",
+        "attachments": [
+          {
+            "color": "#36a64f",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": ":rocket: *Test Message* \n• Project: `TEST PROJECT` \n• Environment: `dev` \n• Module: `core-api` \n• Pipeline: <https://gitlab.com|#12345>"
+                }
+              }
+            ]
+          }
+        ]
+      }' \
+      https://hooks.slack.com/services/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
   when: on_failure
   #allow_failure: true
 
