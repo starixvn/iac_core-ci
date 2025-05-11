@@ -61,7 +61,7 @@
         "attachments": [
           {
             "color": "#36a64f",
-            "text": "$MESSAGE",
+            \"text\": \"$MESSAGE\",
           }
         ]
       }' \
