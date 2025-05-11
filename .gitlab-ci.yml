@@ -18,6 +18,7 @@ include:
 
 stages:
   - .pre
+  - init      # Thêm stage init
   - validate
   - test
   - deploy
