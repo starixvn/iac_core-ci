@@ -3,9 +3,48 @@ include:
   - project: 'iac/core-ci'
     file: '/templates/jobs/init/extract-vars.yml'
     ref: dev
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/cleanup/cleanup.yml'
+    ref: dev
 
 extract_tag_vars:
   extends: .extract_vars
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy-/'
+      when: always
+    - when: never
+
+
+plan:
+  extends: 
+    - .predefined_id_tokens
+    - .terraform_plan
+  needs: ["extract_tag_vars"]
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy-/'
+      when: always
+    - when: never
+ 
+deploy:
+  extends: 
+    - .predefined_id_tokens
+    - .terraform_apply
+  needs: ["extract_tag_vars", "plan"]
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy-/'
+      when: always
+    - when: never
+ 
+notify_success:
+  extends: .notify_pipeline_success
+  needs: ["plan", "deploy"]
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy-/'
+      when: always
+    - when: never
+
+cleanup:
+  extends: .cleanup
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy-/'
       when: always
