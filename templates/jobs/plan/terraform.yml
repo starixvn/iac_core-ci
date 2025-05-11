@@ -30,7 +30,7 @@
 
 ##################################### Deploy TAGs
 #####################################
-.iac_plan_tag:
+.terraform_plan_tag:
   extends: .base_terraform
   stage: plan
   script:

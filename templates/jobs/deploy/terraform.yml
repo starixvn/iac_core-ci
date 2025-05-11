@@ -18,7 +18,7 @@
     - terraform apply -auto-approve $PLAN
   when: manual
 
-.iac_deploy_tag:
+.terraform_apply_tag:
   extends: .base_terraform
   stage: deploy
   script:
