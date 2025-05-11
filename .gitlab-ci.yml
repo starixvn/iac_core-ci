@@ -1,28 +1,26 @@
 ---
 include:
-  # Base configurations
-  - local: '/templates/base/common.yml'     # Common configurations
-  - local: '/templates/base/variables.yml'  # Global variables
-  - local: '/templates/base/stages.yml'     # Stage definitions
-  - local: '/templates/jobs/monitor/metrics.yml'
-  - local: '/templates/base/cache.yml'
-  - local: '/templates/jobs/init/detect-changes.yml'
-  - local: '/templates/jobs/validate/lint.yml'
-  - local: '/templates/jobs/validate/security.yml'
-  - local: '/templates/jobs/deploy/terraform.yml'
-  - local: '/templates/jobs/notify/notify.yml'
+  - project: 'iac/core-ci'
+    file: '/templates/base/common.yml'
+    ref: dev
+  - project: 'iac/core-ci'
+    file: '/templates/base/variables.yml'
+    ref: dev
+  - project: 'iac/core-ci'
+    file: '/templates/base/stages.yml'
+    ref: dev
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/init/detect-changes.yml'
+    ref: dev
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/init/extract-vars.yml'
+    ref: dev
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/deploy/terraform.yml'
+    ref: dev
   
   # Workflows
   - local: '/templates/workflows/dynamic.yml'
-
-
-stages:
-  - .pre
-  - init      # Thêm stage init
-  - validate
-  - test
-  - deploy
-  - .post
 
 # Kiểm tra cú pháp file YAML
 lint_ci_files:
