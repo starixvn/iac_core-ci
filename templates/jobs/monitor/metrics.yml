@@ -1,0 +1,52 @@
+---
+.export_metrics:
+  stage: .post
+  script:
+    - |
+      # Metrics collection
+      echo "Collecting pipeline metrics..."
+      
+      # Pipeline timing metrics
+      PIPELINE_DURATION=$(($(date +%s) - $(date -d "$CI_PIPELINE_CREATED_AT" +%s)))
+      
+      # Job statistics
+      TOTAL_JOBS=$(echo $CI_JOB_NAME_LIST | wc -w)
+      FAILED_JOBS=$(echo $CI_JOB_NAME_LIST | grep -c "_failed" || true)
+      
+      # Resource usage
+      MEMORY_USAGE=$(free -m | awk '/Mem:/ {print $3}')
+      DISK_USAGE=$(df -h . | awk 'NR==2 {print $5}' | sed 's/%//')
+      
+      # Export metrics
+      cat > pipeline_metrics.json <<EOF
+      {
+        "pipeline_id": "$CI_PIPELINE_ID",
+        "duration_seconds": $PIPELINE_DURATION,
+        "total_jobs": $TOTAL_JOBS,
+        "failed_jobs": $FAILED_JOBS,
+        "memory_usage_mb": $MEMORY_USAGE,
+        "disk_usage_percent": $DISK_USAGE,
+        "project": "$CI_PROJECT_PATH",
+        "branch": "$CI_COMMIT_REF_NAME"
+      }
+      EOF
+  artifacts:
+    reports:
+      metrics: pipeline_metrics.json
+    expire_in: 1 week
+
+.monitor_job_status:
+  stage: .post
+  script:
+    - |
+      # Job status monitoring
+      echo "Job execution summary:"
+      echo "- Job name: $CI_JOB_NAME"
+      echo "- Duration: $CI_JOB_DURATION"
+      echo "- Status: $CI_JOB_STATUS"
+      echo "- Runner: $CI_RUNNER_DESCRIPTION"
+      
+      # Alert on failures
+      if [ "$CI_JOB_STATUS" = "failed" ]; then
+        echo "::error::Job $CI_JOB_NAME failed on $CI_RUNNER_DESCRIPTION"
+      fi

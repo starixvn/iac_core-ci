@@ -1,0 +1,41 @@
+---
+.cache_config:
+  cache:
+    # Key theo branch và checksum của file dependencies
+    key: 
+      files:
+        - "**/package-lock.json"
+        - "**/yarn.lock"
+        - "**/go.sum"
+        - "**/*.tf"
+      prefix: ${CI_COMMIT_REF_SLUG}
+    paths:
+      # NPM/Yarn cache
+      - .npm/
+      - .yarn/
+      # Terraform cache
+      - .terraform
+      - "**/.terraform.lock.hcl"
+      # Go modules cache  
+      - .go/pkg/mod
+      # General cache
+      - .cache
+    policy: pull-push
+    when: always
+
+.terraform_cache:
+  extends: .cache_config
+  cache:
+    paths:
+      - .terraform
+      - "**/.terraform.lock.hcl"
+      - .terraform.d/plugin-cache
+    key: ${CI_COMMIT_REF_SLUG}-terraform
+
+.npm_cache:
+  extends: .cache_config  
+  cache:
+    paths:
+      - .npm/
+      - node_modules/
+    key: ${CI_COMMIT_REF_SLUG}-npm
