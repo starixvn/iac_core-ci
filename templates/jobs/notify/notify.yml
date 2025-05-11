@@ -64,10 +64,7 @@
             "blocks": [
               {
                 "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": ":rocket: *Test Message* \n• Project: `TEST PROJECT` \n• Environment: `dev` \n• Module: `core-api` \n• Pipeline: <https://gitlab.com|#12345>"
-                }
+                "text": "$MESSAGE",
               }
             ]
           }
