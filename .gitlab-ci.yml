@@ -19,7 +19,7 @@ include:
     file: '/templates/jobs/deploy/terraform.yml'
     ref: dev
   
-  # Workflows
+  ## Workflows
   - local: '/templates/workflows/dynamic.yml'
 
 # Kiểm tra cú pháp file YAML
