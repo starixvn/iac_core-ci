@@ -28,6 +28,13 @@ include:
     file: '/templates/jobs/cleanup/cleanup.yml'
     ref: dev
 
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/init/detect-changes.yml'
+    ref: dev
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/init/extract-vars.yml'
+    ref: dev
+
 # Phát hiện thay đổi
 detect_changes:
   extends: .detect_changes
