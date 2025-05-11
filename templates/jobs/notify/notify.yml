@@ -61,12 +61,7 @@
         "attachments": [
           {
             "color": "#36a64f",
-            "blocks": [
-              {
-                "type": "section",
-                "text": "$MESSAGE",
-              }
-            ]
+            "text": "$MESSAGE",
           }
         ]
       }' \
