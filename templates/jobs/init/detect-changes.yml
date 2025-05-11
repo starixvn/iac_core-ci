@@ -1,5 +1,5 @@
 ---
-.detect_changes_job:
+.detect_changes:
   stage: .pre
   script:
     - |
