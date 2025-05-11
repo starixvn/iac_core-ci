@@ -1,14 +1,15 @@
 ---
 .cleanup:
   stage: cleanup
+  image: hub.nexdev.net/base/alpine:git-3.21
   script:
+    - echo "cleaning up tag ..."
     - |
-      echo "Bắt đầu dọn dẹp..."
-      # Xóa các file tạm
-      rm -f ${PLAN} ${JSON_PLAN_FILE} || true
-      # Xóa các file cache không cần thiết
-      rm -rf .terraform/.terraform/providers/* || true
-      echo "Hoàn thành dọn dẹp!"
+      curl --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}" \
+          --request DELETE \
+          "${GITLAB_API_URL}/projects/${CI_PROJECT_ID}/repository/tags/${CI_COMMIT_TAG}"
+    - echo "Successfully deleted tag ${CI_COMMIT_TAG}"
   rules:
-    - when: always
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
+      when: always
   allow_failure: true
