@@ -57,7 +57,7 @@
           }
         ]
       }" \
-      "$SLACK_WEBHOOK_URL"
+      "https://hooks.slack.com/services/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"
   when: on_failure
   #allow_failure: true
 
