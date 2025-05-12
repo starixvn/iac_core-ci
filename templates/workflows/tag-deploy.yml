@@ -2,10 +2,10 @@
 include:
   - project: 'iac/core-ci'
     file: '/templates/jobs/init/extract-vars.yml'
-    ref: dev
+    ref: main
   - project: 'iac/core-ci'
     file: '/templates/jobs/cleanup/cleanup.yml'
-    ref: dev
+    ref: main
 
 extract_tag_vars:
   extends: .extract_vars

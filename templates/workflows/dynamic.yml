@@ -2,40 +2,40 @@
 include:
   - project: 'iac/core-ci'
     file: '/templates/base/common.yml'
-    ref: dev
+    ref: main
   - project: 'iac/core-ci'
     file: '/templates/base/cache.yml'
-    ref: dev
+    ref: main
   - project: 'iac/core-ci'
     file: '/templates/base/variables.yml'
-    ref: dev
+    ref: main
   - project: 'iac/core-ci'
     file: '/templates/jobs/init/dynamic.yml'
-    ref: dev
+    ref: main
   - project: 'iac/core-ci'
     file: '/templates/base/stages.yml'
-    ref: dev
+    ref: main
   - project: 'iac/core-ci'
     file: '/templates/jobs/validate/lint.yml'
-    ref: dev
+    ref: main
   - project: 'iac/core-ci'
     file: '/templates/jobs/validate/security.yml'
-    ref: dev
+    ref: main
   - project: 'iac/core-ci'
     file: '/templates/jobs/plan/terraform.yml'
-    ref: dev
+    ref: main
   - project: 'iac/core-ci'
     file: '/templates/jobs/deploy/terraform.yml'
-    ref: dev
+    ref: main
   - project: 'iac/core-ci'
     file: '/templates/jobs/notify/notify.yml'
-    ref: dev
+    ref: main
   - project: 'iac/core-ci'
     file: '/templates/jobs/cleanup/cleanup.yml'
-    ref: dev
+    ref: main
   - project: 'iac/core-ci'
     file: '/templates/jobs/init/detect-changes.yml'
-    ref: dev
+    ref: main
 
 # Phát hiện thay đổi
 detect_changes:
