@@ -14,7 +14,6 @@ extract_tag_vars:
       when: always
     - when: never
 
-
 plan:
   extends: 
     - .predefined_id_tokens
@@ -32,12 +31,14 @@ deploy:
   needs: ["extract_tag_vars", "plan"]
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy-/'
-      when: always
+      when: manual
     - when: never
  
 notify:
   extends: .notify_pipeline_success
   needs: ["deploy"]
+  variables:
+    CI_JOB_STATUS: "success"
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy-/'
       when: always
@@ -49,7 +50,3 @@ cleanup:
     - if: '$CI_COMMIT_TAG =~ /^deploy-/'
       when: always
     - when: never
-
-# workflow:
-#   rules:
-#     - if: '$CI_COMMIT_TAG =~ /^deploy-/'
