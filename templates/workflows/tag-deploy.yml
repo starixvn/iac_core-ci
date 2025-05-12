@@ -10,7 +10,7 @@ include:
 extract_tag_vars:
   extends: .extract_vars
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^deploy-/'
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: always
     - when: never
 #deploy_vault_starix-infra_starix_local
@@ -20,7 +20,7 @@ plan:
     - .terraform_plan
   needs: ["extract_tag_vars"]
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^deploy-/'
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: always
     - when: never
  
@@ -30,7 +30,7 @@ deploy:
     - .terraform_apply
   needs: ["extract_tag_vars", "plan"]
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^deploy-/'
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: manual
     - when: never
  
@@ -40,7 +40,7 @@ notify:
   variables:
     CI_JOB_STATUS: "success"
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^deploy-/'
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: always
     - when: never
 
