@@ -4,6 +4,9 @@ include:
     file: '/templates/base/common.yml'
     ref: dev
   - project: 'iac/core-ci'
+    file: '/templates/base/cache.yml'
+    ref: dev
+  - project: 'iac/core-ci'
     file: '/templates/base/variables.yml'
     ref: dev
   - project: 'iac/core-ci'

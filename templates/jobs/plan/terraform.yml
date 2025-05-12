@@ -1,6 +1,8 @@
 ---
 .terraform_plan:
-  extends: .base_terraform
+  extends:
+    - .base_terraform
+    - .terraform_cache
   stage: plan
   script:
     - echo "App ${MODULE}_MAIN / ${MODULE} | Env ${ENV} | ${TF_CLI_CONFIG_FILE}"
@@ -31,7 +33,9 @@
 ##################################### Deploy TAGs
 #####################################
 .terraform_plan_tag:
-  extends: .base_terraform
+  extends:
+    - .base_terraform
+    - .terraform_cache
   stage: plan
   script:
     - echo "App ${APP}_MAIN / ${MODULE} | Env ${ENV} | ${TF_CLI_CONFIG_FILE}"

@@ -12,6 +12,9 @@
           file: '/templates/base/common.yml'
           ref: dev
         - project: 'iac/core-ci'
+          file: '/templates/base/cache.yml'
+          ref: dev
+        - project: 'iac/core-ci'
           file: '/templates/base/variables.yml'
           ref: dev
         - project: 'iac/core-ci'
@@ -38,15 +41,6 @@
       default:
         tags:
           - "${RUNNER_TAG}"
-
-      stages:
-        - init
-        - validate
-        - security
-        - plan
-        - deploy
-        - notify
-        - cleanup
 
       no_changes:
         stage: init
