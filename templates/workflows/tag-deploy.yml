@@ -40,7 +40,7 @@ deploy:
 
 notify:
   extends: .notify_pipeline_success
-  needs: ["deploy"]
+  needs: ["plan","deploy"]
   variables:
     CI_JOB_STATUS: "success"
   rules:
