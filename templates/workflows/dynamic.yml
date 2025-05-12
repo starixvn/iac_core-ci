@@ -31,6 +31,9 @@ include:
     file: '/templates/jobs/notify/notify.yml'
     ref: dev
   - project: 'iac/core-ci'
+    file: '/templates/jobs/cleanup/cleanup.yml'
+    ref: dev
+  - project: 'iac/core-ci'
     file: '/templates/jobs/init/detect-changes.yml'
     ref: dev
 
