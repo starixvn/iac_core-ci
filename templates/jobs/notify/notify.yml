@@ -38,7 +38,7 @@
       "$SLACK_WEBHOOK_URL"
 
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^deploy_.+/'
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: on_success
     - when: on_success
 
