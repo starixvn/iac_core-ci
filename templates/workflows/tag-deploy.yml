@@ -13,7 +13,7 @@ extract_tag_vars:
     - if: '$CI_COMMIT_TAG =~ /^deploy-/'
       when: always
     - when: never
-
+#deploy_vault_starix-infra_starix_local
 plan:
   extends: 
     - .predefined_id_tokens
@@ -47,6 +47,6 @@ notify:
 cleanup:
   extends: .cleanup
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^deploy-/'
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: always
-    - when: never
+  allow_failure: true
