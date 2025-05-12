@@ -15,9 +15,8 @@ extract_tag_vars:
     - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: always
     - when: never
-#deploy_vault_starix-infra_starix_local
 plan:
-  extends: 
+  extends:
     - .predefined_id_tokens
     - .terraform_plan
   needs: ["extract_tag_vars"]
@@ -29,7 +28,7 @@ plan:
     - when: never
 
 deploy:
-  extends: 
+  extends:
     - .predefined_id_tokens
     - .terraform_apply
   needs: ["extract_tag_vars", "plan"]
