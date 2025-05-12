@@ -5,10 +5,10 @@
     - echo "checking deploy tag $CI_COMMIT_TAG ..."
     - |
       if [[ -n "$CI_COMMIT_TAG" ]]; then
-        APP=$(echo "$CI_COMMIT_TAG" | cut -d'-' -f2)
-        MODULE=$(echo "$CI_COMMIT_TAG" | cut -d'-' -f3)
-        ORG=$(echo "$CI_COMMIT_TAG" | cut -d'-' -f4)
-        ENV=$(echo "$CI_COMMIT_TAG" | cut -d'-' -f5)
+        APP=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f2)
+        MODULE=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f3)
+        ORG=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f4)
+        ENV=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f5)
 
         if [[ "${APP}" == "vault" ]]; then
           VAULT_ENV=${ENV}
