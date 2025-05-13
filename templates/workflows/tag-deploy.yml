@@ -6,6 +6,9 @@ include:
   - project: 'iac/core-ci'
     file: '/templates/jobs/cleanup/cleanup.yml'
     ref: main
+default:
+  tags:
+    - "${RUNNER_TAG}"
 
 extract_tag_vars:
   extends: .extract_vars
