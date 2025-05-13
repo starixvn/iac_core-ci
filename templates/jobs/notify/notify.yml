@@ -1,15 +1,7 @@
 # notify.yml
 ---
-.notify_base: &notify_base
-  stage: notify
-  rules:
-    - when: never
-  script:
-    - |
-      echo "${APP}/${MODULE} -  $ENV - $CI_JOB_STATUS"
-
 .notify_pipeline_success:
-  <<: *notify_base
+  stage: notify
   script:
     - |
       STATUS="$([ "$CI_JOB_STATUS" = "success" ] && echo "SUCCESS" || echo "FAILED")"
@@ -38,7 +30,7 @@
       "$SLACK_WEBHOOK_URL"
 
 .notify_pipeline_failure:
-  <<: *notify_base
+  stage: notify
   script:
     - |
       STATUS="$([ "$CI_JOB_STATUS" = "success" ] && echo "SUCCESS" || echo "FAILED")"
