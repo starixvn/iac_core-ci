@@ -2,6 +2,7 @@
 variables:
   # Docker registry
   RUNNER_TAG: "k8s"
+  DEBUG: "0"
   #DOCKER_REG_LOCAL_URL: "${CI_REGISTRY}"
   # Terraform related
   TF_ROOT: ${APP}/${MODULE}
