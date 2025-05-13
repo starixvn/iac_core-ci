@@ -6,7 +6,7 @@
     - echo "Scanning TF - Security ${APP} / ${MODULE} ..."
     # Kiểm tra các file Terraform
     - |
-      for tf_file in $(find . -name "*.tf"); do
+      for tf_file in $(find ${APP}/${MODULE} -name "*.tf"); do
         echo "Checking $tf_file..."
         
         # Kiểm tra hardcoded credentials
@@ -29,7 +29,7 @@
 
     # Kiểm tra các file tfvars
     - |
-      for vars_file in $(find . -name "*.tfvars"); do
+      for vars_file in $(find $(find ${APP}/${MODULE} -name "*.tfvars"); do
         echo "Checking variables file $vars_file..."
         
         # Kiểm tra sensitive data
@@ -41,7 +41,7 @@
 
     # Kiểm tra cấu hình backend
     - |
-      for backend_file in $(find . -name "backend.conf"); do
+      for backend_file in $(find $(find ${APP}/${MODULE} -name "backend.conf"); do
         echo "Checking backend config $backend_file..."
         
         # Kiểm tra encryption và lock
