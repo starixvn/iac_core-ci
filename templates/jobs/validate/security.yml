@@ -12,20 +12,21 @@
         exit 1
       fi
       for tf_file in $(find . -name "*.tf"); do
-        echo "Checking $tf_file..."
-
         # Kiểm tra hardcoded credentials
+        echo "Checking hardcoded credentials $tf_file..."
         grep -E "(password|secret|token|key).*=.*['\"].*['\"]" "$tf_file" && {
           echo "❌ Found hardcoded credentials in $tf_file"
           exit 1
         }
 
         # Kiểm tra public resources
+        echo "Checking public resources $tf_file..."
         grep -E "(public_access|public =|acl.*public)" "$tf_file" && {
           echo "⚠️ Warning: Found public access configuration in $tf_file"
         }
 
         # Kiểm tra encryption
+        echo "Checking encryption $tf_file..."
         grep -E "(encrypt.*=.*false|encrypted.*=.*false)" "$tf_file" && {
           echo "❌ Found disabled encryption in $tf_file"
           exit 1
@@ -35,8 +36,7 @@
     # Kiểm tra các file tfvars
     - |
       for vars_file in $(find . -name "*.tfvars"); do
-        echo "Checking variables file $vars_file..."
-
+        echo "Checking sensitive data in variables file $vars_file..."
         # Kiểm tra sensitive data
         grep -E "(password|secret|token|key).*=.*[^\"]+\".*\"" "$vars_file" && {
           echo "❌ Found sensitive data in $vars_file"
@@ -47,8 +47,7 @@
     # Kiểm tra cấu hình backend
     - |
       for backend_file in $(find . -name "backend.conf"); do
-        echo "Checking backend config $backend_file..."
-
+        echo "Checking encryption & lock in backend config $backend_file..."
         # Kiểm tra encryption và lock
         grep "encrypt.*=.*false" "$backend_file" && {
           echo "❌ Backend encryption must be enabled"
@@ -61,7 +60,7 @@
 
     # Kiểm tra provider configuration
     - |
-      echo "Checking provider configurations..."
+      echo "Checking version constraints in provider configurations..."
       grep -r "provider.*{" . && {
         # Kiểm tra version constraints
         if ! grep -r "version.*=.*\".*\"" .; then
