@@ -9,7 +9,7 @@
       EMOJI="$([ "$STATUS" = "SUCCESS" ] && echo ":rocket:" || echo ":fire:")"
       FOOTER_DATE=$(date -d '+7 hours' +'%Y-%m-%d %H:%M:%S GMT+7' 2>/dev/null || date +'%Y-%m-%d %H:%M:%S UTC')
 
-      MESSAGE="$EMOJI *[${ENV} - DEPLOYED] ${APP} - ${MODULE}*
+      MESSAGE="$EMOJI *[${ENV^^} - DEPLOYED] ${APP} - ${MODULE}*
       • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\` | by $GITLAB_USER_NAME
       • *Pipeline:* <$CI_PIPELINE_URL|#$CI_PIPELINE_ID>
       • *Commit:* <$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>"
