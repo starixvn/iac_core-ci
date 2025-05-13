@@ -42,7 +42,7 @@ graph TD
   B1d1a --> B1d1a1[backend.conf]
   B1d1a --> B1d1a2[variables.tfvars]
   B1d1 --> B1d1b[uat]
-  B1d2 --> B1d2a[prod]
+  B1d1 --> B1d2a[prod]
   B --> B2[module2]
   A --> C[app2]
   A --> D[.gitlab-ci.yml]
