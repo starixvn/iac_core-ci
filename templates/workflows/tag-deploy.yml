@@ -34,20 +34,18 @@ deploy:
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: manual
-    - when: never
 
 notify:
   extends: .notify_pipeline_success
-  needs: ["extract_tag_vars", "plan", "deploy"]
-  rules:
-    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
-      when: on_success
-    - when: never
-
-cleanup:
-  extends: .cleanup_tag
-  needs: ["notify"]
+  needs: ["extract_tag_vars", "deploy"]
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: always
-    - when: never
+
+cleanup:
+  extends: .cleanup_tag
+  needs: ["deploy", "notify"]
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
+      when: always
+
