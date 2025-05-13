@@ -8,18 +8,18 @@
     - |
       for tf_file in $(find ${APP}/${MODULE} -name "*.tf"); do
         echo "Checking $tf_file..."
-        
+
         # Kiểm tra hardcoded credentials
         grep -E "(password|secret|token|key).*=.*['\"].*['\"]" "$tf_file" && {
           echo "❌ Found hardcoded credentials in $tf_file"
           exit 1
         }
-        
+
         # Kiểm tra public resources
         grep -E "(public_access|public =|acl.*public)" "$tf_file" && {
           echo "⚠️ Warning: Found public access configuration in $tf_file"
         }
-        
+
         # Kiểm tra encryption
         grep -E "(encrypt.*=.*false|encrypted.*=.*false)" "$tf_file" && {
           echo "❌ Found disabled encryption in $tf_file"
@@ -31,7 +31,7 @@
     - |
       for vars_file in $(find $(find ${APP}/${MODULE} -name "*.tfvars"); do
         echo "Checking variables file $vars_file..."
-        
+
         # Kiểm tra sensitive data
         grep -E "(password|secret|token|key).*=.*[^\"]+\".*\"" "$vars_file" && {
           echo "❌ Found sensitive data in $vars_file"
@@ -43,7 +43,7 @@
     - |
       for backend_file in $(find $(find ${APP}/${MODULE} -name "backend.conf"); do
         echo "Checking backend config $backend_file..."
-        
+
         # Kiểm tra encryption và lock
         grep "encrypt.*=.*false" "$backend_file" && {
           echo "❌ Backend encryption must be enabled"
