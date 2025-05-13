@@ -122,6 +122,7 @@
         needs:
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_plan
+        when: manual
         after_script:
           - !reference [.notify_pipeline_failure, script]
 

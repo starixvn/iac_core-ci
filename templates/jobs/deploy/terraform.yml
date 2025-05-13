@@ -16,4 +16,3 @@
       (terraform workspace select ${ENV} || terraform workspace new ${ENV})
     - echo "🚀 Deploying Terraform configuration for ${APP} - ${MODULE} in ${ENV}"
     - terraform apply -auto-approve $PLAN
-  when: manual
