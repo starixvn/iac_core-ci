@@ -67,6 +67,7 @@
           echo "⚠️ Warning: Provider version should be constrained"
         fi
       }
+  allow_failure: false
 
 .helm_security:
   stage: security
