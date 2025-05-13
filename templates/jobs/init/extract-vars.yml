@@ -10,9 +10,10 @@
         ORG=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f4)
         ENV=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f5)
 
-        if [[ "${APP}" == "vault" ]]; then
+        if [[ "${APP}" == "vault" || "${APP}" == "aws" ]]; then
           VAULT_ENV=${ENV}
           VAULT_ADDR="https://vault.unknown"
+          S3_BACKEND_PROFILE=${ENV}
           if [[ "${ORG}" == "starix" ]]; then
             case "${ENV}" in
               dev)    VAULT_ADDR="https://vault-dev.nexdev.net" ;;
@@ -30,6 +31,7 @@
         else
           VAULT_ENV="local"
           VAULT_ADDR="https://vault.nexdev.net"
+          S3_BACKEND_PROFILE="local"
         fi
 
         echo "APP=$APP" >> tag_vars.env
@@ -38,6 +40,7 @@
         echo "ENV=$ENV" >> tag_vars.env
         echo "VAULT_ENV=$VAULT_ENV" >> tag_vars.env
         echo "VAULT_ADDR=$VAULT_ADDR" >> tag_vars.env
+        echo "S3_BACKEND_PROFILE=$S3_BACKEND_PROFILE" >> tag_vars.env
         echo "Extracted APP=$APP, MODULE=$MODULE, ORG=$ORG, ENV=$ENV | $VAULT_ENV , $VAULT_ADDR"
       else
         echo "FAIL with tag $CI_COMMIT_TAG"

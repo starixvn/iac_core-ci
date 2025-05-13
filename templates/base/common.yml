@@ -30,6 +30,7 @@
       if [[ "${APP}" == "vault" ]]; then
         export VAULT_ENV=${ENV}
         export VAULT_ADDR="https://vault.unknown"
+        export S3_BACKEND_PROFILE="local"
         if [[ "${ORG}" == "starix" ]]; then
           case "${ENV}" in
             dev)    export VAULT_ADDR="https://vault-dev.nexdev.net" ;;
@@ -44,9 +45,14 @@
             local)  export VAULT_ADDR="https://vault.lumigame.com" ;;
           esac
         fi
+      elif [[ "${APP}" == "aws" ]]; then
+        export VAULT_ENV="local"
+        export VAULT_ADDR="https://vault.nexdev.net"
+        export S3_BACKEND_PROFILE=${ENV}
       else
         export VAULT_ENV="local"
         export VAULT_ADDR="https://vault.nexdev.net"
+        export S3_BACKEND_PROFILE="local"
       fi
 
     - |
