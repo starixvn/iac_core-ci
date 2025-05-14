@@ -137,14 +137,14 @@
     - echo "Scanning HELM - Security ${APP} / ${MODULE} ..."
 
 
-check_product_engagement:
+.check_product_engagement:
   stage: check
   image: curlimages/curl:8.10.1
   script:
     - echo "🔍 Checking DefectDojo product and engagement availability"
     # Validate critical environment variables
     - |
-      for var in DEFECTDOJO_URL DEFECTDOJO_TOKEN CI_PROJECT_NAME DEFECTDOJO_DEPT; do
+      for var in DEFECTDOJO_URL DEFECTDOJO_API_KEY CI_PROJECT_NAME DEFECTDOJO_DEPT; do
         if [ -z "${!var}" ]; then
           echo "❌ Error: $var is not set"; exit 1
         fi
@@ -261,18 +261,18 @@ check_product_engagement:
     expire_in: 7 day
   allow_failure: false
 
-upload_reports:
+.upload_reports:
   stage: reports
   image: curlimages/curl:8.10.1
   needs:
-    - job: check_product_engagement
+    - job: .check_product_engagement
       artifacts: true
-    - job: trivy_scan
+    - job: .trivy_security
       artifacts: true
   before_script:
     - source product_id.env # Load PRODUCT_ID and ENGAGEMENT_ID
     - ENGAGEMENT_NAME="test-trivy"
-    - test -f reports/trivy-report.json || { echo "❌ Trivy report not found"; exit 1; }
+    - test -f trivy-results.json || { echo "❌ Trivy report not found"; exit 1; }
   script:
     - echo "📤 Uploading Trivy scan report to DefectDojo"
     - |
@@ -290,7 +290,7 @@ upload_reports:
         -F "auto_create_context=true" \
         -F "deduplication_on_engagement=true" \
         -F "close_old_findings=true" \
-        -F "file=@reports/trivy-report.json" \
+        -F "file=@trivy-results.json" \
         -w "\nHTTP Status: %{http_code}\n" \
         || ECHO_CURL_ERROR=$?
     - |
