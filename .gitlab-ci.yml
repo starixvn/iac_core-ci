@@ -72,7 +72,7 @@ validate_templates:
         - "**/*.yml"
         - "**/*.yaml"
 
-.upload_reports:
+upload_reports:
   stage: reports
   image: curlimages/curl:8.10.1
   needs:
