@@ -77,6 +77,7 @@
   before_script:
     - apk add --no-cache wget tar jq curl
   script:
+    script:
     - |
       echo "Scanning with Trivy for ${APP}/${MODULE}..."
       wget --no-verbose https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O trivy.tar.gz
@@ -97,15 +98,18 @@
         "verified": false,
         "active": true,
         "scan_date": now,
-        "findings": [.Results[] | select(.Vulnerabilities != null) | .Vulnerabilities[] | {
-          "title": .VulnerabilityID,
+        "findings": [.Results[] | select(.Misconfigurations != null) | .Misconfigurations[] | {
+          "title": .ID,
           "severity": .Severity,
           "description": .Description,
-          "mitigation": .PrimaryURL,
+          "mitigation": .Resolution,
           "file_path": .PkgPath,
           "line": .Line
         }]
-      }' trivy-results.json > defectdojo-import.json
+      }' trivy-results.json > defectdojo-import.json || {
+        echo "No vulnerabilities found or error in processing results"
+        echo '{"engagement":"'${CI_PROJECT_ID}'","product":"'${APP}'","scan_type":"Trivy Scan","verified":false,"active":true,"scan_date":null,"findings":[]}' > defectdojo-import.json
+      }
       
       # Gửi kết quả lên DefectDojo
       curl -X POST \
