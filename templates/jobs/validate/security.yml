@@ -115,8 +115,14 @@
       # Gửi kết quả lên DefectDojo
       curl -X POST \
         -H "Authorization: Token ${DEFECTDOJO_API_KEY}" \
-        -H "Content-Type: application/json; charset=utf-8" \
-        -d @defectdojo-import.json \
+        -H "Content-Type: multipart/form-data" \
+        -F "engagement=${CI_PROJECT_ID}" \
+        -F "product=${APP}" \
+        -F "scan_type=Trivy Scan" \
+        -F "verified=false" \
+        -F "active=true" \
+        -F "scan_date=$(date -u +"%Y-%m-%d")" \
+        -F "file=@defectdojo-import.json" \
         "${DEFECTDOJO_URL}/api/v2/import-scan/"
   artifacts:
     paths:
