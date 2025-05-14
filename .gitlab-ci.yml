@@ -71,3 +71,44 @@ validate_templates:
       changes:
         - "**/*.yml"
         - "**/*.yaml"
+
+.upload_reports:
+  stage: reports
+  image: curlimages/curl:8.10.1
+  needs:
+    - job: .check_product_engagement
+      artifacts: true
+    - job: .trivy_security
+      artifacts: true
+  before_script:
+    - source product_id.env # Load PRODUCT_ID and ENGAGEMENT_ID
+    - ENGAGEMENT_NAME="test-trivy"
+    - test -f trivy-results.json || { echo "❌ Trivy report not found"; exit 1; }
+  script:
+    - echo "📤 Uploading Trivy scan report to DefectDojo"
+    - |
+      curl -s -S -X POST "${DEFECTDOJO_URL}/api/v2/reimport-scan/" \
+        -H "Authorization: Token ${DEFECTDOJO_TOKEN}" \
+        -F "scan_date=$(date +%F)" \
+        -F "minimum_severity=Medium" \
+        -F "scan_type=Trivy Scan" \
+        -F "active=true" \
+        -F "verified=true" \
+        -F "product_name=${CI_PROJECT_NAME}" \
+        -F "engagement_name=${ENGAGEMENT_NAME}" \
+        -F "engagement=${ENGAGEMENT_ID}" \
+        -F "test_title=${TEST_TITLE}" \
+        -F "auto_create_context=true" \
+        -F "deduplication_on_engagement=true" \
+        -F "close_old_findings=true" \
+        -F "file=@trivy-results.json" \
+        -w "\nHTTP Status: %{http_code}\n" \
+        || ECHO_CURL_ERROR=$?
+    - |
+      if [ -n "$ECHO_CURL_ERROR" ]; then
+        echo "❌ Failed to upload report (curl error code: $ECHO_CURL_ERROR)"
+        exit 1
+      fi
+    - echo "✅ Upload completed"
+  allow_failure: true
+  when: always
