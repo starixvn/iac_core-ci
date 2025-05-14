@@ -42,7 +42,7 @@ lint_ci_files:
         - "**/*.yml"
         - "**/*.yaml"
 
-# Kiểm tra đường dẫn include  
+# Kiểm tra đường dẫn include
 validate_templates:
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   stage: validate
