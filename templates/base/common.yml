@@ -7,7 +7,7 @@
   before_script:
     - |
       # Enable debug mode if DEBUG=1
-      if [ "${DEBUG:-0}" = "1" ]; then
+      if [ "${DEBUG:-0}" = "2" ]; then
         set -x  # Enable command tracing
         export TF_LOG=DEBUG
         export GITLAB_DEBUG=1
