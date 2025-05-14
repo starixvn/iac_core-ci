@@ -114,9 +114,10 @@
         "${DEFECTDOJO_URL}/api/v2/import-scan/"
   artifacts:
     reports:
-      security: trivy-results.json
+      junit: trivy-results.xml
     paths:
       - trivy-results.json
+      - trivy-results.xml
       - defectdojo-import.json
     when: always
     expire_in: 1 week

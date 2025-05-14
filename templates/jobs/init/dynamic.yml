@@ -113,15 +113,6 @@
         needs:
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
         extends: [".trivy_security"]
-        artifacts:
-          reports:
-            junit: trivy-results.xml
-            sarif: trivy-results.sarif
-          paths:
-            - trivy-results.json
-            - trivy-results.xml
-            - trivy-results.sarif
-          expire_in: 1 week
         after_script:
           - !reference [.notify_pipeline_failure, script]
 
