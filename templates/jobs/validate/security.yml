@@ -138,7 +138,7 @@
 
 
 .check_product_engagement:
-  stage: check
+  stage: reports
   image: curlimages/curl:8.10.1
   script:
     - echo "🔍 Checking DefectDojo product and engagement availability"
