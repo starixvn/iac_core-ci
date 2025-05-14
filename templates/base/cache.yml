@@ -25,11 +25,15 @@
 
 .terraform_cache:
   cache:
-  - key: ${TOOL}-$MODULE-$ORG-$ENV-terraform
+  - key: ${APP}-$MODULE-$ORG-$ENV-terraform
     paths:
-      - $CI_PROJECT_DIR/.terraform
-      - $CI_PROJECT_DIR/.terraform.lock.hcl
-      - $CI_PROJECT_DIR/.terraform.d/plugin-cache
+      - ${CI_PROJECT_DIR}/${APP}/${MODULE}/.terraform
+    policy: pull-push
+    when: always
+
+  - key: ${CI_COMMIT_REF_SLUG}-${APP}-${MODULE}-${ORG}-${ENV}-terraform.lock.hcl
+    paths:
+      - ${CI_PROJECT_DIR}/${APP}/${MODULE}/.terraform.lock.hcl
     policy: pull-push
     when: always
 
