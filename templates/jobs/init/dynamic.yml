@@ -104,7 +104,7 @@
         stage: validate
         needs:
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
-        extends: [".terraform_security"]
+        extends: [".terraform_security", ".trivy_security"]
         after_script:
           - !reference [.notify_pipeline_failure, script]
 
