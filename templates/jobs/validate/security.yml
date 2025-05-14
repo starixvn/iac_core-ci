@@ -82,12 +82,8 @@
       wget --no-verbose https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O trivy.tar.gz
       tar -xzf trivy.tar.gz
       chmod +x ./trivy
+      echo "Scanning IaC files for Terraform with Trivy for ${APP}/${MODULE}..."
       ./trivy config --severity HIGH,CRITICAL --format json ${APP}/${MODULE}
-    - |
-      # Scan Helm chart
-      ./trivy fs \
-        --format json \
-        ${APP}/${MODULE}
     - |    
       # Scan IaC files với Trivy
       ./trivy config \
