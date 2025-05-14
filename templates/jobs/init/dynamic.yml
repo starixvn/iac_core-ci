@@ -146,7 +146,7 @@
         echo "Generating basic MODULE jobs for ${APP}_${MODULE}..."
 
         cat >> generated-jobs.yml <<EOF
-
+      
       ${APP}_${MODULE}_env_initializer:
         stage: init
         script:
