@@ -14,8 +14,6 @@ include:
 lint_ci_files:
   extends: .base_job
   stage: validate
-  before_script:
-    - apk add --no-cache yamllint
   script:
     - |
       CHANGED_FILES=""

@@ -74,8 +74,6 @@
 .trivy_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
-  before_script:
-    - apk add --no-cache wget tar jq curl
   script:
     - |
       echo "Scanning with Trivy for ${APP}/${MODULE}..."
