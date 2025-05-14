@@ -63,8 +63,6 @@
             ENV="${BASH_REMATCH[4]}"
             echo "Generating full ENV jobs for ${APP}_${MODULE}_${ORG}_${ENV}..."
 
-            cat >> generated-jobs.yml <<EOF
-
       ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer:
         stage: init
         script:
@@ -90,7 +88,6 @@
           reports:
             dotenv: shared_vars.env  # Optional: makes vars available via GitLab predefined variable expansion
         allow_failure: false
-
 
       ${APP}_${MODULE}_${ORG}_${ENV}_validate:
         stage: validate
@@ -149,6 +146,27 @@
         echo "Generating basic MODULE jobs for ${APP}_${MODULE}..."
 
         cat >> generated-jobs.yml <<EOF
+
+      ${APP}_${MODULE}_env_initializer:
+        stage: init
+        script:
+          - echo "Preparing environment variables..."
+          - >
+            {
+              echo "APP=${APP}";
+              echo "MODULE=${MODULE}"
+            } > shared_vars.env
+          - echo "Environment variables exported:"
+          - cat shared_vars.env
+        variables:
+          APP: ${APP}
+          MODULE: ${MODULE}
+        artifacts:
+          paths:
+            - shared_vars.env
+          expire_in: 15 min
+          reports:
+            dotenv: shared_vars.env
 
       ${APP}_${MODULE}_unit_test:
         stage: validate
