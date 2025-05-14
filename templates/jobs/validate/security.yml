@@ -79,8 +79,7 @@
       tar -xzf trivy.tar.gz
       chmod +x ./trivy
       echo "Scanning IaC files for Terraform with Trivy for ${APP}/${MODULE}..."
-      ./trivy config --severity HIGH,CRITICAL --format json ${APP}/${MODULE}
-    - |    
+      ./trivy config --severity HIGH,CRITICAL --format json ${APP}/${MODULE} 
       # Scan IaC files với Trivy
       ./trivy config \
         --format json \
