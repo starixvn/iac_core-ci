@@ -1,6 +1,8 @@
 ---
 .terraform_apply:
-  extends: .base_terraform
+  extends:
+    - .base_terraform
+    - .terraform_cache
   stage: deploy
   script:
     - |
