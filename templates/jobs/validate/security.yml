@@ -87,7 +87,7 @@
       
       # Scan IaC files với Trivy
       ./trivy config \
-        --server ${TRIVY_SERVER} \
+        --server $TRIVY_SERVER --token $TRIVY_TOKEN \
         --format json \
         --output trivy-results.json \
         ${APP}/${MODULE}
