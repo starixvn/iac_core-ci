@@ -67,8 +67,6 @@
           echo "⚠️ Warning: Provider version should be constrained"
         fi
       }
-  # after_script:
-  #   - !reference [.notify_pipeline_failure, script]
   allow_failure: true
 
 .trivy_security:
@@ -88,59 +86,6 @@
         --format json \
         --output trivy-results.json \
         ${APP}/${MODULE}
-      
-  #     # Convert kết quả sang format DefectDojo
-  #     jq -r '{
-  #       "engagement": "${CI_PROJECT_ID}",
-  #       "product": "${APP}",
-  #       "scan_type": "Trivy Scan",
-  #       "verified": false,
-  #       "active": true,
-  #       "scan_date": now,
-  #       "findings": [.Results[] | select(.Misconfigurations != null) | .Misconfigurations[] | {
-  #         "title": .ID,
-  #         "severity": .Severity,
-  #         "description": .Description,
-  #         "mitigation": .Resolution,
-  #         "file_path": .PkgPath,
-  #         "line": .Line
-  #       }]
-  #     }' trivy-results.json > defectdojo-import.json || {
-  #       echo "No vulnerabilities found or error in processing results"
-  #       echo '{"engagement":"'${CI_PROJECT_ID}'","product":"'${APP}'","scan_type":"Trivy Scan","verified":false,"active":true,"scan_date":null,"findings":[]}' > defectdojo-import.json
-  #     }
-      
-  #     # Gửi kết quả lên DefectDojo
-  #     curl -X POST \
-  #       -H "Authorization: Token ${DEFECTDOJO_API_KEY}" \
-  #       -H "Content-Type: multipart/form-data" \
-  #       -F "engagement=${CI_PROJECT_ID}" \
-  #       -F "product=${APP}" \
-  #       -F "scan_type=Trivy Scan" \
-  #       -F "verified=false" \
-  #       -F "active=true" \
-  #       -F "scan_date=$(date -u +"%Y-%m-%d")" \
-  #       -F "file=@defectdojo-import.json" \
-  #       "${DEFECTDOJO_URL}/api/v2/import-scan/"
-  # artifacts:
-  #   paths:
-  #     - trivy-results.json
-  #     - defectdojo-import.json
-  #   when: always
-  #   expire_in: 1 week
-  # allow_failure: false
-
-.helm_security:
-  stage: security
-  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
-  script:
-    - echo "Scanning HELM - Security ${APP} / ${MODULE} ..."
-
-
-.check_product_engagement:
-  stage: security
-  image: curlimages/curl:8.10.1
-  script:
     - echo "🔍 Checking DefectDojo product and engagement availability"
     # Validate critical environment variables
     - |
@@ -254,27 +199,10 @@
     - |
       echo "PRODUCT_ID=${PRODUCT_ID}" > product_id.env
       echo "ENGAGEMENT_ID=${ENGAGEMENT_ID}" >> product_id.env
-  artifacts:
-    paths:
-      - product_id.env
-    when: always
-    expire_in: 7 day
-  allow_failure: false
 
-
-upload_reports:
-  stage: security
-  image: curlimages/curl:8.10.1
-  needs:
-    - job: .check_product_engagement
-      artifacts: true
-    - job: .trivy_security
-      artifacts: true
-  before_script:
     - source product_id.env # Load PRODUCT_ID and ENGAGEMENT_ID
     - ENGAGEMENT_NAME="test-trivy"
     - test -f trivy-results.json || { echo "❌ Trivy report not found"; exit 1; }
-  script:
     - echo "📤 Uploading Trivy scan report to DefectDojo"
     - |
       curl -s -S -X POST "${DEFECTDOJO_URL}/api/v2/reimport-scan/" \
@@ -302,3 +230,9 @@ upload_reports:
     - echo "✅ Upload completed"
   allow_failure: true
   when: always
+
+.helm_security:
+  stage: security
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
+  script:
+    - echo "Scanning HELM - Security ${APP} / ${MODULE} ...
