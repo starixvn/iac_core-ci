@@ -126,7 +126,7 @@
       - defectdojo-import.json
     when: always
     expire_in: 1 week
-  allow_failure: true
+  allow_failure: false
 
 .helm_security:
   stage: security
