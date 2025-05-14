@@ -144,18 +144,44 @@
 
         cat >> generated-jobs.yml <<EOF
 
+      ${APP}_${MODULE}_env_initializer:
+        stage: init
+        script:
+          - echo "Preparing environment variables..."
+          - >
+            {
+              echo "APP=${APP}";
+              echo "MODULE=${MODULE}"
+            } > shared_vars.env
+          - echo "Environment variables exported:"
+          - cat shared_vars.env
+        variables:
+          APP: ${APP}
+          MODULE: ${MODULE}
+        artifacts:
+          paths:
+            - shared_vars.env
+          expire_in: 15 min
+          reports:
+            dotenv: shared_vars.env
+
       ${APP}_${MODULE}_unit_test:
         stage: validate
         extends: [".unit_test"]
         needs:
-          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+          - job: ${APP}_${MODULE}_env_initializer
 
       ${APP}_${MODULE}_scan:
         stage: security
         extends: [".terraform_security"]
         needs:
-          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
-          - job: ${APP}_${MODULE}_unit_test
+          - job: ${APP}_${MODULE}_env_initializer
+
+      ${APP}_${MODULE}_trivy:
+        stage: security
+        extends: [".trivy_security"]
+        needs:
+          - job: ${APP}_${MODULE}_env_initializer
 
       EOF
             CHANGED_MODULES=$((CHANGED_MODULES + 1))

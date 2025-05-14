@@ -6,21 +6,27 @@
     - echo "Scanning TF - Security ${APP} / ${MODULE} ..."
     # Kiểm tra các file Terraform
     - |
+      cd ${APP}/${MODULE}
+      if ! find . -name "*.tf" > /dev/null 2>&1; then
+        echo "❌ No Terraform files found"
+        exit 1
+      fi
       for tf_file in $(find . -name "*.tf"); do
-        echo "Checking $tf_file..."
-        
         # Kiểm tra hardcoded credentials
+        echo "Checking hardcoded credentials $tf_file..."
         grep -E "(password|secret|token|key).*=.*['\"].*['\"]" "$tf_file" && {
           echo "❌ Found hardcoded credentials in $tf_file"
           exit 1
         }
-        
+
         # Kiểm tra public resources
+        echo "Checking public resources $tf_file..."
         grep -E "(public_access|public =|acl.*public)" "$tf_file" && {
           echo "⚠️ Warning: Found public access configuration in $tf_file"
         }
-        
+
         # Kiểm tra encryption
+        echo "Checking encryption $tf_file..."
         grep -E "(encrypt.*=.*false|encrypted.*=.*false)" "$tf_file" && {
           echo "❌ Found disabled encryption in $tf_file"
           exit 1
@@ -30,8 +36,7 @@
     # Kiểm tra các file tfvars
     - |
       for vars_file in $(find . -name "*.tfvars"); do
-        echo "Checking variables file $vars_file..."
-        
+        echo "Checking sensitive data in variables file $vars_file..."
         # Kiểm tra sensitive data
         grep -E "(password|secret|token|key).*=.*[^\"]+\".*\"" "$vars_file" && {
           echo "❌ Found sensitive data in $vars_file"
@@ -42,8 +47,7 @@
     # Kiểm tra cấu hình backend
     - |
       for backend_file in $(find . -name "backend.conf"); do
-        echo "Checking backend config $backend_file..."
-        
+        echo "Checking encryption & lock in backend config $backend_file..."
         # Kiểm tra encryption và lock
         grep "encrypt.*=.*false" "$backend_file" && {
           echo "❌ Backend encryption must be enabled"
@@ -56,13 +60,75 @@
 
     # Kiểm tra provider configuration
     - |
-      echo "Checking provider configurations..."
+      echo "Checking version constraints in provider configurations..."
       grep -r "provider.*{" . && {
         # Kiểm tra version constraints
         if ! grep -r "version.*=.*\".*\"" .; then
           echo "⚠️ Warning: Provider version should be constrained"
         fi
       }
+  # after_script:
+  #   - !reference [.notify_pipeline_failure, script]
+  allow_failure: true
+
+.trivy_security:
+  stage: security
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
+  script:
+    - |
+      echo "Scanning with Trivy for ${APP}/${MODULE}..."
+      wget --no-verbose https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O trivy.tar.gz
+      tar -xzf trivy.tar.gz
+      chmod +x ./trivy
+      echo "Scanning IaC files for Terraform with Trivy for ${APP}/${MODULE}..."
+      ./trivy config --severity HIGH,CRITICAL --format json ${APP}/${MODULE}
+    - |    
+      # Scan IaC files với Trivy
+      ./trivy config \
+        --format json \
+        --output trivy-results.json \
+        ${APP}/${MODULE}
+      
+      # Convert kết quả sang format DefectDojo
+      jq -r '{
+        "engagement": "${CI_PROJECT_ID}",
+        "product": "${APP}",
+        "scan_type": "Trivy Scan",
+        "verified": false,
+        "active": true,
+        "scan_date": now,
+        "findings": [.Results[] | select(.Misconfigurations != null) | .Misconfigurations[] | {
+          "title": .ID,
+          "severity": .Severity,
+          "description": .Description,
+          "mitigation": .Resolution,
+          "file_path": .PkgPath,
+          "line": .Line
+        }]
+      }' trivy-results.json > defectdojo-import.json || {
+        echo "No vulnerabilities found or error in processing results"
+        echo '{"engagement":"'${CI_PROJECT_ID}'","product":"'${APP}'","scan_type":"Trivy Scan","verified":false,"active":true,"scan_date":null,"findings":[]}' > defectdojo-import.json
+      }
+      
+      # Gửi kết quả lên DefectDojo
+      curl -X POST \
+        -H "Authorization: Token ${DEFECTDOJO_API_KEY}" \
+        -H "Content-Type: multipart/form-data" \
+        -F "engagement=${CI_PROJECT_ID}" \
+        -F "product=${APP}" \
+        -F "scan_type=Trivy Scan" \
+        -F "verified=false" \
+        -F "active=true" \
+        -F "scan_date=$(date -u +"%Y-%m-%d")" \
+        -F "file=@defectdojo-import.json" \
+        "${DEFECTDOJO_URL}/api/v2/import-scan/"
+  artifacts:
+    paths:
+      - trivy-results.json
+      - defectdojo-import.json
+    when: always
+    expire_in: 1 week
+  allow_failure: false
 
 .helm_security:
   stage: security
