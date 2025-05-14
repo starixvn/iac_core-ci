@@ -24,13 +24,14 @@
     when: always
 
 .terraform_cache:
-  extends: .cache_config
   cache:
+  - key: ${TOOL}-$MODULE-$ORG-$ENV-terraform
     paths:
-      - .terraform
-      - "**/.terraform.lock.hcl"
-      - .terraform.d/plugin-cache
-    key: ${CI_COMMIT_REF_SLUG}-terraform
+      - $CI_PROJECT_DIR/.terraform
+      - $CI_PROJECT_DIR/.terraform.lock.hcl
+      - $CI_PROJECT_DIR/.terraform.d/plugin-cache
+    policy: pull-push
+    when: always
 
 .npm_cache:
   extends: .cache_config  
