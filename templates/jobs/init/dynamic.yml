@@ -139,13 +139,12 @@
 
       EOF
             CHANGED_MODULES=$((CHANGED_MODULES + 1))
+          elif [[ "$var_name" =~ ^([^_]+)_([^_]+)_CHANGED$ ]]; then
+            APP="${BASH_REMATCH[1]}"
+            MODULE="${BASH_REMATCH[2]}"
+            echo "Generating basic MODULE jobs for ${APP}_${MODULE}..."
 
-      elif [[ "$var_name" =~ ^([^_]+)_([^_]+)_CHANGED$ ]]; then
-        APP="${BASH_REMATCH[1]}"
-        MODULE="${BASH_REMATCH[2]}"
-        echo "Generating basic MODULE jobs for ${APP}_${MODULE}..."
-
-        cat >> generated-jobs.yml <<EOF
+            cat >> generated-jobs.yml <<EOF
 
       ${APP}_${MODULE}_env_initializer:
         stage: init
