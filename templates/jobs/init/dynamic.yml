@@ -104,7 +104,15 @@
         stage: validate
         needs:
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
-        extends: [".terraform_security", ".trivy_security"]
+        extends: [".terraform_security"]
+        after_script:
+          - !reference [.notify_pipeline_failure, script]
+
+      ${APP}_${MODULE}_${ORG}_${ENV}_trivy:
+        stage: validate
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+        extends: [".trivy_security"]
         artifacts:
           reports:
             junit: trivy-results.xml
