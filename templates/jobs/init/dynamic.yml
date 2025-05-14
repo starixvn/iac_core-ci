@@ -105,6 +105,13 @@
         needs:
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
         extends: [".terraform_security", ".trivy_security"]
+        artifacts:
+          reports:
+            junit: trivy-results.xml
+          paths:
+            - trivy-results.json
+            - trivy-results.xml
+          expire_in: 1 week
         after_script:
           - !reference [.notify_pipeline_failure, script]
 
