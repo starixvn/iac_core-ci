@@ -79,7 +79,7 @@
       tar -xzf trivy.tar.gz
       chmod +x ./trivy
       echo "Scanning IaC files for Terraform with Trivy for ${APP}/${MODULE}..."
-      ./trivy config --severity HIGH,CRITICAL --format json ${APP}/${MODULE} 
+      ./trivy config --severity HIGH,CRITICAL --format json ${APP}/${MODULE}
       # Scan IaC files với Trivy
       ./trivy config \
         --format json \
@@ -198,8 +198,8 @@
     - |
       echo "PRODUCT_ID=${PRODUCT_ID}" > product_id.env
       echo "ENGAGEMENT_ID=${ENGAGEMENT_ID}" >> product_id.env
-
-    - source product_id.env # Load PRODUCT_ID and ENGAGEMENT_ID
+    # Load PRODUCT_ID and ENGAGEMENT_ID
+    - source product_id.env
     - ENGAGEMENT_NAME="test-trivy"
     - test -f trivy-results.json || { echo "❌ Trivy report not found"; exit 1; }
     - echo "📤 Uploading Trivy scan report to DefectDojo"
