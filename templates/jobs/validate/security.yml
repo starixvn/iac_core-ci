@@ -67,6 +67,8 @@
           echo "⚠️ Warning: Provider version should be constrained"
         fi
       }
+  # after_script:
+  #   - !reference [.notify_pipeline_failure, script]
   allow_failure: true
 
 .trivy_security:
@@ -125,6 +127,8 @@
       - defectdojo-import.json
     when: always
     expire_in: 1 week
+  # after_script:
+  #   - !reference [.notify_pipeline_failure, script]
   allow_failure: true
 
 .helm_security:
