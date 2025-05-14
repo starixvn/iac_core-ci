@@ -12,7 +12,7 @@ include:
 
 # Kiểm tra cú pháp file YAML
 lint_ci_files:
-  extends: .base_job
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   stage: validate
   script:
     - |
@@ -44,7 +44,7 @@ lint_ci_files:
 
 # Kiểm tra đường dẫn include  
 validate_templates:
-  extends: .base_job
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   stage: validate
   script:
     - |
