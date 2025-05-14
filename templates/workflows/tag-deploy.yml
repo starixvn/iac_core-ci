@@ -13,7 +13,7 @@ default:
 extract_tag_vars:
   extends: .extract_vars
   after_script:
-    - *notify_pipeline_failure_script
+    - *notify_pipeline_failure
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: always
@@ -24,7 +24,7 @@ plan:
     - .terraform_plan
   needs: ["extract_tag_vars"]
   after_script:
-    - *notify_pipeline_failure_script
+    - *notify_pipeline_failure
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: always
@@ -35,7 +35,7 @@ deploy:
     - .terraform_apply
   needs: ["extract_tag_vars", "plan"]
   after_script:
-    - *notify_pipeline_failure_script
+    - *notify_pipeline_failure
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: manual

@@ -29,7 +29,7 @@
       }" \
       "$SLACK_WEBHOOK_URL"
 
-.notify_pipeline_failure:
+.notify_pipeline_failure: &notify_pipeline_failure
   stage: notify
   script:
     - |
