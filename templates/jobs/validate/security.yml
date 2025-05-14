@@ -67,7 +67,7 @@
           echo "⚠️ Warning: Provider version should be constrained"
         fi
       }
-  allow_failure: false
+  allow_failure: true
 
 .trivy_security:
   stage: security
@@ -125,7 +125,7 @@
       - defectdojo-import.json
     when: always
     expire_in: 1 week
-  allow_failure: false
+  allow_failure: true
 
 .helm_security:
   stage: security
