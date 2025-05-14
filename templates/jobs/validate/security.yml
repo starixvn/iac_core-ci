@@ -69,6 +69,59 @@
       }
   allow_failure: false
 
+.trivy_security:
+  stage: security
+  #image: aquasec/trivy:latest
+  variables:
+    TRIVY_SERVER: ${TRIVY_SERVER}
+    DEFECTDOJO_URL: ${DEFECTDOJO_URL}
+    DEFECTDOJO_API_KEY: ${DEFECTDOJO_API_KEY}
+  script:
+    - |
+      echo "Scanning with Trivy for ${APP}/${MODULE}..."
+      - wget --no-verbose https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz?inline=false -O - | tar -zxvf -
+      - ls -l
+      # Scan IaC files với Trivy
+      trivy config \
+        --server ${TRIVY_SERVER} \
+        --format json \
+        --output trivy-results.json \
+        ${APP}/${MODULE}
+      
+      # Convert kết quả sang format DefectDojo
+      jq -r '{
+        "engagement": "${CI_PROJECT_ID}",
+        "product": "${APP}",
+        "scan_type": "Trivy Scan",
+        "verified": false,
+        "active": true,
+        "scan_date": now,
+        "findings": [.Results[] | select(.Vulnerabilities != null) | .Vulnerabilities[] | {
+          "title": .VulnerabilityID,
+          "severity": .Severity,
+          "description": .Description,
+          "mitigation": .PrimaryURL,
+          "file_path": .PkgPath,
+          "line": .Line
+        }]
+      }' trivy-results.json > defectdojo-import.json
+      
+      # Gửi kết quả lên DefectDojo
+      curl -X POST \
+        -H "Authorization: Token ${DEFECTDOJO_API_KEY}" \
+        -H "Content-Type: application/json" \
+        -d @defectdojo-import.json \
+        "${DEFECTDOJO_URL}/api/v2/import-scan/"
+  artifacts:
+    reports:
+      security: trivy-results.json
+    paths:
+      - trivy-results.json
+      - defectdojo-import.json
+    when: always
+    expire_in: 1 week
+  allow_failure: false
+
 .helm_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21

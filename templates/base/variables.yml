@@ -6,6 +6,9 @@ variables:
   #DOCKER_REG_LOCAL_URL: "${CI_REGISTRY}"
   # Terraform related
   TF_ROOT: ${APP}/${MODULE}
+  TRIVY_VERSION: "0.24.2"
+  DEFECTDOJO_URL: "https://defectdojo.nexdev.net"
+  DEFECTDOJO_API_KEY: "19c0a551c892ba79f1bf36d6d1fe87a504d0d406"
   PLAN: plan.tfplan
   JSON_PLAN_FILE: tfplan.json
   TF_CLI_CONFIG_FILE: ${CI_PROJECT_DIR}/.terraformrc
