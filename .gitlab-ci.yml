@@ -78,6 +78,11 @@ trivy_scan_job:
     - .trivy_security
   stage: security
   variables:
+    DEFECTDOJO_DEPT: "NX-Atomix"
+    CI_PROJECT_NAME: "${CI_PROJECT_NAME}"
+    CI_PROJECT_PATH: "${CI_PROJECT_PATH}"
+    DEFECTDOJO_PRODUCT_NAME: "${CI_PROJECT_NAME}"
+    DEFECTDOJO_PRODUCT_VERSION: "${CI_COMMIT_REF_NAME}"
     TRIVY_VERSION: "${TRIVY_VERSION}"  # or specify a version
     TEST_TITLE: "Trivy Security Scan"
     DEFECTDOJO_ENGAGEMENT_PERIOD: "30"  # engagement period in days
