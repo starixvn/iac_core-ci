@@ -223,7 +223,7 @@
         -F "auto_create_context=true" \
         -F "deduplication_on_engagement=true" \
         -F "close_old_findings=true" \
-        -F "file=@reports/trivy-report.json" \
+        -F "file=@trivy-results.json" \
         -w "\nHTTP Status: %{http_code}\n" \
         || ECHO_CURL_ERROR=$?
     - |
