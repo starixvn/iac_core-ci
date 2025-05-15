@@ -74,16 +74,11 @@
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - |
-      if [ ! -d "${APP}/${MODULE}" ]; then
-        echo "❌ Scan directory ${APP}/${MODULE} not found"
-        echo "Available directories:"
-        ls -al ${APP}
-        exit 1
-      fi
       echo "Scanning with Trivy for ${APP}/${MODULE}..."
-      wget --no-verbose https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz?inline=false -O trivy.tar.gz
+      wget --no-verbose https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O trivy.tar.gz
       tar -xzf trivy.tar.gz
       chmod +x ./trivy
+
       echo "Scanning IaC files for Terraform with Trivy for ${APP}/${MODULE}..."
       ./trivy config --severity HIGH,CRITICAL --format json ${APP}/${MODULE}
       # Scan IaC files with Trivy
