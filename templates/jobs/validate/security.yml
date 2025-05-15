@@ -68,6 +68,7 @@
         fi
       }
   allow_failure: true
+
 .trivy_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
@@ -208,6 +209,7 @@
       echo "ENGAGEMENT_ID=${ENGAGEMENT_ID}" >> product_id.env
   artifacts:
     paths:
+      - product_id.env
       - trivy-results.json
     expire_in: 1 week
 
