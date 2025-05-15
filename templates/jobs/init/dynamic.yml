@@ -97,8 +97,6 @@
         extends: [".terraform_lint",".predefined_id_tokens"]
         needs:
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
-        after_script:
-          - !reference [.notify_pipeline_failure, script]
 
       ${APP}_${MODULE}_${ORG}_${ENV}_scan:
         stage: validate
@@ -113,8 +111,6 @@
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_scan
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_validate
-        after_script:
-          - !reference [.notify_pipeline_failure, script]
 
       ${APP}_${MODULE}_${ORG}_${ENV}_deploy:
         stage: deploy
@@ -122,17 +118,34 @@
         needs:
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_plan
-        when: manual
-        after_script:
-          - !reference [.notify_pipeline_failure, script]
 
-      ${APP}_${MODULE}_${ORG}_${ENV}_notify:
+      ${APP}_${MODULE}_${ORG}_${ENV}_notify_automatic_job_failed:
+        stage: notify
+        extends: .notify_pipeline_failure
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_validate
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_plan
+          # - job: ${APP}_${MODULE}_${ORG}_${ENV}_scan
+        variables:
+          NOTIFY_REASON: "FAILED"
+
+      ${APP}_${MODULE}_${ORG}_${ENV}_notify_manual_job_failure:
+        stage: notify
+        extends: .notify_pipeline_failure
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_deploy
+        variables:
+          NOTIFY_REASON: "FAILED"
+
+      ${APP}_${MODULE}_${ORG}_${ENV}_notify_job_success:
         extends: .notify_pipeline_success
         needs:
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_deploy
         variables:
-          CI_JOB_STATUS: "success"
+          NOTIFY_REASON: "SUCCESS"
 
       EOF
             CHANGED_MODULES=$((CHANGED_MODULES + 1))

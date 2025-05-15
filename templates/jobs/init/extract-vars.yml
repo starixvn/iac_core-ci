@@ -10,10 +10,10 @@
         ORG=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f4)
         ENV=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f5)
 
-        if [[ "${APP}" == "vault" || "${APP}" == "aws" ]]; then
+        if [[ "${APP}" == "vault" ]]; then
           VAULT_ENV=${ENV}
           VAULT_ADDR="https://vault.unknown"
-          S3_BACKEND_PROFILE=${ENV}
+          S3_BACKEND_PROFILE="local"
           if [[ "${ORG}" == "starix" ]]; then
             case "${ENV}" in
               dev)    VAULT_ADDR="https://vault-dev.nexdev.net" ;;
@@ -28,6 +28,10 @@
               local)  VAULT_ADDR="https://vault.lumigame.com" ;;
             esac
           fi
+        elif [[ "${APP}" == "aws" ]]; then
+          VAULT_ENV="local"
+          VAULT_ADDR="https://vault.nexdev.net"
+          S3_BACKEND_PROFILE=${ENV} 
         else
           VAULT_ENV="local"
           VAULT_ADDR="https://vault.nexdev.net"
