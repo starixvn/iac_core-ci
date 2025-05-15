@@ -1,5 +1,6 @@
 ---
 include:
+ # GitLab CI/CD includes configuration
   - project: 'iac/core-ci'
     file: '/templates/base/common.yml'
     ref: dev
@@ -78,6 +79,8 @@ trivy_scan_job:
     - .trivy_security
   stage: security
   variables:
+
+    ENGAGEMENT_NAME: "${CI_PROJECT_NAME}-${TEST_TITLE}"
     DEFECTDOJO_DEPT: "NX-Atomix"
     CI_PROJECT_NAME: "${CI_PROJECT_NAME}"
     CI_PROJECT_PATH: "${CI_PROJECT_PATH}"
