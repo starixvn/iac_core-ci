@@ -214,8 +214,10 @@
         fi
       fi
       echo "ENGAGEMENT_ID=${ENGAGEMENT_ID}" >> product_id.env
-  allow_failure: true
-  when: always
+  artifacts:
+    paths:
+      - trivy-results.json
+    expire_in: 1 week
 
 .helm_security:
   stage: security

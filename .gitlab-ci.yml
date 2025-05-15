@@ -74,13 +74,17 @@ validate_templates:
         - "**/*.yml"
         - "**/*.yaml"
 
-trivy_scan_job:
+trivy_security_job:
   extends:
     - .trivy_security
+  stage: security
+
+uplaod_reports:
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
+  stage: security
   needs:
     - job: .trivy_security
       artifacts: true
-  stage: security
   before_script:
     - source product_id.env
     - ENGAGEMENT_NAME="${CI_PROJECT_NAME}/${TEST_TITLE}"
@@ -113,3 +117,7 @@ trivy_scan_job:
         exit 1
       fi
     - echo "✅ Upload completed"
+  when: always
+  artifacts:
+    paths:
+      - trivy-results.json
