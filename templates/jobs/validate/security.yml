@@ -1,7 +1,4 @@
 ---
-include:
-  local: '**/security.yml'
-
 .terraform_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
