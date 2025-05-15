@@ -89,11 +89,19 @@
     - echo "🔍 Checking DefectDojo product and engagement availability"
     # Validate critical environment variables
     - |
+
       for var in DEFECTDOJO_URL DEFECTDOJO_TOKEN CI_PROJECT_NAME DEFECTDOJO_DEPT; do
-        if [ -z "${!var}" ]; then
+        eval value='$'"$var"
+        if [ -z "$value" ]; then
           echo "❌ Error: $var is not set"; exit 1
         fi
       done
+
+      # for var in DEFECTDOJO_URL DEFECTDOJO_TOKEN CI_PROJECT_NAME DEFECTDOJO_DEPT; do
+      #   if [ -z "${!var}" ]; then
+      #     echo "❌ Error: $var is not set"; exit 1
+      #   fi
+      # done
     # Initialize artifact file
     - touch product_id.env
     # Sanitize and set ENGAGEMENT_NAME
