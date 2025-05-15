@@ -79,11 +79,11 @@ trivy_security_job:
     - .trivy_security
   stage: security
 
-uplaod_reports:
+upload_reports:
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   stage: security
   needs:
-    - job: .trivy_security
+    - job: trivy_security_job
       artifacts: true
   before_script:
     - source product_id.env
