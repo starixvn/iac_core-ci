@@ -77,7 +77,15 @@ validate_templates:
 trivy_scan_job:
   extends:
     - .trivy_security
+  needs:
+    - job: .trivy_security
+      artifacts: true
   stage: security
+  before_script:
+    - source product_id.env
+    - ENGAGEMENT_NAME="${CI_PROJECT_NAME}/${TEST_TITLE}"
+    - ENGAGEMENT_NAME=$(echo "$ENGAGEMENT_NAME" | tr -s '[:space:]' '-' | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
+    - test -f trivy-results.json || { echo "❌ Trivy report not found"; exit 1; }
   script:
     - |
     - echo "📤 Uploading Trivy scan report to DefectDojo"
