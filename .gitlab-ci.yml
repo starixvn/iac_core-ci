@@ -71,3 +71,23 @@ validate_templates:
       changes:
         - "**/*.yml"
         - "**/*.yaml"
+
+rivy_scan_job:
+  extends:
+    - .trivy_security
+  stage: security
+  variables:
+    APP: ${CI_PROJECT_NAME}
+    MODULE: ${CI_COMMIT_REF_NAME}
+    TRIVY_VERSION: "${TRIVY_VERSION}"  # or specify a version
+    TEST_TITLE: "Trivy Security Scan"
+    DEFECTDOJO_ENGAGEMENT_PERIOD: "30"  # engagement period in days
+    DEFECTDOJO_ENGAGEMENT_STATUS: "In Progress"
+    DEFECTDOJO_ENGAGEMENT_BUILD_SERVER: true
+    DEFECTDOJO_ENGAGEMENT_SOURCE_CODE_MANAGEMENT_SERVER: true
+    DEFECTDOJO_ENGAGEMENT_ORCHESTRATION_ENGINE: true
+    DEFECTDOJO_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT: true
+    DEFECTDOJO_ENGAGEMENT_THREAT_MODEL: false
+    DEFECTDOJO_ENGAGEMENT_API_TEST: false
+    DEFECTDOJO_ENGAGEMENT_PEN_TEST: false
+    DEFECTDOJO_ENGAGEMENT_CHECK_LIST: false
