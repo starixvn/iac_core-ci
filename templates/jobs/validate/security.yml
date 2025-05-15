@@ -77,13 +77,18 @@ check_product_engagement:
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - echo "🔍 Checking DefectDojo product and engagement availability"
+    # Validate critical environment variables
     - |
+      missing_vars=0
       for var in DEFECTDOJO_URL DEFECTDOJO_API_KEY CI_PROJECT_NAME DEFECTDOJO_DEPT TEST_TITLE; do
         if [ -z "${!var}" ]; then
           echo "❌ Error: $var is not set"
-          exit 1
+          missing_vars=1
         fi
       done
+      if [ $missing_vars -eq 1 ]; then
+        exit 1
+      fi
     - touch product_id.env
     - |
       ENGAGEMENT_NAME="${CI_PROJECT_NAME}/${TEST_TITLE}"
@@ -236,7 +241,6 @@ trivy_security:
     - echo "🔍 Checking DefectDojo product and engagement availability"
     # Validate critical environment variables
     - |
-
       for var in DEFECTDOJO_URL DEFECTDOJO_API_KEY CI_PROJECT_NAME DEFECTDOJO_DEPT; do
         eval value='$'"$var"
         if [ -z "$value" ]; then
