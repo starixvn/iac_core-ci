@@ -72,8 +72,8 @@ include:
       }
   allow_failure: true
 
-.check_product_engagement:
-  stage: .pre
+check_product_engagement:
+  stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - echo "🔍 Checking DefectDojo product and engagement availability"
@@ -212,11 +212,6 @@ include:
     paths:
       - product_id.env
     when: always
-
-check_product_engagement:
-  extends:
-    - .check_product_engagement
-  stage: security
 
 trivy_security:
   stage: security
