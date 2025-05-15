@@ -79,10 +79,7 @@ trivy_scan_job:
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   extends:
     - .trivy_security
-  needs:
-    - job: .trivy_security
-      artifacts: true
-  after_script:
+  before_script:
     - source product_id.env # Load PRODUCT_ID and ENGAGEMENT_ID
     - ENGAGEMENT_NAME="${CI_PROJECT_NAME}/${TEST_TITLE}"
     - ENGAGEMENT_NAME=$(echo "$ENGAGEMENT_NAME" | tr -s '[:space:]' '-' | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
