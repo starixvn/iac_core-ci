@@ -78,12 +78,12 @@ trivy_scan_job:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   extends:
-    - .trivy_scan
+    - .trivy_security
     - .check_product_engagement
   needs:
     - job: .check_product_engagement
       artifacts: true
-    - job: .trivy_scan
+    - job: .trivy_security
       artifacts: true
   before_script:
     - source product_id.env # Load PRODUCT_ID and ENGAGEMENT_ID
