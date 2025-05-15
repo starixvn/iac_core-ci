@@ -10,7 +10,7 @@ include:
   - project: 'iac/core-ci'
     file: '/templates/base/stages.yml'
     ref: dev
-  - local: 'validate/security.yml'
+  - local: '/templates/validate/security.yml'
 
 # Kiểm tra cú pháp file YAML
 lint_ci_files:
