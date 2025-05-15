@@ -76,7 +76,6 @@ validate_templates:
 
 Trivy_Scan:
   extends:
-    - .trivy_security
     - .check_product_engagement
   stage: security
 

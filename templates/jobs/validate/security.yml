@@ -75,6 +75,9 @@ include:
 .check_product_engagement:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
+  needs:
+    - job: .trivy_security
+      artifacts: true
   script:
     - echo "🔍 Checking DefectDojo product and engagement availability"
     # Validate critical environment variables
