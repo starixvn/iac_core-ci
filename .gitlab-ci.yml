@@ -76,7 +76,6 @@ validate_templates:
 
 Trivy_Scan:
   extends:
-    - .upload_reports
     - .trivy_security
   stage: security
 
