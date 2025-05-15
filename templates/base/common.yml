@@ -12,15 +12,15 @@
         export TF_LOG=DEBUG
         export GITLAB_DEBUG=1
       fi
-      
+
       # Print debug info
       echo "Debug information:"
       echo "- Working directory: $PWD"
       echo "- Git reference: $CI_COMMIT_SHA"
       echo "- Runner: $CI_RUNNER_DESCRIPTION"
-      #echo "- Available environment variables:"
-      #env | sort
-      
+      echo "- Available environment variables:"
+      env | sort
+
       # Create debug artifacts directory
       mkdir -p debug_artifacts
     - |
@@ -68,7 +68,7 @@
     - git config --global user.name "ansible"
     - git config --global url."https://ansible:${CI_JOB_TOKEN}@${CI_SERVER_HOST}".insteadOf "https://${CI_SERVER_HOST}"
     - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
-#image: ${DOCKER_REG_LOCAL_URL}/base/alpine:git-3.21
+# image: ${DOCKER_REG_LOCAL_URL}/base/alpine:git-3.21
 .predefined_id_tokens:
   id_tokens:
     VAULT_ID_TOKEN:

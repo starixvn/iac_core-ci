@@ -12,8 +12,6 @@ default:
 
 extract_tag_vars:
   extends: .extract_vars
-  after_script:
-    - !reference [.notify_pipeline_failure, script]
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: always
@@ -23,8 +21,6 @@ plan:
     - .predefined_id_tokens
     - .terraform_plan
   needs: ["extract_tag_vars"]
-  after_script:
-    - !reference [.notify_pipeline_failure, script]
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: always
@@ -41,7 +37,23 @@ deploy:
       when: manual
     - when: never
 
-notify:
+notify_automatic_job_failure:
+  extends: .notify_pipeline_failure
+  needs: ["extract_tag_vars", "plan"]
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/ && $CI_PIPELINE_SUCCESS'
+      when: on_failure
+    - when: never
+
+notify_manual_job_failure:
+  extends: .notify_pipeline_failure
+  needs: ["extract_tag_vars", "deploy"]
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/ && $CI_PIPELINE_SUCCESS'
+      when: on_failure
+    - when: never
+
+notify_success:
   extends: .notify_pipeline_success
   needs: ["deploy"]
   variables:
