@@ -75,7 +75,6 @@ validate_templates:
 
 trivy_scan_job:
   extends:
-    - .check_product_engagement
     - .trivy_security
   stage: security
   before_script:

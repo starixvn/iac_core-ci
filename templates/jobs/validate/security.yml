@@ -68,11 +68,22 @@
         fi
       }
   allow_failure: true
-
-.check_product_engagement:
+.trivy_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
+    - |
+      echo "Scanning with Trivy for ${APP}/${MODULE}..."
+      wget --no-verbose https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O trivy.tar.gz
+      tar -xzf trivy.tar.gz
+      chmod +x ./trivy
+      echo "Scanning IaC files for Terraform with Trivy for ${APP}/${MODULE}..."
+      ./trivy config --severity HIGH,CRITICAL --format json ${APP}/${MODULE}
+      # Scan IaC files with Trivy
+      ./trivy config \
+        --format json \
+        --output trivy-results.json \
+        ${APP}/${MODULE}
     - echo "🔍 Checking DefectDojo product and engagement availability"
     # Validate critical environment variables
     - |
@@ -197,29 +208,9 @@
       echo "ENGAGEMENT_ID=${ENGAGEMENT_ID}" >> product_id.env
   artifacts:
     paths:
-      - product_id.env
-
-.trivy_security:
-  stage: security
-  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
-  script:
-    - |
-      echo "Scanning with Trivy for ${APP}/${MODULE}..."
-      wget --no-verbose https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O trivy.tar.gz
-      tar -xzf trivy.tar.gz
-      chmod +x ./trivy
-
-
-      echo "Scanning IaC files for Terraform with Trivy for ${APP}/${MODULE}..."
-      ./trivy config --severity HIGH,CRITICAL --format json ${APP}/${MODULE}
-      # Scan IaC files with Trivy
-      ./trivy config \
-        --format json \
-        --output trivy-results.json \
-        ${APP}/${MODULE}
-  artifacts:
-    paths:
       - trivy-results.json
+    expire_in: 1 week
+
 
 .helm_security:
   stage: security
