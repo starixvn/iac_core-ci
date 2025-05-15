@@ -73,7 +73,7 @@ include:
   allow_failure: true
 
 .check_product_engagement:
-  stage: pre-security
+  stage: .pre
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - echo "🔍 Checking DefectDojo product and engagement availability"
