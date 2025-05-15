@@ -241,7 +241,7 @@ include:
   needs:
     - job: .check_product_engagement
       artifacts: true
-    - job: trivy_security_job
+    - job: .trivy_security
       artifacts: true
   before_script:
     - source product_id.env

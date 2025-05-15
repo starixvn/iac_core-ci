@@ -76,6 +76,7 @@ validate_templates:
 
 security_job:
   extends:
+    - .trivy_security
     - .upload_reports
   stage: security
   when: always
