@@ -1,5 +1,6 @@
 ---
 include:
+
  # GitLab CI/CD includes configuration
   - project: 'iac/core-ci'
     file: '/templates/base/common.yml'
@@ -78,24 +79,10 @@ trivy_scan_job:
   extends:
     - .trivy_security
   stage: security
-  variables:
-
-    ENGAGEMENT_NAME: "${CI_PROJECT_NAME}-${TEST_TITLE}"
-    DEFECTDOJO_DEPT: "NX-Atomix"
-    CI_PROJECT_NAME: "${CI_PROJECT_NAME}"
-    CI_PROJECT_PATH: "${CI_PROJECT_PATH}"
-    DEFECTDOJO_PRODUCT_NAME: "${CI_PROJECT_NAME}"
-    DEFECTDOJO_PRODUCT_VERSION: "${CI_COMMIT_REF_NAME}"
-    TRIVY_VERSION: "${TRIVY_VERSION}"  # or specify a version
-    TEST_TITLE: "Trivy Security Scan"
-    DEFECTDOJO_ENGAGEMENT_PERIOD: "30"  # engagement period in days
-    DEFECTDOJO_ENGAGEMENT_STATUS: "In Progress"
-    DEFECTDOJO_ENGAGEMENT_BUILD_SERVER: "null"
-    DEFECTDOJO_ENGAGEMENT_SOURCE_CODE_MANAGEMENT_SERVER: "null"
-    DEFECTDOJO_ENGAGEMENT_ORCHESTRATION_ENGINE: "null"
-    DEFECTDOJO_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT: "true"
-    DEFECTDOJO_ENGAGEMENT_THREAT_MODEL: "true"
-    DEFECTDOJO_ENGAGEMENT_API_TEST: "true"
-    DEFECTDOJO_ENGAGEMENT_PEN_TEST: "true"
-    DEFECTDOJO_ENGAGEMENT_CHECK_LIST: "true"
-    DEFECTDOJO_NOT_ON_MASTER: "false"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "**/*"
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - "**/*"
