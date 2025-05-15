@@ -37,7 +37,7 @@
       MSG="${EMOJI} *[${ENV} - DEPLOYED]*
       • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\` | by $GITLAB_USER_NAME
       • *Pipeline:* <${CI_PIPELINE_URL}|#${CI_PIPELINE_ID}>
-      • *Commit:* <${CI_PROJECT_URL}/-/commit/${CI_COMMIT_SHA}|${CI_COMMIT_SHORT_SHA}>"
+      • *Commit:* <${CI_PROJECT_URL}/-/commit/${CI_COMMIT_SHA}|${CI_COMMIT_SHORT_SHA}> - ${CI_COMMIT_MESSAGE}"
 
       curl -sS -X POST -H 'Content-type: application/json' \
       --data "{
@@ -61,12 +61,12 @@
       echo "Fetching failed jobs from pipeline $CI_PIPELINE_ID..."
       FAILED_JOBS=$(curl --silent --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}" \
         "$GITLAB_API_URL/projects/$CI_PROJECT_ID/pipelines/$CI_PIPELINE_ID/jobs" \
-        | jq -r '.[] | select(.status == "failed") | "- <\(.name)|\(.web_url)>"')
+        | jq -r '.[] | select(.status == "failed") | "- <\(.web_url)>|\(.name)"')
 
       MSG="${EMOJI} *[${ENV} - FAILED]*
       • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\` | by ${GITLAB_USER_NAME}
       • *Pipeline:* <${CI_PIPELINE_URL}|#${CI_PIPELINE_ID}>
-      • *Commit:* <${CI_PROJECT_URL}/-/commit/${CI_COMMIT_SHA}|${CI_COMMIT_SHORT_SHA}>
+      • *Commit:* <${CI_PROJECT_URL}/-/commit/${CI_COMMIT_SHA}|${CI_COMMIT_SHORT_SHA}> - ${CI_COMMIT_MESSAGE}
       • Failed Job:
         ${FAILED_JOBS}"
 
