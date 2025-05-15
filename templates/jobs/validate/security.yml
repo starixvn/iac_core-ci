@@ -187,9 +187,6 @@
         ENGAGEMENT_JSON=$(jq -n \
           --arg name "$ENGAGEMENT_NAME" \
           --argjson product "$PRODUCT_ID" \
-          --arg target_start "$(date +%F)" \
-          --arg target_end "$(date -d "+${DEFECTDOJO_ENGAGEMENT_PERIOD} days" +%F)" \
-          --arg status "$DEFECTDOJO_ENGAGEMENT_STATUS" \
           --argjson build_server "$DEFECTDOJO_ENGAGEMENT_BUILD_SERVER" \
           --argjson source_code_management_server "$DEFECTDOJO_ENGAGEMENT_SOURCE_CODE_MANAGEMENT_SERVER" \
           --argjson orchestration_engine "$DEFECTDOJO_ENGAGEMENT_ORCHESTRATION_ENGINE" \
@@ -198,6 +195,9 @@
           --argjson api_test "$DEFECTDOJO_ENGAGEMENT_API_TEST" \
           --argjson pen_test "$DEFECTDOJO_ENGAGEMENT_PEN_TEST" \
           --argjson check_list "$DEFECTDOJO_ENGAGEMENT_CHECK_LIST" \
+          --arg target_start "$(date +%F)" \
+          --arg target_end "$(date -d "+${DEFECTDOJO_ENGAGEMENT_PERIOD} days" +%F)" \
+          --arg status "$DEFECTDOJO_ENGAGEMENT_STATUS" \
           '{name: $name, product: $product, target_start: $target_start, target_end: $target_end, status: $status, build_server: $build_server, source_code_management_server: $source_code_management_server, orchestration_engine: $orchestration_engine, deduplication_on_engagement: $deduplication_on_engagement, threat_model: $threat_model, api_test: $api_test, pen_test: $pen_test, check_list: $check_list}')
         echo "DEBUG: Engagement JSON payload: $ENGAGEMENT_JSON"
         CREATE_ENGAGEMENT_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
