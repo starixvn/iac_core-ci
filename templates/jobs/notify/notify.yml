@@ -10,7 +10,7 @@
   before_script:
     - |
       # Setup base variables
-      export SLACK_USERNAME="${APP} :small_blue_diamond: ${MODULE}"
+      export SLACK_USERNAME="${APP}🔹${MODULE}"
       export STATUS="${NOTIFY_REASON}"
       export COLOR="$([ "$STATUS" = "SUCCESS" ] && echo "$SUCCESS_COLOR" || echo "$FAILURE_COLOR")"
       export EMOJI="$([ "$STATUS" = "SUCCESS" ] && echo "$SUCCESS_EMOJI" || echo "$FAILURE_EMOJI")"
