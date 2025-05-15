@@ -73,11 +73,7 @@ validate_templates:
       changes:
         - "**/*.yml"
         - "**/*.yaml"
-<<<<<<< HEAD
-
-=======
 #Trivy Scan
->>>>>>> ffd1ae664de1b87ad8c4dd1685a48e6f374005df
 trivy_scan_job:
   extends:
     - .trivy_security
