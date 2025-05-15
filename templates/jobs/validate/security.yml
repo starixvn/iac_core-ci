@@ -221,9 +221,6 @@ include:
 trivy_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
-  needs:
-    - job: check_product_engagement
-      artifacts: true
   script:
     - |
       echo "Scanning with Trivy for ${APP}/${MODULE}..."
@@ -256,8 +253,6 @@ trivy_security:
   stage: security
   needs:
     - job: trivy_security
-      artifacts: true
-    - job: check_product_engagement
       artifacts: true
   before_script:
     - source product_id.env
