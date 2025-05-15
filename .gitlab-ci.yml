@@ -9,6 +9,9 @@ include:
   - project: 'iac/core-ci'
     file: '/templates/base/stages.yml'
     ref: dev
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/validate/security.yml'
+    ref: dev
 
 # Kiểm tra cú pháp file YAML
 lint_ci_files:
@@ -72,7 +75,7 @@ validate_templates:
         - "**/*.yml"
         - "**/*.yaml"
 
-rivy_scan_job:
+trivy_scan_job:
   extends:
     - .trivy_security
   stage: security
