@@ -78,7 +78,6 @@ trivy_security_job:
   extends:
     - .trivy_security
     - .check_product_engagement
-    - 
   stage: security
 
 upload_reports:
