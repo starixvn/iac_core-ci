@@ -196,14 +196,14 @@
       fi
       echo "ENGAGEMENT_ID=${ENGAGEMENT_ID}" >> product_id.env
   artifacts:
-    paths:
-      - product_id.env
+    reports:
+      dotenv: product_id.env
 
 .trivy_security:
   stage: security
   needs:
-  - job: .check_product_engagement
-    artifacts: true
+    - job: check_product_engagement
+      artifacts: true
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - |
