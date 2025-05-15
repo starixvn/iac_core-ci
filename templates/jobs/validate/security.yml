@@ -220,6 +220,7 @@ include:
   artifacts:
     paths:
       - trivy-results.json
+      - product_id.env
     expire_in: 1 week
 
 .helm_security:
