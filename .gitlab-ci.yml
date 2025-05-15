@@ -73,7 +73,7 @@ validate_templates:
       changes:
         - "**/*.yml"
         - "**/*.yaml"
-
+##########
 trivy_scan_job:
   extends:
     - .trivy_security
