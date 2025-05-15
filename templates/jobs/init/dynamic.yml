@@ -120,8 +120,6 @@
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_plan
         when: manual
         allow_failure: false
-        after_script:
-          - !reference [.notify_pipeline_failure, script]
 
       ${APP}_${MODULE}_${ORG}_${ENV}_notify_automatic_job_failed:
         stage: notify
