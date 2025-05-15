@@ -75,9 +75,9 @@
   script:
     - |
       echo "Scanning with Trivy for ${APP}/${MODULE}..."
-      wget --no-verbose https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O trivy.tar.gz
-      tar -xzf trivy.tar.gz
-      chmod +x ./trivy
+      if ! wget --no-verbose https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz?inline=false -O - | tar -zxvf -; then
+        echo "❌ Failed to download/extract Trivy"; exit 1
+      fi
       echo "Scanning IaC files for Terraform with Trivy for ${APP}/${MODULE}..."
       ./trivy config --severity HIGH,CRITICAL --format json ${APP}/${MODULE}
       # Scan IaC files with Trivy
