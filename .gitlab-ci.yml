@@ -77,6 +77,9 @@ validate_templates:
 trivy_scan_job:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
+  extends:
+    - .trivy_scan
+    - .check_product_engagement
   needs:
     - job: .check_product_engagement
       artifacts: true
@@ -84,13 +87,13 @@ trivy_scan_job:
       artifacts: true
   before_script:
     - source product_id.env # Load PRODUCT_ID and ENGAGEMENT_ID
-    - ENGAGEMENT_NAME="${CI_PROJECT_NAME}"/"${TEST_TITLE}"
+    - ENGAGEMENT_NAME="${CI_PROJECT_NAME}/${TEST_TITLE}"
     - ENGAGEMENT_NAME=$(echo "$ENGAGEMENT_NAME" | tr -s '[:space:]' '-' | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
     - test -f reports/trivy-report.json || { echo "❌ Trivy report not found"; exit 1; }
   script:
     - echo "📤 Uploading Trivy scan report to DefectDojo"
     - |
-      curl -s -S -X POST "${DEFECTDOJO_URL}/api/v2/reimport-scan/" \
+      HTTP_RESPONSE=$(curl -s -S -X POST "${DEFECTDOJO_URL}/api/v2/reimport-scan/" \
         -H "Authorization: Token ${DEFECTDOJO_API_KEY}" \
         -F "scan_date=$(date +%F)" \
         -F "minimum_severity=Medium" \
