@@ -1,6 +1,6 @@
 ---
-# include:
-#   - local: "**/variables.yml"
+include:
+  - local: "**/variables.yml"
 
 .terraform_security:
   stage: security
