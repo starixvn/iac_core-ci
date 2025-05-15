@@ -78,8 +78,6 @@ trivy_scan_job:
     - .trivy_security
   stage: security
   variables:
-    APP: ${CI_PROJECT_NAME}
-    MODULE: ${CI_COMMIT_REF_NAME}
     TRIVY_VERSION: "${TRIVY_VERSION}"  # or specify a version
     TEST_TITLE: "Trivy Security Scan"
     DEFECTDOJO_ENGAGEMENT_PERIOD: "30"  # engagement period in days
