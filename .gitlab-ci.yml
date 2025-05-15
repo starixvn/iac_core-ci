@@ -75,27 +75,42 @@ validate_templates:
         - "**/*.yaml"
 #Trivy Scan
 trivy_scan_job:
-  extends:
-    - .trivy_security
   stage: security
-  variables:
-    #Defect Dojo Variable
-    ENGAGEMENT_NAME: "${CI_PROJECT_NAME}-${TEST_TITLE}"
-    DEFECTDOJO_DEPT: "NX-Atomix"
-    CI_PROJECT_NAME: "${CI_PROJECT_NAME}"
-    CI_PROJECT_PATH: "${CI_PROJECT_PATH}"
-    DEFECTDOJO_PRODUCT_NAME: "${CI_PROJECT_NAME}"
-    DEFECTDOJO_PRODUCT_VERSION: "${CI_COMMIT_REF_NAME}"
-    TRIVY_VERSION: "${TRIVY_VERSION}"  # or specify a version
-    TEST_TITLE: "Trivy Security Scan"
-    DEFECTDOJO_ENGAGEMENT_PERIOD: "30"  # engagement period in days
-    DEFECTDOJO_ENGAGEMENT_STATUS: "In Progress"
-    DEFECTDOJO_ENGAGEMENT_BUILD_SERVER: "null"
-    DEFECTDOJO_ENGAGEMENT_SOURCE_CODE_MANAGEMENT_SERVER: "null"
-    DEFECTDOJO_ENGAGEMENT_ORCHESTRATION_ENGINE: "null"
-    DEFECTDOJO_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT: "true"
-    DEFECTDOJO_ENGAGEMENT_THREAT_MODEL: "true"
-    DEFECTDOJO_ENGAGEMENT_API_TEST: "true"
-    DEFECTDOJO_ENGAGEMENT_PEN_TEST: "true"
-    DEFECTDOJO_ENGAGEMENT_CHECK_LIST: "true"
-    DEFECTDOJO_NOT_ON_MASTER: "false"
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
+  needs:
+    - job: check_product_engagement
+      artifacts: true
+    - job: trivy_scan
+      artifacts: true
+  before_script:
+    - source product_id.env # Load PRODUCT_ID and ENGAGEMENT_ID
+    - ENGAGEMENT_NAME="${CI_PROJECT_NAME}"/"${TEST_TITLE}"
+    - ENGAGEMENT_NAME=$(echo "$ENGAGEMENT_NAME" | tr -s '[:space:]' '-' | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
+    - test -f reports/trivy-report.json || { echo "❌ Trivy report not found"; exit 1; }
+  script:
+    - echo "📤 Uploading Trivy scan report to DefectDojo"
+    - |
+      curl -s -S -X POST "${DEFECTDOJO_URL}/api/v2/reimport-scan/" \
+        -H "Authorization: Token ${DEFECTDOJO_API_KEY}" \
+        -F "scan_date=$(date +%F)" \
+        -F "minimum_severity=Medium" \
+        -F "scan_type=Trivy Scan" \
+        -F "active=true" \
+        -F "verified=true" \
+        -F "product_name=${CI_PROJECT_NAME}" \
+        -F "engagement_name=${ENGAGEMENT_NAME}" \
+        -F "engagement=${ENGAGEMENT_ID}" \
+        -F "test_title=${TEST_TITLE}" \
+        -F "auto_create_context=true" \
+        -F "deduplication_on_engagement=true" \
+        -F "close_old_findings=true" \
+        -F "file=@trivy-results.json" \
+        -w "\nHTTP Status: %{http_code}\n" \
+        || ECHO_CURL_ERROR=$?
+    - |
+      if [ -n "$ECHO_CURL_ERROR" ]; then
+        echo "❌ Failed to upload report (curl error code: $ECHO_CURL_ERROR)"
+        exit 1
+      fi
+    - echo "✅ Upload completed"
+  when: always
