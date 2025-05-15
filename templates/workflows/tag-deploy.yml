@@ -30,6 +30,7 @@ deploy:
     - .predefined_id_tokens
     - .terraform_apply
   needs: ["extract_tag_vars", "plan"]
+  allow_failure: false
   after_script:
     - !reference [.notify_pipeline_failure, script]
   rules:
@@ -55,17 +56,19 @@ notify_manual_job_failure:
 
 notify_success:
   extends: .notify_pipeline_success
-  needs: ["deploy"]
+  needs:
+    - job: deploy
+    - job: extract_tag_vars
   variables:
     CI_JOB_STATUS: "success"
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
-      when: always
+      when: on_success
     - when: never
 
 cleanup:
+  stage: .post
   extends: .cleanup_tag
-  needs: ["deploy"]
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: always
