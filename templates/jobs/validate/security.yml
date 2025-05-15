@@ -72,7 +72,7 @@ include:
       }
   allow_failure: true
 
-.check_product_engagement:
+check_product_engagement:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
@@ -204,11 +204,11 @@ include:
     when: always
 
 
-.trivy_security:
+trivy_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   needs:
-    - job: .check_product_engagement
+    - job: check_product_engagement
       artifacts: true  
   script:
     - |
@@ -242,7 +242,9 @@ include:
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   stage: security
   needs:
-    - job: .trivy_security
+    - job: trivy_security
+      artifacts: true
+    - job: check_product_engagement
       artifacts: true
   before_script:
     - source product_id.env
