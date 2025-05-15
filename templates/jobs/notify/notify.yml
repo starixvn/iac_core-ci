@@ -24,6 +24,7 @@
             *)          export SLACK_ICON_EMOJI=":kubernetes:" ;;
           esac ;;
         "Opensearch") export SLACK_ICON_EMOJI=":opensearch-ico:" ;;
+        "vault")      export SLACK_ICON_EMOJI=":vault:" ;;
         "rancher")    export SLACK_ICON_EMOJI=":rancher:" ;;
         "aws")        export SLACK_ICON_EMOJI=":aws:" ;;
         *)            export SLACK_ICON_EMOJI=":gitlab:" ;;
