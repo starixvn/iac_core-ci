@@ -39,6 +39,8 @@ deploy:
 notify_automatic_job_failure:
   extends: .notify_pipeline_failure
   needs: ["extract_tag_vars", "plan"]
+  variables:
+    NOTIFY_REASON: "FAILED"
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: on_failure
@@ -47,6 +49,8 @@ notify_automatic_job_failure:
 notify_manual_job_failure:
   extends: .notify_pipeline_failure
   needs: ["extract_tag_vars", "deploy"]
+  variables:
+    NOTIFY_REASON: "FAILED"
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: on_failure
@@ -58,7 +62,7 @@ notify_success:
     - job: deploy
     - job: extract_tag_vars
   variables:
-    CI_JOB_STATUS: "success"
+    NOTIFY_REASON: "SUCCESS"
   rules:
     - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
       when: on_success
