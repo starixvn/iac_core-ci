@@ -254,38 +254,25 @@ trivy_security:
   needs:
     - job: trivy_security
       artifacts: true
-  before_script:
-    - source product_id.env
-    - ENGAGEMENT_NAME="${CI_PROJECT_NAME}/${TEST_TITLE}"
-    - ENGAGEMENT_NAME=$(echo "$ENGAGEMENT_NAME" | tr -s '[:space:]' '-' | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
-    - test -f trivy-results.json || { echo "❌ Trivy report not found"; exit 1; }
   script:
     - echo "🔍 Checking DefectDojo product and engagement availability"
     # Validate critical environment variables
     - |
-
-      for var in DEFECTDOJO_URL DEFECTDOJO_API_KEY CI_PROJECT_NAME DEFECTDOJO_DEPT; do
+      for var in DEFECTDOJO_URL DEFECTDOJO_API_KEY CI_PROJECT_NAME DEFECTDOJO_DEPT TEST_TITLE; do
         eval value='$'"$var"
         if [ -z "$value" ]; then
           echo "❌ Error: $var is not set"; exit 1
         fi
       done
 
-      # for var in DEFECTDOJO_URL DEFECTDOJO_API_KEY CI_PROJECT_NAME DEFECTDOJO_DEPT; do
-      #   if [ -z "${!var}" ]; then
-      #     echo "❌ Error: $var is not set"; exit 1
-      #   fi
-      # done
-    # Initialize artifact file
-    - touch product_id.env
-    # Sanitize and set ENGAGEMENT_NAME
     - |
-      ENGAGEMENT_NAME="${ENGAGEMENT_NAME}"
+      ENGAGEMENT_NAME="${CI_PROJECT_NAME}/${TEST_TITLE}"
       ENGAGEMENT_NAME=$(echo "$ENGAGEMENT_NAME" | tr -s '[:space:]' '-' | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
       if [ -z "$ENGAGEMENT_NAME" ]; then
         echo "❌ Error: ENGAGEMENT_NAME could not be constructed"; exit 1
       fi
       echo "DEBUG: CI_PROJECT_NAME=$CI_PROJECT_NAME, TEST_TITLE=$TEST_TITLE, ENGAGEMENT_NAME=$ENGAGEMENT_NAME"
+
     # Check or create product type
     - |
       PRODUCT_TYPE_RESPONSE=$(curl -s -w "\n%{http_code}" -H "Authorization: Token ${DEFECTDOJO_API_KEY}" \
@@ -315,6 +302,7 @@ trivy_security:
           exit 1
         fi
       fi
+
     # Check if product exists
     - |
       PRODUCT_RESPONSE=$(curl -s -w "\n%{http_code}" -H "Authorization: Token ${DEFECTDOJO_API_KEY}" \
@@ -344,7 +332,7 @@ trivy_security:
           exit 1
         fi
       fi
-      echo "PRODUCT_ID=${PRODUCT_ID}" > product_id.env
+
     # Check if engagement exists
     - |
       ENGAGEMENT_RESPONSE=$(curl -s -w "\n%{http_code}" -H "Authorization: Token ${DEFECTDOJO_API_KEY}" \
@@ -360,15 +348,15 @@ trivy_security:
         ENGAGEMENT_JSON=$(jq -n \
           --arg name "$ENGAGEMENT_NAME" \
           --argjson product "$PRODUCT_ID" \
-          --argjson deduplication_on_engagement "$DEFECTDOJO_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT" \
-          --argjson threat_model "$DEFECTDOJO_ENGAGEMENT_THREAT_MODEL" \
-          --argjson api_test "$DEFECTDOJO_ENGAGEMENT_API_TEST" \
-          --argjson pen_test "$DEFECTDOJO_ENGAGEMENT_PEN_TEST" \
-          --argjson check_list "$DEFECTDOJO_ENGAGEMENT_CHECK_LIST" \
+          --argjson deduplication_on_engagement "${DEFECTDOJO_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT:-true}" \
+          --argjson threat_model "${DEFECTDOJO_ENGAGEMENT_THREAT_MODEL:-false}" \
+          --argjson api_test "${DEFECTDOJO_ENGAGEMENT_API_TEST:-false}" \
+          --argjson pen_test "${DEFECTDOJO_ENGAGEMENT_PEN_TEST:-false}" \
+          --argjson check_list "${DEFECTDOJO_ENGAGEMENT_CHECK_LIST:-false}" \
           --arg target_start "$(date +%F)" \
-          --arg target_end "$(date -d "+${DEFECTDOJO_ENGAGEMENT_PERIOD} days" +%F)" \
-          --arg status "$DEFECTDOJO_ENGAGEMENT_STATUS" \
-          '{name: $name, product: $product, target_start: $target_start, target_end: $target_end, status: $status, build_server: $build_server, source_code_management_server: $source_code_management_server, orchestration_engine: $orchestration_engine, deduplication_on_engagement: $deduplication_on_engagement, threat_model: $threat_model, api_test: $api_test, pen_test: $pen_test, check_list: $check_list}')
+          --arg target_end "$(date -d "+${DEFECTDOJO_ENGAGEMENT_PERIOD:-30} days" +%F)" \
+          --arg status "${DEFECTDOJO_ENGAGEMENT_STATUS:-In Progress}" \
+          '{name: $name, product: $product, target_start: $target_start, target_end: $target_end, status: $status, deduplication_on_engagement: $deduplication_on_engagement, threat_model: $threat_model, api_test: $api_test, pen_test: $pen_test, check_list: $check_list}')
         echo "DEBUG: Engagement JSON payload: $ENGAGEMENT_JSON"
         CREATE_ENGAGEMENT_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
           -H "Authorization: Token ${DEFECTDOJO_API_KEY}" \
@@ -386,7 +374,8 @@ trivy_security:
           exit 1
         fi
       fi
-      echo "ENGAGEMENT_ID=${ENGAGEMENT_ID}" >> product_id.env
+
+    - test -f trivy-results.json || { echo "❌ Trivy report not found"; exit 1; }
     - echo "📤 Uploading Trivy scan report to DefectDojo"
     - |
       curl -s -S -X POST "${DEFECTDOJO_URL}/api/v2/reimport-scan/" \
