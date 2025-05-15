@@ -1,4 +1,7 @@
 ---
+include:
+  local: '**/security.yml'
+
 .terraform_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
@@ -187,14 +190,7 @@
         ENGAGEMENT_JSON=$(jq -n \
           --arg name "$ENGAGEMENT_NAME" \
           --argjson product "$PRODUCT_ID" \
-          --argjson build_server "$DEFECTDOJO_ENGAGEMENT_BUILD_SERVER" \
-          --argjson source_code_management_server "$DEFECTDOJO_ENGAGEMENT_SOURCE_CODE_MANAGEMENT_SERVER" \
-          --argjson orchestration_engine "$DEFECTDOJO_ENGAGEMENT_ORCHESTRATION_ENGINE" \
           --argjson deduplication_on_engagement "$DEFECTDOJO_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT" \
-          --argjson threat_model "$DEFECTDOJO_ENGAGEMENT_THREAT_MODEL" \
-          --argjson api_test "$DEFECTDOJO_ENGAGEMENT_API_TEST" \
-          --argjson pen_test "$DEFECTDOJO_ENGAGEMENT_PEN_TEST" \
-          --argjson check_list "$DEFECTDOJO_ENGAGEMENT_CHECK_LIST" \
           --arg target_start "$(date +%F)" \
           --arg target_end "$(date -d "+${DEFECTDOJO_ENGAGEMENT_PERIOD} days" +%F)" \
           --arg status "$DEFECTDOJO_ENGAGEMENT_STATUS" \
