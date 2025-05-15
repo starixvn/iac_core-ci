@@ -76,6 +76,7 @@ validate_templates:
 
 upload_reports:
   extends:
+    - .trivy_security
     - .upload_reports
   stage: security
   before_script:
