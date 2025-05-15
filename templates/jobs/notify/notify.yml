@@ -23,9 +23,10 @@
             "argo-app") export SLACK_ICON_EMOJI=":argo:" ;;
             *)          export SLACK_ICON_EMOJI=":kubernetes:" ;;
           esac ;;
-        "rancher") export SLACK_ICON_EMOJI=":rancher:" ;;
-        "aws")     export SLACK_ICON_EMOJI=":aws:" ;;
-        *)         export SLACK_ICON_EMOJI=":gitlab:" ;;
+        "Opensearch") export SLACK_ICON_EMOJI=":opensearch-ico:" ;;
+        "rancher")    export SLACK_ICON_EMOJI=":rancher:" ;;
+        "aws")        export SLACK_ICON_EMOJI=":aws:" ;;
+        *)            export SLACK_ICON_EMOJI=":gitlab:" ;;
       esac
 
 
