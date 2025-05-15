@@ -76,8 +76,8 @@ validate_templates:
 
 trivy_scan_job:
   extends:
-    - .trivy_security
     - .check_product_engagement
+    - .trivy_security
   stage: security
   before_script:
     - source product_id.env # Load PRODUCT_ID and ENGAGEMENT_ID
