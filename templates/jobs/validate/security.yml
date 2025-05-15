@@ -239,7 +239,7 @@ include:
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   stage: security
   needs:
-    - job: _check_product_engagement_job
+    - job: .check_product_engagement
       artifacts: true
     - job: trivy_security_job
       artifacts: true
