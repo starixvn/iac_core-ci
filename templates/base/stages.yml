@@ -3,6 +3,7 @@ stages:
   - .pre
   - init
   - validate
+  - pre-security
   - security
   - plan
   - deploy
