@@ -75,9 +75,6 @@ include:
 .check_product_engagement:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
-  needs:
-    - job: .trivy_security
-      artifacts: true
   script:
     - echo "🔍 Checking DefectDojo product and engagement availability"
     # Validate critical environment variables
@@ -210,6 +207,9 @@ include:
 .trivy_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
+  needs:
+    - job: .check_product_engagement
+      artifacts: true  
   script:
     - |
       echo "Scanning with Trivy for ${APP}/${MODULE}..."
