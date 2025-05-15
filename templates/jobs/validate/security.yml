@@ -74,38 +74,16 @@
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - |
-      # if [ ! -d "${APP}/${MODULE}" ]; then
-      #   echo "❌ Scan directory ${APP}/${MODULE} not found"
-      #   echo "Available directories:"
-      #   ls -al ${APP}
-      #   exit 1
-      # fi
-      # echo "Scanning with Trivy for ${APP}/${MODULE}..."
-      # wget --no-verbose https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz?inline=false -O - | tar -zxvf -
-      
-      # Validate directory exists
       if [ ! -d "${APP}/${MODULE}" ]; then
         echo "❌ Scan directory ${APP}/${MODULE} not found"
-        echo "Current working directory: $(pwd)"
-        echo "APP value: ${APP}"
-        echo "MODULE value: ${MODULE}"
+        echo "Available directories:"
+        ls -al ${APP}
         exit 1
       fi
-
-      # Download Trivy with error handling
-      echo "Downloading Trivy ${TRIVY_VERSION}..."
-      if ! wget --no-verbose "https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" -O - | tar -zxvf -; then
-        echo "❌ Failed to download/extract Trivy"
-        exit 1
-      fi
-
-      # Verify Trivy executable
-      if [ ! -f "./trivy" ]; then
-        echo "❌ Trivy binary not found after extraction"
-        exit 1
-      fi
+      echo "Scanning with Trivy for ${APP}/${MODULE}..."
+      wget --no-verbose https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz?inline=false -O trivy.tar.gz
+      tar -xzf trivy.tar.gz
       chmod +x ./trivy
-
       echo "Scanning IaC files for Terraform with Trivy for ${APP}/${MODULE}..."
       ./trivy config --severity HIGH,CRITICAL --format json ${APP}/${MODULE}
       # Scan IaC files with Trivy
