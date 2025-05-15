@@ -72,45 +72,23 @@ include:
       }
   allow_failure: true
 
-.trivy_security:
+.check_product_engagement:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
-    - |
-      echo "Scanning with Trivy for ${APP}/${MODULE}..."
-      wget --no-verbose https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O trivy.tar.gz
-      tar -xzf trivy.tar.gz
-      chmod +x ./trivy
-
-
-      echo "Scanning IaC files for Terraform with Trivy for ${APP}/${MODULE}..."
-      ./trivy config --severity HIGH,CRITICAL --format json ${APP}/${MODULE}
-      # Scan IaC files with Trivy
-      ./trivy config \
-        --format json \
-        --output trivy-results.json \
-        ${APP}/${MODULE}
     - echo "🔍 Checking DefectDojo product and engagement availability"
     # Validate critical environment variables
     - |
-
       for var in DEFECTDOJO_URL DEFECTDOJO_API_KEY CI_PROJECT_NAME DEFECTDOJO_DEPT; do
-        eval value='$'"$var"
-        if [ -z "$value" ]; then
+        if [ -z "${!var}" ]; then
           echo "❌ Error: $var is not set"; exit 1
         fi
       done
-
-      # for var in DEFECTDOJO_URL DEFECTDOJO_API_KEY CI_PROJECT_NAME DEFECTDOJO_DEPT; do
-      #   if [ -z "${!var}" ]; then
-      #     echo "❌ Error: $var is not set"; exit 1
-      #   fi
-      # done
     # Initialize artifact file
     - touch product_id.env
     # Sanitize and set ENGAGEMENT_NAME
     - |
-      ENGAGEMENT_NAME="${ENGAGEMENT_NAME}"
+      ENGAGEMENT_NAME="${CI_PROJECT_NAME}"/"${TEST_TITLE}"
       ENGAGEMENT_NAME=$(echo "$ENGAGEMENT_NAME" | tr -s '[:space:]' '-' | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
       if [ -z "$ENGAGEMENT_NAME" ]; then
         echo "❌ Error: ENGAGEMENT_NAME could not be constructed"; exit 1
@@ -190,14 +168,17 @@ include:
         ENGAGEMENT_JSON=$(jq -n \
           --arg name "$ENGAGEMENT_NAME" \
           --argjson product "$PRODUCT_ID" \
+          --arg target_start "$(date +%F)" \
+          --arg target_end "$(date -d "+${DEFECTDOJO_ENGAGEMENT_PERIOD} days" +%F)" \
+          --arg status "$DEFECTDOJO_ENGAGEMENT_STATUS" \
+          --argjson build_server "$DEFECTDOJO_ENGAGEMENT_BUILD_SERVER" \
+          --argjson source_code_management_server "$DEFECTDOJO_ENGAGEMENT_SOURCE_CODE_MANAGEMENT_SERVER" \
+          --argjson orchestration_engine "$DEFECTDOJO_ENGAGEMENT_ORCHESTRATION_ENGINE" \
           --argjson deduplication_on_engagement "$DEFECTDOJO_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT" \
           --argjson threat_model "$DEFECTDOJO_ENGAGEMENT_THREAT_MODEL" \
           --argjson api_test "$DEFECTDOJO_ENGAGEMENT_API_TEST" \
           --argjson pen_test "$DEFECTDOJO_ENGAGEMENT_PEN_TEST" \
           --argjson check_list "$DEFECTDOJO_ENGAGEMENT_CHECK_LIST" \
-          --arg target_start "$(date +%F)" \
-          --arg target_end "$(date -d "+${DEFECTDOJO_ENGAGEMENT_PERIOD} days" +%F)" \
-          --arg status "$DEFECTDOJO_ENGAGEMENT_STATUS" \
           '{name: $name, product: $product, target_start: $target_start, target_end: $target_end, status: $status, build_server: $build_server, source_code_management_server: $source_code_management_server, orchestration_engine: $orchestration_engine, deduplication_on_engagement: $deduplication_on_engagement, threat_model: $threat_model, api_test: $api_test, pen_test: $pen_test, check_list: $check_list}')
         echo "DEBUG: Engagement JSON payload: $ENGAGEMENT_JSON"
         CREATE_ENGAGEMENT_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
@@ -219,9 +200,82 @@ include:
       echo "ENGAGEMENT_ID=${ENGAGEMENT_ID}" >> product_id.env
   artifacts:
     paths:
-      - trivy-results.json
       - product_id.env
-    expire_in: 1 week
+    when: always
+
+
+.trivy_security:
+  stage: security
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
+  script:
+    - |
+      echo "Scanning with Trivy for ${APP}/${MODULE}..."
+      wget --no-verbose https://gitlab.nexdev.net/NEXOPS/tools/trivy-scan/-/raw/main/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O trivy.tar.gz
+      tar -xzf trivy.tar.gz
+      chmod +x ./trivy
+
+      echo "Scanning IaC files for Terraform with Trivy for ${APP}/${MODULE}..."
+      ./trivy config --severity HIGH,CRITICAL --format json ${APP}/${MODULE}
+      # Scan IaC files with Trivy
+      ./trivy config \
+        --format json \
+        --output trivy-results.json \
+        ${APP}/${MODULE}
+    - echo "🔍 Checking DefectDojo product and engagement availability"
+    # Validate critical environment variables
+    - |
+
+      for var in DEFECTDOJO_URL DEFECTDOJO_API_KEY CI_PROJECT_NAME DEFECTDOJO_DEPT; do
+        eval value='$'"$var"
+        if [ -z "$value" ]; then
+          echo "❌ Error: $var is not set"; exit 1
+        fi
+      done
+  artifacts:
+    paths:
+      - trivy-results.json
+
+.upload_reports:
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
+  stage: security
+  needs:
+    - job: _check_product_engagement_job
+      artifacts: true
+    - job: trivy_security_job
+      artifacts: true
+  before_script:
+    - source product_id.env
+    - ENGAGEMENT_NAME="${CI_PROJECT_NAME}/${TEST_TITLE}"
+    - ENGAGEMENT_NAME=$(echo "$ENGAGEMENT_NAME" | tr -s '[:space:]' '-' | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
+    - test -f trivy-results.json || { echo "❌ Trivy report not found"; exit 1; }
+  script:
+    - |
+    - echo "📤 Uploading Trivy scan report to DefectDojo"
+    - |
+      curl -s -S -X POST "${DEFECTDOJO_URL}/api/v2/reimport-scan/" \
+        -H "Authorization: Token ${DEFECTDOJO_API_KEY}" \
+        -F "scan_date=$(date +%F)" \
+        -F "minimum_severity=Medium" \
+        -F "scan_type=Trivy Scan" \
+        -F "active=true" \
+        -F "verified=true" \
+        -F "product_name=${CI_PROJECT_NAME}" \
+        -F "engagement_name=${ENGAGEMENT_NAME}" \
+        -F "engagement=${ENGAGEMENT_ID}" \
+        -F "test_title=${TEST_TITLE}" \
+        -F "auto_create_context=true" \
+        -F "deduplication_on_engagement=true" \
+        -F "close_old_findings=true" \
+        -F "file=@trivy-results.json" \
+        -w "\nHTTP Status: %{http_code}\n" \
+        || ECHO_CURL_ERROR=$?
+    - |
+      if [ -n "$ECHO_CURL_ERROR" ]; then
+        echo "❌ Failed to upload report (curl error code: $ECHO_CURL_ERROR)"
+        exit 1
+      fi
+    - echo "✅ Upload completed"
+
 
 .helm_security:
   stage: security
