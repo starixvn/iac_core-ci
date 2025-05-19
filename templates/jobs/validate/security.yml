@@ -249,6 +249,10 @@ trivy_security:
   needs: [trivy_security, .upload_reports]
   allow_failure: true
   stage: security
+  variables:
+    DEFECTDOJO_SCAN_TYPE: "Trivy Security Scan"
+    DEFECTDOJO_SCAN_TEST_TYPE: "GitLab-CI Trivy Security Scan"
+    DEFECTDOJO_SCAN_FILE: "${TRIVY_REPORT_FILE}" 
 
 
 .helm_security:
