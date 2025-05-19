@@ -107,7 +107,7 @@ trivy_scan:
     - echo "🔍 Checking DefectDojo product and engagement availability"
     # Validate critical environment variables
     - |
-      for var in DEFECTDOJO_URL DEFECTDOJO_API_KEY CI_PROJECT_NAME DEFECTDOJO_DEPT TEST_TITLE; do
+      for var in DEFECTDOJO_URL DEFECTDOJO_API_KEY CI_PROJECT_NAME DEFECTDOJO_DEPT ; do
         eval value='$'"$var"
         if [ -z "$value" ]; then
           echo "❌ Error: $var is not set"; exit 1
@@ -115,12 +115,12 @@ trivy_scan:
       done
 
     - |
-      ENGAGEMENT_NAME="${CI_PROJECT_NAME}/${TEST_TITLE}"
+      ENGAGEMENT_NAME="${CI_PROJECT_NAME}/${}"
       ENGAGEMENT_NAME=$(echo "$ENGAGEMENT_NAME" | tr -s '[:space:]' '-' | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
       if [ -z "$ENGAGEMENT_NAME" ]; then
         echo "❌ Error: ENGAGEMENT_NAME could not be constructed"; exit 1
       fi
-      echo "DEBUG: CI_PROJECT_NAME=$CI_PROJECT_NAME, TEST_TITLE=$TEST_TITLE, ENGAGEMENT_NAME=$ENGAGEMENT_NAME"
+      echo "DEBUG: CI_PROJECT_NAME=$CI_PROJECT_NAME, =$, ENGAGEMENT_NAME=$ENGAGEMENT_NAME"
 
     # Check or create product type
     - |
@@ -238,7 +238,6 @@ trivy_scan:
         -F "engagement_name=${ENGAGEMENT_NAME}" \
         -F "engagement=${ENGAGEMENT_ID}" \
         -F "test_type=\"${DEFECTDOJO_SCAN_TEST_TYPE}\"" \
-        -F "test_title=${TEST_TITLE}" \
         -F "auto_create_context=true" \
         -F "deduplication_on_engagement=true" \
         -F "close_old_findings=true" \
