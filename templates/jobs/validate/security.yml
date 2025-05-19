@@ -253,6 +253,7 @@ upload_reports:
     DEFECTDOJO_SCAN_TYPE: "Trivy Security Scan"
     DEFECTDOJO_SCAN_TEST_TYPE: "GitLab-CI Trivy Security Scan"
     DEFECTDOJO_SCAN_FILE: "${TRIVY_REPORT_FILE}" 
+  when: always
 
 
 .helm_security:

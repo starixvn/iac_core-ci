@@ -11,7 +11,6 @@ include:
     file: '/templates/base/stages.yml'
     ref: dev
   - local: '**/security.yml'
-
 # Kiểm tra cú pháp file YAML
 lint_ci_files:
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
@@ -78,3 +77,11 @@ trivy_defectdojo:
   extends:
     - .trivy_reports
   stage: security
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+      when: always
+  allow_failure: true
+  variables:
+    TRIVY_SEVERITY: "HIGH,CRITICAL"
