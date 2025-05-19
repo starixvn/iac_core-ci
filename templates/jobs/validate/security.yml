@@ -92,9 +92,12 @@ trivy_security:
     paths:
       - ${TRIVY_REPORT_FILE}
 
-upload_reports:
+.upload_reports:
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   stage: security
+  needs:
+    - job: trivy_security
+      artifacts: true
   script:
     - echo "🔍 Checking DefectDojo product and engagement availability"
     # Validate critical environment variables
@@ -245,15 +248,15 @@ upload_reports:
   allow_failure: true
   when: always
 
-.trivy_reports:
-  needs: [trivy_security, upload_reports]
-  allow_failure: true
-  stage: security
-  variables:
-    DEFECTDOJO_SCAN_TYPE: "Trivy Security Scan"
-    DEFECTDOJO_SCAN_TEST_TYPE: "GitLab-CI Trivy Security Scan"
-    DEFECTDOJO_SCAN_FILE: "${TRIVY_REPORT_FILE}" 
-  when: always
+# .trivy_reports:
+#   needs: [trivy_security, upload_reports]
+#   allow_failure: true
+#   stage: security
+#   variables:
+#     DEFECTDOJO_SCAN_TYPE: "Trivy Security Scan"
+#     DEFECTDOJO_SCAN_TEST_TYPE: "GitLab-CI Trivy Security Scan"
+#     DEFECTDOJO_SCAN_FILE: "${TRIVY_REPORT_FILE}" 
+#   when: always
 
 
 .helm_security:
