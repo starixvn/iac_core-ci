@@ -247,6 +247,11 @@ include:
   allow_failure: true
   when: always
 
+.trivy_reports:
+  needs: [.trivy_security, .upload_reports]
+  allow_failure: true
+  stage: security
+
 .helm_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21

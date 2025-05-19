@@ -75,9 +75,8 @@ validate_templates:
         - "**/*.yaml"
 
 trivy_defectdojo:
-  needs: [.trivy_security, .upload_reports]
-  allow_failure: true
-  stage: security
+  extends:
+    - .trivy_reports
   variables:
     DEFECTDOJO_SCAN_TYPE: "Trivy Security Scan"
     DEFECTDOJO_SCAN_TEST_TYPE: "GitLab-CI Trivy Security Scan"
