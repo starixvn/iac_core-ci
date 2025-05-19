@@ -76,7 +76,7 @@ validate_templates:
 
 trivy_defectdojo:
   extends:
-    - .trivy_defectdojo
+    - .trivy_reports
   stage: security
   variables:
     DEFECTDOJO_SCAN_TYPE: "Trivy Security Scan"
