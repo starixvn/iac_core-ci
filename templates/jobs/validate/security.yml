@@ -85,18 +85,22 @@ include:
       chmod +x ./trivy
 
       echo "Scanning IaC files for Terraform with Trivy for ${APP}/${MODULE}..."
+      ./trivy config --severity HIGH,CRITICAL --format json ${APP}/${MODULE}
+      # Scan IaC files with Trivy
       ./trivy config \
-        --severity HIGH,CRITICAL \
         --format json \
-        --exit-code 1 \
-        "${APP}/${MODULE}" > ${TRIVY_REPORT_FILE:=trivy-results.json} || true
+        --output trivy-results.json \
+        ${APP}/${MODULE}
   artifacts:
     paths:
-      - ${TRIVY_REPORT_FILE}
+      - trivy-results.json
 
 .upload_reports:
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   stage: security
+  needs:
+    - job: trivy_security
+      artifacts: true
   script:
     - echo "🔍 Checking DefectDojo product and engagement availability"
     # Validate critical environment variables
@@ -235,7 +239,7 @@ include:
         -F "auto_create_context=true" \
         -F "deduplication_on_engagement=true" \
         -F "close_old_findings=true" \
-        -F "file=@${DEFECTDOJO_SCAN_FILE}" \
+        -F "file=@trivy-results.json" \
         -w "\nHTTP Status: %{http_code}\n" \
         || ECHO_CURL_ERROR=$?
     - |
@@ -246,15 +250,6 @@ include:
     - echo "✅ Upload completed"
   allow_failure: true
   when: always
-
-.trivy_reports:
-  needs: [.trivy_security, .upload_reports]
-  allow_failure: true
-  stage: security
-  variables:
-    DEFECTDOJO_SCAN_TYPE: "Trivy Security Scan"
-    DEFECTDOJO_SCAN_TEST_TYPE: "GitLab-CI Trivy Security Scan"
-    DEFECTDOJO_SCAN_FILE: "${TRIVY_REPORT_FILE}"  
 
 .helm_security:
   stage: security
