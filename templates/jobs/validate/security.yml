@@ -254,13 +254,7 @@ trivy_scan:
   extends: .defectdojo_upload
   stage: security
   variables:
-    DEFECTDOJO_SCAN_FILE: "trivy-report.json"
+    DEFECTDOJO_SCAN_FILE: "./${TRIVY_REPORT_FILE}"
   needs:
     - job: trivy_scan
       artifacts: true
-  before_script:
-    - |
-      if [ ! -f "${DEFECTDOJO_SCAN_FILE}" ]; then
-        echo "❌ Error: Missing report file!"
-        exit 1
-      fi
