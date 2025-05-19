@@ -76,7 +76,7 @@ include:
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - echo "Scanning HELM - Security ${APP} / ${MODULE} ..."
-trivy_scan:
+.trivy_scan:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   variables:
@@ -99,7 +99,7 @@ trivy_scan:
     paths:
       - ${TRIVY_REPORT_FILE}
 
-defectdojo_upload:
+.defectdojo_upload:
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   stage: security
   needs: []
@@ -251,9 +251,12 @@ defectdojo_upload:
       fi
     - echo "✅ Upload completed"
 .trivy_defecdojo:
-  needs: ["trivy_scan", "defectdojo_upload"]
+  extends: .defectdojo_upload, .trivy_scan
   stage: security
   variables:
-    DEFECTDOJO_SCAN_FILE: "trivy-report.json"
+    DEFECTDOJO_SCAN_FILE: "${TRIVY_REPORT_FILE}"
     DEFECTDOJO_SCAN_TYPE: "Trivy Scan"
     DEFECTDOJO_SCAN_TEST_TYPE: "GitLab-CI Trivy Scan"
+  needs:
+    - job: trivy_scan
+      artifacts: true
