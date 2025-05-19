@@ -74,7 +74,17 @@ validate_templates:
         - "**/*.yml"
         - "**/*.yaml"
 
-upload_reports:
-  extends:
-    - .upload_reports
+trivy_defectdojo:
+  needs: [.trivy_security,.upload_reports]
+  allow_failure: true
   stage: security
+  variables:
+    DEFECTDOJO_SCAN_TYPE: "Trivy Security Scan"
+    DEFECTDOJO_SCAN_TEST_TYPE: "GitLab-CI Trivy Security Scan"
+    DEFECTDOJO_SCAN_FILE: "${TRIVY_REPORT_FILE}"
+  rules:
+    - if: '$DEFECTDOJO_NOT_ON_MASTER == "true" && $CI_COMMIT_BRANCH == "master"'
+      when: never
+    - if: '"$DEFECTDOJO_ANCHORE_DISABLE" == "true"'
+      when: never
+    - when: always
