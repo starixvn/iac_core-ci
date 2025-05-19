@@ -250,8 +250,10 @@ include:
         exit 1
       fi
     - echo "✅ Upload completed"
-.trivy_defecdojo:
-  extends: .defectdojo_upload, .trivy_scan
+.trivy_defectdojo:
+  extends: 
+    - .defectdojo_upload
+    - .trivy_scan
   stage: security
   variables:
     DEFECTDOJO_SCAN_FILE: "${TRIVY_REPORT_FILE}"
