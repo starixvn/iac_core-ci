@@ -20,14 +20,14 @@
       case "${APP}" in
         "Kubernetes")
           case "$MODULE" in
-            "argo-app") export SLACK_ICON_EMOJI=":argo:" ;;
-            *)          export SLACK_ICON_EMOJI=":kubernetes:" ;;
+            "argo-app") export SLACK_ICON_EMOJI=":argo-ico:" ;;
+            *)          export SLACK_ICON_EMOJI=":kubernetes-ico:" ;;
           esac ;;
         "Opensearch") export SLACK_ICON_EMOJI=":opensearch-ico:" ;;
-        "vault")      export SLACK_ICON_EMOJI=":vault:" ;;
-        "rancher")    export SLACK_ICON_EMOJI=":rancher:" ;;
-        "aws")        export SLACK_ICON_EMOJI=":aws:" ;;
-        *)            export SLACK_ICON_EMOJI=":gitlab:" ;;
+        "vault")      export SLACK_ICON_EMOJI=":vault-ico:" ;;
+        "rancher")    export SLACK_ICON_EMOJI=":rancher-ico:" ;;
+        "aws")        export SLACK_ICON_EMOJI=":aws-ico:" ;;
+        *)            export SLACK_ICON_EMOJI=":gitlab-ico:" ;;
       esac
 
 
