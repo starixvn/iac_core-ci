@@ -77,4 +77,5 @@ validate_templates:
 trivy_defectdojo:
   extends:
     - .upload_reports
+    - .trivy_security
   stage: security
