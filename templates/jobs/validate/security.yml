@@ -72,8 +72,6 @@ include:
       }
   allow_failure: true
 
-
-
 trivy_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
