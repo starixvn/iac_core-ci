@@ -99,7 +99,7 @@ trivy_scan:
     paths:
       - ${TRIVY_REPORT_FILE}
 
-.defectdojo_upload:
+defectdojo_upload:
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   stage: security
   needs: []
@@ -251,12 +251,9 @@ trivy_scan:
       fi
     - echo "✅ Upload completed"
 .trivy_defecdojo:
-  extends: .defectdojo_upload
+  needs: ["trivy_scan", "defectdojo_upload"]
   stage: security
   variables:
     DEFECTDOJO_SCAN_FILE: "trivy-report.json"
     DEFECTDOJO_SCAN_TYPE: "Trivy Scan"
     DEFECTDOJO_SCAN_TEST_TYPE: "GitLab-CI Trivy Scan"
-  needs:
-    - job: trivy_scan
-      artifacts: true
