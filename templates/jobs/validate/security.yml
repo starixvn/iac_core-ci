@@ -71,7 +71,11 @@ include:
         fi
       }
   allow_failure: true
-
+.helm_security:
+  stage: security
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
+  script:
+    - echo "Scanning HELM - Security ${APP} / ${MODULE} ..."
 trivy_scan:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
@@ -260,8 +264,3 @@ trivy_scan:
         echo "❌ Error: Missing report file!"
         exit 1
       fi
-.helm_security:
-  stage: security
-  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
-  script:
-    - echo "Scanning HELM - Security ${APP} / ${MODULE} ..."
