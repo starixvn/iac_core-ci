@@ -74,7 +74,7 @@ validate_templates:
         - "**/*.yml"
         - "**/*.yaml"
 
-upload_reports:
+trivy_defectdojo:
   extends:
     - .upload_reports
   stage: security
