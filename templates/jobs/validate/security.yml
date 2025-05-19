@@ -249,11 +249,17 @@ trivy_scan:
 .trivy_defecdojo:
   extends: .defectdojo_upload
   stage: security
+  variables:
+    DEFECTDOJO_SCAN_FILE: ${TRIVY_REPORT_FILE}
   needs:
     - job: trivy_scan
       artifacts: true
-  variables:
-    DEFECTDOJO_SCAN_FILE: ${TRIVY_REPORT_FILE}
+  before_script:
+    - |
+      if [ ! -f "${DEFECTDOJO_SCAN_FILE}" ]; then
+        echo "❌ Error: Missing report file!"
+        exit 1
+      fi
 .helm_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
