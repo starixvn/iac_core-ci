@@ -75,6 +75,7 @@ validate_templates:
         - "**/*.yaml"
 
 trivy_defectdojo:
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   extends:
     - .trivy_reports
   allow_failure: true
