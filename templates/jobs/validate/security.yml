@@ -253,7 +253,7 @@ trivy_scan:
     - job: trivy_scan
       artifacts: true
   variables:
-    DEFECTDOJO_SCAN_FILE: "${TRIVY_REPORT_FILE}"
+    DEFECTDOJO_SCAN_FILE: "trivy-report.json"
 .helm_security:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
