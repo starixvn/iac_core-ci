@@ -76,7 +76,7 @@ include:
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - echo "Scanning HELM - Security ${APP} / ${MODULE} ..."
-.trivy_scan:
+trivy_scan:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   variables:
@@ -258,5 +258,5 @@ include:
     DEFECTDOJO_SCAN_TYPE: "Trivy Scan"
     DEFECTDOJO_SCAN_TEST_TYPE: "GitLab-CI Trivy Scan"
   needs:
-    - job: .trivy_scan
+    - job: trivy_scan
       artifacts: true
