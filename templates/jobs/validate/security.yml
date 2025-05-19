@@ -220,7 +220,7 @@ trivy_scan:
         fi
       fi
 
-    - test -f trivy-results.json || { echo "❌ Trivy report not found"; exit 1; }
+    - test -f ${DEFECTDOJO_SCAN_FILE} || { echo "❌ Trivy report not found"; exit 1; }
     - echo "📤 Uploading Trivy scan report to DefectDojo"
     - |
       curl -s -S -X POST "${DEFECTDOJO_URL}/api/v2/reimport-scan/" \
