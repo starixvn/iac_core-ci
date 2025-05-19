@@ -246,7 +246,6 @@ trivy_scan:
         exit 1
       fi
     - echo "✅ Upload completed"
-
 .trivy_defecdojo:
   extends: .defectdojo_upload
   stage: security
