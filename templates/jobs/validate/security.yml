@@ -76,7 +76,7 @@ trivy_scan:
   stage: security
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   variables:
-    TRIVY_REPORT_FILE: "trivy-report-${CI_JOB_ID}.json"
+    TRIVY_REPORT_FILE: "trivy-report.json"
   script:
     - |
       echo "Scanning with Trivy for ${APP}/${MODULE}..."
