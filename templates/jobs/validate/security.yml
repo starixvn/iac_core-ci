@@ -231,12 +231,13 @@ trivy_scan:
         -H "Authorization: Token ${DEFECTDOJO_API_KEY}" \
         -F "scan_date=$(date +%F)" \
         -F "minimum_severity=Medium" \
-        -F "scan_type=Trivy Scan" \
+        -F "scan_type=${DEFECTDOJO_SCAN_TYPE}" \
         -F "active=true" \
         -F "verified=true" \
         -F "product_name=${CI_PROJECT_NAME}" \
         -F "engagement_name=${ENGAGEMENT_NAME}" \
         -F "engagement=${ENGAGEMENT_ID}" \
+        -F "test_type=\"${DEFECTDOJO_SCAN_TEST_TYPE}\"" \
         -F "test_title=${TEST_TITLE}" \
         -F "auto_create_context=true" \
         -F "deduplication_on_engagement=true" \
@@ -255,6 +256,8 @@ trivy_scan:
   stage: security
   variables:
     DEFECTDOJO_SCAN_FILE: "trivy-report.json"
+    DEFECTDOJO_SCAN_TYPE: "Trivy Scan"
+    DEFECTDOJO_SCAN_TEST_TYPE: "GitLab-CI Trivy Scan"
   needs:
     - job: trivy_scan
       artifacts: true
