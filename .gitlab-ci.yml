@@ -25,7 +25,7 @@ lint_ci_files:
         CHANGED_FILES=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA)
       fi
       for file in $CHANGED_FILES; do
-        if [[ "$file" =~ \.yml$ ]] || [[ "$file" =~ \.yaml$ ]]; then
+        if [[ "$file" =~ \.ya?ml$ ]]; then  # Simplified YAML extension check
           echo "Checking syntax for $file"
           if ! yamllint -c .yamllint "$file"; then
             echo "❌ Syntax check failed for $file"
@@ -74,8 +74,7 @@ validate_templates:
         - "**/*.yml"
         - "**/*.yaml"
 
-trivy_defectdojo:
+upload_reports:
   extends:
     - .upload_reports
-  needs: [.trivy_security]
   stage: security
