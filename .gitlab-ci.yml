@@ -79,10 +79,3 @@ trivy_defectdojo:
     - .trivy_reports
   allow_failure: true
   stage: security
-  needs:
-    - pipeline: $CI_PIPELINE_ID
-      job: .trivy_security
-  variables:
-    DEFECTDOJO_SCAN_TYPE: "Trivy Security Scan"
-    DEFECTDOJO_SCAN_TEST_TYPE: "GitLab-CI Trivy Security Scan"
-    DEFECTDOJO_SCAN_FILE: "${TRIVY_REPORT_FILE}"
