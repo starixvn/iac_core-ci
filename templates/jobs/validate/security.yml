@@ -98,6 +98,10 @@ trivy_security:
   needs:
     - job: trivy_security
       artifacts: true
+  variables:
+    DEFECTDOJO_SCAN_TYPE: "Trivy Security Scan"
+    DEFECTDOJO_SCAN_TEST_TYPE: "GitLab-CI Trivy Security Scan"
+    DEFECTDOJO_SCAN_FILE: "${TRIVY_REPORT_FILE}"   
   script:
     - echo "🔍 Checking DefectDojo product and engagement availability"
     # Validate critical environment variables
@@ -253,3 +257,4 @@ trivy_security:
   image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
   script:
     - echo "Scanning HELM - Security ${APP} / ${MODULE} ..."
+
