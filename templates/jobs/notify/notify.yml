@@ -63,7 +63,7 @@
       echo "Fetching failed jobs from pipeline $CI_PIPELINE_ID..."
       FAILED_JOBS=$(curl --silent --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}" \
         "$GITLAB_API_URL/projects/$CI_PROJECT_ID/pipelines/$CI_PIPELINE_ID/jobs" \
-        | jq -r '.[] | select(.status == "failed") | "  [-] <\(.web_url)|\(.name)>"')
+        | jq -r '.[] | select(.status == "failed" and .allow_failure != true) | "  [-] <\(.web_url)|\(.name)>"')
 
       MSG="${EMOJI} *[${ENV^^} - FAILED]*
       • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\` | by ${GITLAB_USER_NAME}
