@@ -16,12 +16,13 @@
           S3_BACKEND_PROFILE="local"
           if [[ "${ORG}" == "starix" ]]; then
             case "${ENV}" in
-              dev)    VAULT_ADDR="https://vault-dev.nexdev.net" ;;
-              local)  VAULT_ADDR="https://vault.nexdev.net" ;;
-              sit)    VAULT_ADDR="https://vault.playonesit.com" ;;
-              uat)    VAULT_ADDR="https://vault.starixuat.com" ;;
-              prod)   VAULT_ADDR="https://vault.starixplay.com" ;;
-              kldr)   VAULT_ADDR="https://vn-st-vault.byb6181.com" ;;
+              dev)      VAULT_ADDR="https://vault-dev.nexdev.net" ;;
+              local)    VAULT_ADDR="https://vault.nexdev.net" ;;
+              sit)      VAULT_ADDR="https://vault.playonesit.com" ;;
+              uat)      VAULT_ADDR="https://vault.starixuat.com" ;;
+              prod)     VAULT_ADDR="https://vault.starixplay.com" ;;
+              klsimple) VAULT_ADDR="https://vn-vault-s.byb6181.com" ;;
+              kldr)     VAULT_ADDR="https://vn-st-vault.byb6181.com" ;;
             esac
           elif [[ "$ORG" == "lumi" ]]; then
             case "$ENV" in
