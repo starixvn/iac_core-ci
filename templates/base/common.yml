@@ -41,6 +41,7 @@
             sit)      export VAULT_ADDR="https://vault.playonesit.com" ;;
             uat)      export VAULT_ADDR="https://vault.starixuat.com" ;;
             prod)     export VAULT_ADDR="https://vault.starixplay.com" ;;
+            klprod)   export VAULT_ADDR="https://vn-st-klp-vault.byb6181.com" ;;
             klsimple) export VAULT_ADDR="https://vn-vault-s.byb6181.com" ;;
             kldr)     export VAULT_ADDR="https://vn-st-vault.byb6181.com" ;;
           esac
