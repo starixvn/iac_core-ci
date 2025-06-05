@@ -118,8 +118,11 @@
         needs:
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_plan
-        when: manual
         allow_failure: false
+        rules:
+          - if: '$MANUAL_DEPLOY == "false"'
+            when: on_success
+          - when: manual
 
       ${APP}_${MODULE}_${ORG}_${ENV}_notify_automatic_job_failed:
         stage: notify
