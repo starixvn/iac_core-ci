@@ -120,8 +120,6 @@
           - job: ${APP}_${MODULE}_${ORG}_${ENV}_plan
         allow_failure: false
         rules:
-          - if: $AUTO_APPPROVE == "true"
-            when: on_success
           - when: manual
 
       ${APP}_${MODULE}_${ORG}_${ENV}_notify_automatic_job_failed:
