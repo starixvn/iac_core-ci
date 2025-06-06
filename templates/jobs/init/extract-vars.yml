@@ -10,7 +10,7 @@
         ORG=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f4)
         ENV=$(echo "$CI_COMMIT_TAG" | cut -d'_' -f5)
 
-        if [[ "${APP}" == "vault" ]]; then
+        if [[ "${APP}" == "vault" || "${APP}" == "Vault" ]]; then
           VAULT_ENV=${ENV}
           VAULT_ADDR="https://vault.unknown"
           S3_BACKEND_PROFILE="local"

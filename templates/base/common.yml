@@ -30,7 +30,7 @@
       echo "Debug: APP=${APP}, MODULE=${MODULE}, ORG=${ORG}, ENV=${ENV}"
       echo "Current path: $(pwd) | CI_PROJECT_DIR ${CI_PROJECT_DIR}"
     - |
-      if [[ "${APP}" == "vault" ]]; then
+      if [[ "${APP}" == "vault" || "${APP}" == "Vault" ]]; then
         export VAULT_ENV=${ENV}
         export VAULT_ADDR="https://vault.unknown"
         export S3_BACKEND_PROFILE="local"
