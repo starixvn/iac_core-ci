@@ -27,13 +27,13 @@
   cache:
   - key: ${APP}-$MODULE-$ORG-$ENV-terraform
     paths:
-      - ${CI_PROJECT_DIR}/${APP}/${MODULE}/.terraform
+      - ${TF_HOME_PATH}/.terraform
     policy: pull-push
     when: always
 
   - key: ${CI_COMMIT_REF_SLUG}-${APP}-${MODULE}-${ORG}-${ENV}-terraform.lock.hcl
     paths:
-      - ${CI_PROJECT_DIR}/${APP}/${MODULE}/.terraform.lock.hcl
+      - ${TF_HOME_PATH}/.terraform.lock.hcl
     policy: pull-push
     when: always
 
