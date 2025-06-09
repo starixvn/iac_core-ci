@@ -10,34 +10,34 @@
       include:
         - project: 'iac/core-ci'
           file: '/templates/base/common.yml'
-          ref: main
+          ref: josh-dev
         - project: 'iac/core-ci'
           file: '/templates/base/cache.yml'
-          ref: main
+          ref: josh-dev
         - project: 'iac/core-ci'
           file: '/templates/base/variables.yml'
-          ref: main
+          ref: josh-dev
         - project: 'iac/core-ci'
           file: '/templates/base/stages.yml'
-          ref: main
+          ref: josh-dev
         - project: 'iac/core-ci'
           file: '/templates/jobs/validate/lint.yml'
-          ref: main
+          ref: josh-dev
         - project: 'iac/core-ci'
           file: '/templates/jobs/validate/security.yml'
-          ref: main
+          ref: josh-dev
         - project: 'iac/core-ci'
           file: '/templates/jobs/plan/terraform.yml'
-          ref: main
+          ref: josh-dev
         - project: 'iac/core-ci'
           file: '/templates/jobs/deploy/terraform.yml'
-          ref: main
+          ref: josh-dev
         - project: 'iac/core-ci'
           file: '/templates/jobs/notify/notify.yml'
-          ref: main
+          ref: josh-dev
         - project: 'iac/core-ci'
           file: '/templates/jobs/cleanup/cleanup.yml'
-          ref: main
+          ref: josh-dev
       default:
         tags:
           - "${RUNNER_TAG}"
