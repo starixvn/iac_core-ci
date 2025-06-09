@@ -86,6 +86,7 @@
           MODULE: ${MODULE}
           ORG: ${ORG}
           ENV: ${ENV}
+          CI_PROJECT_DIR: ${CI_PROJECT_DIR}
         artifacts:
           paths:
             - shared_vars.env
