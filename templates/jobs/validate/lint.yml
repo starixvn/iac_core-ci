@@ -1,0 +1,15 @@
+---
+.terraform_lint:
+  stage: validate
+  extends: .base_terraform
+  script:
+    - terraform --version
+    - terraform fmt -check
+    # - terraform validate
+
+.unit_test:
+  stage: security
+  image: ${DOCKER_REG_LOCAL_URL}/base/alpine:git-3.21
+  script:
+    - |
+      echo "Debug: APP=${APP}, MODULE=${MODULE}"

@@ -1,0 +1,60 @@
+---
+.detect_changes:
+  stage: .pre
+  script:
+    - |
+      # logging
+      echo "Starting change detection..."
+      mkdir -p "${CI_PROJECT_DIR}/tmp"
+      CHANGE_FILE="${CI_PROJECT_DIR}/tmp/changed_vars.env"
+      touch "${CHANGE_FILE}"
+
+      # Phát hiện thay đổi
+      if [ -n "$CI_MERGE_REQUEST_CHANGED_PATHS" ]; then
+        echo "Using Merge Request changed paths..."
+        readarray -t CHANGED_FILES <<< "$CI_MERGE_REQUEST_CHANGED_PATHS"
+      elif [ "$CI_COMMIT_BEFORE_SHA" != "0000000000000000000000000000000000000000" ]; then
+        echo "Using git diff for changes..."
+        readarray -t CHANGED_FILES < <(git diff --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA" 2>/dev/null || echo "")
+      else
+        echo "No changes detected"
+        CHANGED_FILES=()
+      fi
+
+      # Xử lý các file thay đổi
+      declare -A UNIQUE_PATHS
+      for file in "${CHANGED_FILES[@]}"; do
+        if [[ "$file" =~ ^variable\.d/([^/]+)/([^/]+)/ ]]; then
+          APP="${CI_PROJECT_NAMESPACE##*/}"
+          MODULE="${CI_PROJECT_NAME}"
+          ORG="${BASH_REMATCH[1]}"
+          ENV="${BASH_REMATCH[2]}"
+          KEY="${APP}_${MODULE}_${ORG}_${ENV}"
+          UNIQUE_PATHS["$KEY"]=1
+        elif [[ "$file" =~ ^(.*)$ ]]; then
+          APP="${CI_PROJECT_NAMESPACE##*/}"
+          MODULE="${CI_PROJECT_NAME}"
+          SUBPATH="${BASH_REMATCH[1]}"
+          if [[ ! "$SUBPATH" =~ ^variable\.d/ ]]; then
+            KEY="${APP}_${MODULE}"
+            UNIQUE_PATHS["$KEY"]=1
+          fi
+        fi
+      done
+
+      # Ghi kết quả
+      for path in "${!UNIQUE_PATHS[@]}"; do
+        echo "${path}_CHANGED=true" >> "${CHANGE_FILE}"
+      done
+
+      mv "${CHANGE_FILE}" "${CI_PROJECT_DIR}/"
+      echo "Detected changes:"
+      cat changed_vars.env || echo "No changes detected"
+  artifacts:
+    paths:
+      - changed_vars.env
+    when: always
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: never
+    - when: always

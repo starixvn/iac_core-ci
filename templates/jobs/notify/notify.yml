@@ -1,0 +1,88 @@
+# notify.yml
+---
+.notify_base: &notify_base
+  stage: notify
+  variables:
+    SUCCESS_COLOR: "#36a64f"
+    FAILURE_COLOR: "#ff0000"
+    SUCCESS_EMOJI: ":rocket:"
+    FAILURE_EMOJI: ":fire:"
+  before_script:
+    - |
+      # Setup base variables
+      export SLACK_USERNAME="${APP^^}🔹${MODULE}"
+      export STATUS="${NOTIFY_REASON}"
+      export COLOR="$([ "$STATUS" = "SUCCESS" ] && echo "$SUCCESS_COLOR" || echo "$FAILURE_COLOR")"
+      export EMOJI="$([ "$STATUS" = "SUCCESS" ] && echo "$SUCCESS_EMOJI" || echo "$FAILURE_EMOJI")"
+      export TIMESTAMP=$(TZ=GMT-7 date +'%Y-%m-%d %H:%M:%S' 2>/dev/null)
+
+      # Set icon based on application type
+      case "${APP}" in
+        "Kubernetes")
+          case "$MODULE" in
+            "argo-app") export SLACK_ICON_EMOJI=":argo-ico:" ;;
+            *)          export SLACK_ICON_EMOJI=":kubernetes-ico:" ;;
+          esac ;;
+        "Opensearch") export SLACK_ICON_EMOJI=":opensearch-ico:" ;;
+        "vault")      export SLACK_ICON_EMOJI=":vault-ico:" ;;
+        "Vault")      export SLACK_ICON_EMOJI=":vault-ico:" ;;
+        "Rancher")    export SLACK_ICON_EMOJI=":rancher-ico:" ;;
+        "aws")        export SLACK_ICON_EMOJI=":aws-ico:" ;;
+        *)            export SLACK_ICON_EMOJI=":gitlab-ico:" ;;
+      esac
+
+
+.notify_pipeline_success:
+  <<: *notify_base
+  stage: notify
+  script:
+    - |
+      MSG="${EMOJI} *[${ENV^^} - DEPLOYED]*
+      • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\` | by $GITLAB_USER_NAME
+      • *Pipeline:* <${CI_PIPELINE_URL}|#${CI_PIPELINE_ID}>
+      • *Commit:* <${CI_PROJECT_URL}/-/commit/${CI_COMMIT_SHA}|${CI_COMMIT_SHORT_SHA}> - ${CI_COMMIT_MESSAGE}"
+
+      curl -sS -X POST -H 'Content-type: application/json' \
+      --data "{
+        \"channel\": \"${SLACK_CHANNEL}\",
+        \"username\": \"${SLACK_USERNAME}\",
+        \"icon_emoji\": \"${SLACK_ICON_EMOJI}\",
+        \"attachments\": [{
+          \"color\": \"${COLOR}\",
+          \"text\": \"${MSG}\",
+          \"footer\": \"${TIMESTAMP}\"
+        }]
+      }" \
+      "${SLACK_WEBHOOK_URL}"
+  when: on_success
+
+.notify_pipeline_failure:
+  <<: *notify_base
+  stage: notify
+  script:
+    - |
+      echo "Fetching failed jobs from pipeline $CI_PIPELINE_ID..."
+      FAILED_JOBS=$(curl --silent --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}" \
+        "$GITLAB_API_URL/projects/$CI_PROJECT_ID/pipelines/$CI_PIPELINE_ID/jobs" \
+        | jq -r '.[] | select(.status == "failed" and .allow_failure != true) | "  [-] <\(.web_url)|\(.name)>"')
+
+      MSG="${EMOJI} *[${ENV^^} - FAILED]*
+      • *Environment:* \`${ENV:-$VAULT_ENV}\` | *Branch/Tag:* \`${CI_COMMIT_REF_NAME}\` | by ${GITLAB_USER_NAME}
+      • *Pipeline:* <${CI_PIPELINE_URL}|#${CI_PIPELINE_ID}>
+      • *Commit:* <${CI_PROJECT_URL}/-/commit/${CI_COMMIT_SHA}|${CI_COMMIT_SHORT_SHA}> - ${CI_COMMIT_MESSAGE}
+      • *Failed Job*:
+      ${FAILED_JOBS}"
+
+      # curl -sS -X POST -H 'Content-type: application/json' \
+      # --data "{
+      #   \"channel\": \"${SLACK_CHANNEL}\",
+      #   \"username\": \"${SLACK_USERNAME}\",
+      #   \"icon_emoji\": \"${SLACK_ICON_EMOJI}\",
+      #   \"attachments\": [{
+      #     \"color\": \"${COLOR}\",
+      #     \"text\": \"${MSG}\",
+      #     \"footer\": \"${TIMESTAMP}\"
+      #   }]
+      # }" \
+      # "${SLACK_WEBHOOK_URL}"
+  when: on_failure

@@ -1,0 +1,237 @@
+---
+.generate_dynamic_jobs:
+  stage: .pre
+  script:
+    - |
+      # version and timestamp
+      echo "# Generated at $(date)" > generated-jobs.yml
+      echo "# Version: 1.0" >> generated-jobs.yml
+      env | sort
+      cat > generated-jobs.yml <<'EOF'
+      include:
+        - project: 'iac/core-ci'
+          file: '/templates/base/common.yml'
+          ref: v2.0.0
+        - project: 'iac/core-ci'
+          file: '/templates/base/cache.yml'
+          ref: v2.0.0
+        - project: 'iac/core-ci'
+          file: '/templates/base/variables.yml'
+          ref: v2.0.0
+        - project: 'iac/core-ci'
+          file: '/templates/base/stages.yml'
+          ref: v2.0.0
+        - project: 'iac/core-ci'
+          file: '/templates/jobs/validate/lint.yml'
+          ref: v2.0.0
+        - project: 'iac/core-ci'
+          file: '/templates/jobs/validate/security.yml'
+          ref: v2.0.0
+        - project: 'iac/core-ci'
+          file: '/templates/jobs/plan/terraform.yml'
+          ref: v2.0.0
+        - project: 'iac/core-ci'
+          file: '/templates/jobs/deploy/terraform.yml'
+          ref: v2.0.0
+        - project: 'iac/core-ci'
+          file: '/templates/jobs/notify/notify.yml'
+          ref: v2.0.0
+        - project: 'iac/core-ci'
+          file: '/templates/jobs/cleanup/cleanup.yml'
+          ref: v2.0.0
+      default:
+        tags:
+          - "${RUNNER_TAG}"
+
+      no_changes:
+        stage: init
+        script:
+          - echo "No changes detected in any module"
+        rules:
+          - if: '$CI_PIPELINE_SOURCE == "push"'
+            when: never
+          - when: on_success
+      EOF
+
+      CHANGED_MODULES=0
+      if [ -f changed_vars.env ]; then
+        echo "Processing detected changes..."
+        while IFS='=' read -r var_name _; do
+          if [[ "$var_name" =~ ^([^_]+)_([^_]+)_([^_]+)_([^_]+)_CHANGED$ ]]; then
+            APP="${BASH_REMATCH[1]}"
+            MODULE="${BASH_REMATCH[2]}"
+            ORG="${BASH_REMATCH[3]}"
+            ENV="${BASH_REMATCH[4]}"
+            echo "Generating full ENV jobs for ${APP}_${MODULE}_${ORG}_${ENV}..."
+
+            cat >> generated-jobs.yml <<EOF
+
+      ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer:
+        stage: init
+        script:
+          - echo "Preparing environment variables..."
+          - >
+            {
+              echo "APP=${APP}";
+              echo "MODULE=${MODULE}";
+              echo "ORG=${ORG}";
+              echo "ENV=${ENV}";
+              echo "TF_HOME_PATH=${CI_PROJECT_DIR}";
+              echo "TF_CONF_PATH=${CI_PROJECT_DIR}/variable.d/${ORG}/${ENV}"
+            } > shared_vars.env
+          - echo "Environment variables exported:"
+          - cat shared_vars.env
+        artifacts:
+          paths:
+            - shared_vars.env
+          expire_in: 15 min
+          reports:
+            dotenv: shared_vars.env  # Optional: makes vars available via GitLab predefined variable expansion
+        allow_failure: false
+
+
+      ${APP}_${MODULE}_${ORG}_${ENV}_validate:
+        stage: validate
+        extends: [".terraform_lint",".predefined_id_tokens"]
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+
+      ${APP}_${MODULE}_${ORG}_${ENV}_scan:
+        stage: validate
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+        extends: [".terraform_security"]
+
+      ${APP}_${MODULE}_${ORG}_${ENV}_plan:
+        stage: plan
+        extends: [".terraform_plan",".predefined_id_tokens"]
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_scan
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_validate
+
+      ${APP}_${MODULE}_${ORG}_${ENV}_deploy:
+        stage: deploy
+        extends: [".terraform_apply",".predefined_id_tokens"]
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_plan
+        allow_failure: false
+        rules:
+          - if: \$AUTO_APPPROVE == "true"
+            when: on_success
+          - when: manual
+
+      ${APP}_${MODULE}_${ORG}_${ENV}_notify_automatic_job_failed:
+        stage: notify
+        extends: .notify_pipeline_failure
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_validate
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_plan
+          # - job: ${APP}_${MODULE}_${ORG}_${ENV}_scan
+        variables:
+          NOTIFY_REASON: "FAILED"
+
+      ${APP}_${MODULE}_${ORG}_${ENV}_notify_manual_job_failure:
+        stage: notify
+        extends: .notify_pipeline_failure
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_deploy
+        variables:
+          NOTIFY_REASON: "FAILED"
+
+      ${APP}_${MODULE}_${ORG}_${ENV}_notify_job_success:
+        extends: .notify_pipeline_success
+        needs:
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_deploy
+          - job: ${APP}_${MODULE}_${ORG}_${ENV}_env_initializer
+        variables:
+          NOTIFY_REASON: "SUCCESS"
+
+      EOF
+            CHANGED_MODULES=$((CHANGED_MODULES + 1))
+
+      elif [[ "$var_name" =~ ^([^_]+)_([^_]+)_CHANGED$ ]]; then
+        APP="${BASH_REMATCH[1]}"
+        MODULE="${BASH_REMATCH[2]}"
+        echo "Generating basic MODULE jobs for ${APP}_${MODULE}..."
+
+        cat >> generated-jobs.yml <<EOF
+
+      ${APP}_${MODULE}_env_initializer:
+        stage: init
+        script:
+          - echo "Preparing environment variables..."
+          - >
+            {
+              echo "APP=${APP}";
+              echo "MODULE=${MODULE}"
+            } > shared_vars.env
+          - echo "Environment variables exported:"
+          - cat shared_vars.env
+        variables:
+          APP: ${APP}
+          MODULE: ${MODULE}
+        artifacts:
+          paths:
+            - shared_vars.env
+          expire_in: 15 min
+          reports:
+            dotenv: shared_vars.env
+
+      ${APP}_${MODULE}_unit_test:
+        stage: validate
+        extends: [".unit_test"]
+        needs:
+          - job: ${APP}_${MODULE}_env_initializer
+
+      ${APP}_${MODULE}_scan:
+        stage: security
+        extends: [".terraform_security"]
+        needs:
+          - job: ${APP}_${MODULE}_env_initializer
+
+      ${APP}_${MODULE}_trivy:
+        stage: security
+        extends: [".trivy_security"]
+        needs:
+          - job: ${APP}_${MODULE}_env_initializer
+
+      EOF
+            CHANGED_MODULES=$((CHANGED_MODULES + 1))
+          fi
+        done < changed_vars.env
+      else
+        echo "No module changes detected."
+      fi
+
+      if [ $CHANGED_MODULES -gt 0 ]; then
+        sed -i '/no_changes:/,/when: on_success/d' generated-jobs.yml
+      fi
+      echo "Generated jobs.yml content:"
+      cat generated-jobs.yml
+  artifacts:
+    paths:
+      - generated-jobs.yml
+    expire_in: 1 hour
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: never
+    - when: always
+
+.trigger_dynamic:
+  stage: init
+  needs:
+    - job: generate_dynamic_jobs
+      artifacts: true
+  trigger:
+    include:
+      - artifact: generated-jobs.yml
+        job: generate_dynamic_jobs
+    strategy: depend
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: never
+    - when: always

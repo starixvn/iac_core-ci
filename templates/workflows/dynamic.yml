@@ -1,0 +1,52 @@
+---
+include:
+  - project: 'iac/core-ci'
+    file: '/templates/base/common.yml'
+    ref: v2.0.0
+  - project: 'iac/core-ci'
+    file: '/templates/base/cache.yml'
+    ref: v2.0.0
+  - project: 'iac/core-ci'
+    file: '/templates/base/variables.yml'
+    ref: v2.0.0
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/init/dynamic.yml'
+    ref: v2.0.0
+  - project: 'iac/core-ci'
+    file: '/templates/base/stages.yml'
+    ref: v2.0.0
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/validate/lint.yml'
+    ref: v2.0.0
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/validate/security.yml'
+    ref: v2.0.0
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/plan/terraform.yml'
+    ref: v2.0.0
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/deploy/terraform.yml'
+    ref: v2.0.0
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/notify/notify.yml'
+    ref: v2.0.0
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/cleanup/cleanup.yml'
+    ref: v2.0.0
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/init/detect-changes.yml'
+    ref: v2.0.0
+
+# Phát hiện thay đổi
+detect_changes:
+  extends: .detect_changes
+
+# Tạo jobs động
+generate_dynamic_jobs:
+  extends: .generate_dynamic_jobs
+  needs: ["detect_changes"]
+
+# Kích hoạt pipeline con
+trigger_dynamic:
+  extends: .trigger_dynamic
+  needs: ["generate_dynamic_jobs"]

@@ -1,0 +1,106 @@
+---
+# Định nghĩa các job base
+.base_job:
+  image:
+    name: ${DOCKER_REG_LOCAL_URL}/base/hashicorp/terraform:1.11.4-vault
+    entrypoint: ["/usr/bin/env"]
+  before_script:
+    - |
+      # Enable debug mode if DEBUG=1
+      if [ "${DEBUG}" = "1" ]; then
+        set -x  # Enable command tracing
+        export TF_LOG=DEBUG
+        export GITLAB_DEBUG=1
+      fi
+
+      # Print debug info
+      echo "Debug information:"
+      echo "- Working directory: $PWD"
+      echo "- Git reference: $CI_COMMIT_SHA"
+      echo "- Runner: $CI_RUNNER_DESCRIPTION"
+      if [ "${DEBUG}" = "1" ]; then
+        echo "- Available environment variables:"
+        env | sort
+      fi
+      
+
+      # Create debug artifacts directory
+      mkdir -p debug_artifacts
+    - |
+      echo "Debug: APP=${APP}, MODULE=${MODULE}, ORG=${ORG}, ENV=${ENV}"
+      echo "Current path: $(pwd) | CI_PROJECT_DIR ${CI_PROJECT_DIR}"
+    - |
+      if [[ "${APP}" == "vault" || "${APP}" == "Vault" ]]; then
+        export VAULT_ENV=${ENV}
+        export VAULT_ADDR="https://vault.unknown"
+        export S3_BACKEND_PROFILE="local"
+        if [[ "${ORG}" == "starix" ]]; then
+          case "${ENV}" in
+            dev)      export VAULT_ADDR="https://vault-dev.nexdev.net" ;;
+            local)    export VAULT_ADDR="https://vault.nexdev.net" ;;
+            sit)      export VAULT_ADDR="https://vault.playonesit.com" ;;
+            uat)      export VAULT_ADDR="https://vault.starixuat.com" ;;
+            prod)     export VAULT_ADDR="https://vault.starixplay.com" ;;
+            klprod)   export VAULT_ADDR="https://vn-st-klp-vault.byb6181.com" ;;
+            klsimple) export VAULT_ADDR="https://vn-vault-s.byb6181.com" ;;
+            kldr)     export VAULT_ADDR="https://vn-st-vault.byb6181.com" ;;
+          esac
+        elif [[ "${ORG}" == "lumi" ]]; then
+          case "${ENV}" in
+            local)  export VAULT_ADDR="https://vault.lumigame.com" ;;
+          esac
+        fi
+      elif [[ "${APP}" == "aws" ]]; then
+        export VAULT_ENV="local"
+        export VAULT_ADDR="https://vault.nexdev.net"
+        export S3_BACKEND_PROFILE=${ENV}
+      else
+        export VAULT_ENV="local"
+        export VAULT_ADDR="https://vault.nexdev.net"
+        export S3_BACKEND_PROFILE="local"
+      fi
+
+    # - |
+    #   export TF_HOME_PATH="${CI_PROJECT_DIR}"
+    #   export TF_CONF_PATH="${TF_HOME_PATH}/variable.d/${ORG}/${ENV}"
+    - echo "[- DEBUG -] VAULT_ENV=${VAULT_ENV}, VAULT_ADDR=${VAULT_ADDR}"
+    - echo "${CI_SERVER_HOST} | ${CI_JOB_TOKEN} | ${TF_CLI_CONFIG_FILE}"
+    - echo -e "credentials \"${CI_SERVER_HOST}\" {\n  token = \"${CI_JOB_TOKEN}\"\n}" > ${TF_CLI_CONFIG_FILE}
+    - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - git config --global user.email "ansible@nexdev.net"
+    - git config --global user.name "ansible"
+    - git config --global url."https://ansible:${CI_JOB_TOKEN}@${CI_SERVER_HOST}".insteadOf "https://${CI_SERVER_HOST}"
+    - ssh-keyscan -t rsa gitlab.nexdev.net >> ~/.ssh/known_hosts ;
+# image: ${DOCKER_REG_LOCAL_URL}/base/alpine:git-3.21
+.predefined_id_tokens:
+  id_tokens:
+    VAULT_ID_TOKEN:
+      aud: 'https://gitlab.nexdev.net'
+
+.base_terraform:
+  extends: .base_job
+  # variables:
+  #   TF_ROOT: ${APP}/${MODULE}
+
+.image:
+  image:
+    name: ${DOCKER_REG_LOCAL_URL}/base/hashicorp/terraform:1.11.4-vault
+    entrypoint: ["/usr/bin/env"]
+  after_script:
+    - |
+      # Collect debug artifacts if enabled
+      if [ "${DEBUG:-0}" = "1" ]; then
+        # Save logs
+        cp .terraform/logs/*.log debug_artifacts/ 2>/dev/null || true
+        # Save terraform plan
+        cp tfplan.out debug_artifacts/ 2>/dev/null || true
+        # Save environment info
+        env > debug_artifacts/environment.txt
+      fi
+  artifacts:
+    when: on_failure
+    paths:
+      - debug_artifacts/
+    expire_in: 1 week

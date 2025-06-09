@@ -1,0 +1,31 @@
+---
+.terraform_plan:
+  extends:
+    - .base_terraform
+    - .terraform_cache
+  stage: plan
+  script:
+    - echo "App ${MODULE}_MAIN / ${MODULE} | Env ${ENV} | ${TF_CLI_CONFIG_FILE}"
+    - |
+      echo "** Getting credentials - Project_ID ${CI_PROJECT_ID}"
+      vault --version
+      export VAULT_TOKEN="$(vault write -field=token auth/jwt/login role="${TF_VAR_vault_role}" jwt=${VAULT_ID_TOKEN})"
+      vault token lookup
+    - export AWS_PROFILE=${S3_BACKEND_PROFILE}
+    - aws configure list
+    - |
+      cd ${TF_HOME_PATH}
+      terraform init -backend-config="${TF_CONF_PATH}/backend.conf"
+      (terraform workspace select ${ENV} || terraform workspace new ${ENV})
+    - echo "Preparing Terraform configuration for ${APP} - ${MODULE} in ${ENV}"
+    - alias convert_report="jq -r '([.resource_changes[]?.change.actions?]|flatten)|{\"create\":(map(select(.==\"create\"))|length),\"update\":(map(select(.==\"update\"))|length),\"delete\":(map(select(.==\"delete\"))|length)}'"
+    - terraform plan -var-file="${TF_CONF_PATH}/variables.tfvars" -out=${PLAN}
+    - terraform show -json $PLAN | convert_report > ${JSON_PLAN_FILE}
+  artifacts:
+    name: $APP-$MODULE-$ENV
+    reports:
+      terraform: ${TF_HOME_PATH}/${JSON_PLAN_FILE}
+    paths:
+      - ${TF_HOME_PATH}/${JSON_PLAN_FILE}
+      - ${TF_HOME_PATH}/${PLAN}
+    expire_in: 1 week

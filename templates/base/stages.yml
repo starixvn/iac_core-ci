@@ -1,0 +1,10 @@
+---
+stages:
+  - .pre
+  - init
+  - validate
+  - security
+  - plan
+  - deploy
+  - notify
+  - cleanup

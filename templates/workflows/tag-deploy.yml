@@ -1,0 +1,77 @@
+---
+include:
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/init/extract-vars.yml'
+    ref: v2.0.0
+  - project: 'iac/core-ci'
+    file: '/templates/jobs/cleanup/cleanup.yml'
+    ref: v2.0.0
+default:
+  tags:
+    - "${RUNNER_TAG}"
+
+extract_tag_vars:
+  extends: .extract_vars
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
+      when: always
+    - when: never
+plan:
+  extends:
+    - .predefined_id_tokens
+    - .terraform_plan
+  needs: ["extract_tag_vars"]
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
+      when: always
+
+deploy:
+  extends:
+    - .predefined_id_tokens
+    - .terraform_apply
+  needs: ["extract_tag_vars", "plan"]
+  allow_failure: false
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
+      when: manual
+    - when: never
+
+notify_automatic_job_failure:
+  extends: .notify_pipeline_failure
+  needs: ["extract_tag_vars", "plan"]
+  variables:
+    NOTIFY_REASON: "FAILED"
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
+      when: on_failure
+    - when: never
+
+notify_manual_job_failure:
+  extends: .notify_pipeline_failure
+  needs: ["extract_tag_vars", "deploy"]
+  variables:
+    NOTIFY_REASON: "FAILED"
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
+      when: on_failure
+    - when: never
+
+notify_success:
+  extends: .notify_pipeline_success
+  needs:
+    - job: deploy
+    - job: extract_tag_vars
+  variables:
+    NOTIFY_REASON: "SUCCESS"
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
+      when: on_success
+    - when: never
+
+cleanup:
+  stage: .post
+  extends: .cleanup_tag
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^deploy_.+_.+$/'
+      when: always
+    - when: never

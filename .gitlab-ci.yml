@@ -1,0 +1,73 @@
+---
+include:
+  - project: 'iac/core-ci'
+    file: '/templates/base/common.yml'
+    ref: dev
+  - project: 'iac/core-ci'
+    file: '/templates/base/variables.yml'
+    ref: dev
+  - project: 'iac/core-ci'
+    file: '/templates/base/stages.yml'
+    ref: dev
+
+# Kiểm tra cú pháp file YAML
+lint_ci_files:
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
+  stage: validate
+  script:
+    - |
+      CHANGED_FILES=""
+      if [ -n "$CI_MERGE_REQUEST_CHANGED_PATHS" ]; then
+        CHANGED_FILES="$CI_MERGE_REQUEST_CHANGED_PATHS"
+      else
+        CHANGED_FILES=$(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA)
+      fi
+      for file in $CHANGED_FILES; do
+        if [[ "$file" =~ \.yml$ ]] || [[ "$file" =~ \.yaml$ ]]; then
+          echo "Checking syntax for $file"
+          if ! yamllint -c .yamllint "$file"; then
+            echo "❌ Syntax check failed for $file"
+            exit 1
+          fi
+          echo "✅ Syntax check passed for $file"
+        fi
+      done
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "**/*.yml"
+        - "**/*.yaml"
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - "**/*.yml"
+        - "**/*.yaml"
+
+# Kiểm tra đường dẫn include
+validate_templates:
+  image: $DOCKER_REG_LOCAL_URL/base/alpine:git-3.21
+  stage: validate
+  script:
+    - |
+      for template in $(find . -name "*.yml" -o -name "*.yaml"); do
+        echo "Validating includes in $template"
+        while IFS= read -r include_path; do
+          if [[ "$include_path" =~ ^local: ]]; then
+            path=${include_path#*:}
+            path=${path//\'/}
+            path=${path//\"/}
+            if [ ! -f "${path#/}" ]; then
+              echo "❌ Include path not found: $path in $template"
+              exit 1
+            fi
+          fi
+        done < <(grep -E "^\s*-\s*local:" "$template" 2>/dev/null)
+      done
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - "**/*.yml"
+        - "**/*.yaml"
+    - if: '$CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - "**/*.yml"
+        - "**/*.yaml"
