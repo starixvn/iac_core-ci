@@ -47,6 +47,8 @@
         echo "VAULT_ENV=$VAULT_ENV" >> tag_vars.env
         echo "VAULT_ADDR=$VAULT_ADDR" >> tag_vars.env
         echo "S3_BACKEND_PROFILE=$S3_BACKEND_PROFILE" >> tag_vars.env
+        echo "TF_HOME_PATH=${CI_PROJECT_DIR}" >> tag_vars.env
+        echo "TF_CONF_PATH=${TF_HOME_PATH}/variable.d/${ORG}/${ENV}" >> tag_vars.env
         echo "Extracted APP=$APP, MODULE=$MODULE, ORG=$ORG, ENV=$ENV | $VAULT_ENV , $VAULT_ADDR"
       else
         echo "FAIL with tag $CI_COMMIT_TAG"

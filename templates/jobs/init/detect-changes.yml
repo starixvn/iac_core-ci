@@ -24,17 +24,17 @@
       # Xử lý các file thay đổi
       declare -A UNIQUE_PATHS
       for file in "${CHANGED_FILES[@]}"; do
-        if [[ "$file" =~ ^([^/]+)/([^/]+)/variable\.d/([^/]+)/([^/]+)/ ]]; then
-          APP="${BASH_REMATCH[1]}"
-          MODULE="${BASH_REMATCH[2]}"
-          ORG="${BASH_REMATCH[3]}"
-          ENV="${BASH_REMATCH[4]}"
+        if [[ "$file" =~ ^variable\.d/([^/]+)/([^/]+)/ ]]; then
+          APP="${CI_PROJECT_NAMESPACE##*/}"
+          MODULE="${CI_PROJECT_NAME}"
+          ORG="${BASH_REMATCH[1]}"
+          ENV="${BASH_REMATCH[2]}"
           KEY="${APP}_${MODULE}_${ORG}_${ENV}"
           UNIQUE_PATHS["$KEY"]=1
-        elif [[ "$file" =~ ^([^/]+)/([^/]+)/(.*)$ ]]; then
-          APP="${BASH_REMATCH[1]}"
-          MODULE="${BASH_REMATCH[2]}"
-          SUBPATH="${BASH_REMATCH[3]}"
+        elif [[ "$file" =~ ^(.*)$ ]]; then
+          APP="${CI_PROJECT_NAMESPACE##*/}"
+          MODULE="${CI_PROJECT_NAME}"
+          SUBPATH="${BASH_REMATCH[1]}"
           if [[ ! "$SUBPATH" =~ ^variable\.d/ ]]; then
             KEY="${APP}_${MODULE}"
             UNIQUE_PATHS["$KEY"]=1
