@@ -77,16 +77,10 @@
               echo "ORG=${ORG}";
               echo "ENV=${ENV}";
               echo "TF_HOME_PATH=${CI_PROJECT_DIR}";
-              echo "TF_CONF_PATH=${TF_HOME_PATH}/variable.d/${ORG}/${ENV}"
+              echo "TF_CONF_PATH=${CI_PROJECT_DIR}/variable.d/${ORG}/${ENV}"
             } > shared_vars.env
           - echo "Environment variables exported:"
           - cat shared_vars.env
-        variables:
-          APP: ${APP}
-          MODULE: ${MODULE}
-          ORG: ${ORG}
-          ENV: ${ENV}
-          CI_PROJECT_DIR: ${CI_PROJECT_DIR}
         artifacts:
           paths:
             - shared_vars.env
