@@ -26,6 +26,6 @@
     reports:
       terraform: ${CI_PROJECT_DIR}/${APP}/${MODULE}/${JSON_PLAN_FILE}
     paths:
-      - $CI_PROJECT_DIR/${APP}/${MODULE}/${JSON_PLAN_FILE}
-      - $CI_PROJECT_DIR/${APP}/${MODULE}/${PLAN}
+      - ${TF_HOME_PATH}/${JSON_PLAN_FILE}
+      - ${TF_HOME_PATH}/${PLAN}
     expire_in: 1 week
