@@ -81,8 +81,6 @@
 
 .base_terraform:
   extends: .base_job
-  # variables:
-  #   TF_ROOT: ${APP}/${MODULE}
 
 .image:
   image:

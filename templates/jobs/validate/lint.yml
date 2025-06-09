@@ -5,7 +5,7 @@
   script:
     - terraform --version
     - terraform fmt -check
-    # - terraform validate
+    - terraform validate
 
 .unit_test:
   stage: security
