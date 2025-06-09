@@ -73,16 +73,16 @@
       • *Failed Job*:
       ${FAILED_JOBS}"
 
-      curl -sS -X POST -H 'Content-type: application/json' \
-      --data "{
-        \"channel\": \"${SLACK_CHANNEL}\",
-        \"username\": \"${SLACK_USERNAME}\",
-        \"icon_emoji\": \"${SLACK_ICON_EMOJI}\",
-        \"attachments\": [{
-          \"color\": \"${COLOR}\",
-          \"text\": \"${MSG}\",
-          \"footer\": \"${TIMESTAMP}\"
-        }]
-      }" \
-      "${SLACK_WEBHOOK_URL}"
+      # curl -sS -X POST -H 'Content-type: application/json' \
+      # --data "{
+      #   \"channel\": \"${SLACK_CHANNEL}\",
+      #   \"username\": \"${SLACK_USERNAME}\",
+      #   \"icon_emoji\": \"${SLACK_ICON_EMOJI}\",
+      #   \"attachments\": [{
+      #     \"color\": \"${COLOR}\",
+      #     \"text\": \"${MSG}\",
+      #     \"footer\": \"${TIMESTAMP}\"
+      #   }]
+      # }" \
+      # "${SLACK_WEBHOOK_URL}"
   when: on_failure
