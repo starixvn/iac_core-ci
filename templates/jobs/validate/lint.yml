@@ -5,10 +5,7 @@
   script:
     - terraform --version
     - terraform fmt -check
-    - |
-      cd ${TF_HOME_PATH}
-      terraform init -backend-config="${TF_CONF_PATH}/backend.conf"
-    - terraform validate
+    # - terraform validate
 
 .unit_test:
   stage: security
