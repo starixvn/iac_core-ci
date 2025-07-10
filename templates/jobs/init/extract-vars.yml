@@ -20,6 +20,7 @@
               local)    VAULT_ADDR="https://vault.nexdev.net" ;;
               sit)      VAULT_ADDR="https://vault.playonesit.com" ;;
               uat)      VAULT_ADDR="https://vault.starixuat.com" ;;
+              kluat)    VAULT_ADDR="https://vault-st-klu.starixuat.com" ;;
               prod)     VAULT_ADDR="https://vault.starixplay.com" ;;
               klprod)   VAULT_ADDR="https://vn-st-klp-vault.byb6181.com" ;;
               klsimple) VAULT_ADDR="https://vn-vault-s.byb6181.com" ;;
