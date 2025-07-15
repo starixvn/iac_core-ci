@@ -22,8 +22,8 @@
               uat)      VAULT_ADDR="https://vault.starixuat.com" ;;
               kluat)    VAULT_ADDR="https://vault-st-klu.starixuat.com" ;;
               prod)     VAULT_ADDR="https://vault.starixplay.com" ;;
-              klprod)   VAULT_ADDR="https://vn-st-klp-vault.byb6181.com" ;;
-              klsimple) VAULT_ADDR="https://vn-vault-s.byb6181.com" ;;
+              klprod)   VAULT_ADDR="https://vault-st-klp.starixplay.com" ;;
+              klsimple) VAULT_ADDR="https://vault-s.starixplay.com" ;;
               kldr)     VAULT_ADDR="https://vn-st-vault.byb6181.com" ;;
             esac
           elif [[ "$ORG" == "lumi" ]]; then
