@@ -77,6 +77,7 @@
               echo "ENV=${ENV}";
               echo "TF_HOME_PATH=${CI_PROJECT_DIR}";
               echo "TF_CONF_PATH=${CI_PROJECT_DIR}/variable.d/${ORG}/${ENV}"
+              echo "VAULT_JWT_BACKEND=${VAULT_JWT_BACKEND}"
             } > shared_vars.env
           - echo "Environment variables exported:"
           - cat shared_vars.env

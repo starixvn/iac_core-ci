@@ -20,3 +20,5 @@ variables:
   #DEFAULT_BRANCH: "main"
   SLACK_WEBHOOK_URL: ${CI_SLACK_WEBHOOK_URL}
   SLACK_CHANNEL: "deploy-command-center"
+
+  VAULT_JWT_BACKEND: "jwt"

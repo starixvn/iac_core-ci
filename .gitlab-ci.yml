@@ -2,13 +2,13 @@
 include:
   - project: 'iac/core-ci'
     file: '/templates/base/common.yml'
-    ref: dev
+    ref: v2.0.0
   - project: 'iac/core-ci'
     file: '/templates/base/variables.yml'
-    ref: dev
+    ref: v2.0.0
   - project: 'iac/core-ci'
     file: '/templates/base/stages.yml'
-    ref: dev
+    ref: v2.0.0
 
 # Kiểm tra cú pháp file YAML
 lint_ci_files:
