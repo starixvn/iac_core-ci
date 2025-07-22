@@ -74,7 +74,8 @@
               echo "APP=${APP}";
               echo "MODULE=${MODULE}";
               echo "ORG=${ORG}";
-              echo "ENV=${ENV}"
+              echo "ENV=${ENV}";
+              echo "VAULT_JWT_BACKEND=${VAULT_JWT_BACKEND}"
             } > shared_vars.env
           - echo "Environment variables exported:"
           - cat shared_vars.env
