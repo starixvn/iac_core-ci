@@ -44,7 +44,7 @@
             prod)     export VAULT_ADDR="https://vault.starixplay.com" ;;
             klprod)   export VAULT_ADDR="https://vault-st-klp.starixplay.com" ;;
             klsimple) export VAULT_ADDR="https://vault-s.starixplay.com" ;;
-            kldr)     export VAULT_ADDR="https://vn-st-vault.byb6181.com" ;;
+            dr)       export VAULT_ADDR="https://vault-st.dr.starixplay.com" ;;
           esac
         elif [[ "${ORG}" == "lumi" ]]; then
           case "${ENV}" in

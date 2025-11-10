@@ -24,7 +24,7 @@
               prod)     VAULT_ADDR="https://vault.starixplay.com" ;;
               klprod)   VAULT_ADDR="https://vault-st-klp.starixplay.com" ;;
               klsimple) VAULT_ADDR="https://vault-s.starixplay.com" ;;
-              kldr)     VAULT_ADDR="https://vn-st-vault.byb6181.com" ;;
+              dr)       VAULT_ADDR="https://vault-st.dr.starixplay.com" ;;
             esac
           elif [[ "$ORG" == "lumi" ]]; then
             case "$ENV" in
